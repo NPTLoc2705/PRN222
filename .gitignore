@@ -1,0 +1,29 @@
+# Ignore Visual Studio user-specific files
+.vs/
+*.user
+*.suo
+
+# Ignore build outputs
+bin/
+obj/
+*.exe
+*.dll
+
+# Ignore cache and build metadata
+*.cache
+*.props
+*.targets
+*.assets.json
+
+# Ignore your specific server build folders
+PRN222.Server/bin/
+PRN222.Server/obj/
+PRN222.Server/.cache/
+
+# Ignore Rider/JetBrains IDE files (if applicable)
+.idea/
+*.iml
+
+# Ignore system files
+Thumbs.db
+Desktop.ini
