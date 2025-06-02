@@ -1,0 +1,146 @@
+﻿@model IEnumerable<mvc.dataaccess.Entities.Blog>
+
+@{
+    ViewData["Title"] = "Drug Articles";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #1a3c5e;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .article-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .article-card {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+            .article-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            }
+
+        .article-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .no-image {
+            width: 100%;
+            height: 200px;
+            background: #e0e0e0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            font-style: italic;
+        }
+
+        .article-content {
+            padding: 15px;
+        }
+
+        .article-title {
+            font-size: 1.5em;
+            margin: 0 0 10px;
+            color: #1a3c5e;
+            line-height: 1.3;
+        }
+
+        .article-excerpt {
+            font-size: 1em;
+            color: #555;
+            line-height: 1.6;
+            margin: 0;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .article-link {
+            display: inline-block;
+            margin-top: 10px;
+            color: #007bff;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+            .article-link:hover {
+                text-decoration: underline;
+            }
+        @@media (max-width: 600px) {
+            .article-grid
+
+        {
+            grid-template-columns: 1fr;
+        }
+
+        h1 {
+            font-size: 2em;
+        }
+
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>News Articles</h1>
+        <div class="article-grid">
+            @foreach (var item in Model)
+            {
+                <div class="article-card">
+                    @if (item.ImageData != null)
+                    {
+                        <img src="data:image/jpeg;base64,@Convert.ToBase64String(item.ImageData)" alt="@item.title" class="article-image" />
+                    }
+                    else
+                    {
+                        <div class="no-image">No Image Available</div>
+                    }
+                    <div class="article-content">
+                        <h2 class="article-title">@Html.DisplayFor(modelItem => item.title)</h2>
+                        <p class="article-excerpt">@Html.DisplayFor(modelItem => item.blog_content)</p>
+                        <a asp-action="Details" asp-route-id="@item.Id" class="article-link">Read More</a>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</body>
+</html>
