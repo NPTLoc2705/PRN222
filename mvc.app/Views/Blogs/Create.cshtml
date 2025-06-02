@@ -1,0 +1,67 @@
+﻿@model mvc.dataaccess.Entities.Blog
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h1>Create</h1>
+
+<h4>Blog</h4>
+
+<hr />
+
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="form-group">
+                <label asp-for="title" class="control-label"></label>
+                <input asp-for="title" class="form-control" />
+                <span asp-validation-for="title" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="blog_content" class="control-label"></label>
+                <textarea asp-for="blog_content" class="form-control"></textarea>
+                <span asp-validation-for="blog_content" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="ImageData" class="control-label"></label>
+                <input type="file" id="imageInput" accept="image/*" class="form-control" />
+                <input type="hidden" asp-for="ImageData" id="imageData" />
+                <span asp-validation-for="ImageData" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        document.getElementById('imageInput').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    // Get the Base64 string, removing the data URL prefix (e.g., "data:image/jpeg;base64,")
+                    const base64String = e.target.result.split(',')[1];
+                    document.getElementById('imageData').value = base64String;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    </script>
+}
