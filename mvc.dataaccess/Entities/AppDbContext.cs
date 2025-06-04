@@ -24,6 +24,7 @@ namespace mvc.dataaccess.Entities
         {
             modelBuilder.Entity<User>().ToTable("Users");
             modelBuilder.Entity<Post>().ToTable("Posts");
+            modelBuilder.Entity<Blog>().ToTable("Blogs");
             // Additional configurations can be added here
             base.OnModelCreating(modelBuilder);
         }

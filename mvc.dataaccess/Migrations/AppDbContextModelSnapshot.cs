@@ -44,7 +44,7 @@ namespace mvc.dataaccess.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Blogs");
+                    b.ToTable("Blogs", (string)null);
                 });
 
             modelBuilder.Entity("mvc.dataaccess.Entities.Post", b =>
