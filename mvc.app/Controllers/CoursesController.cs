@@ -15,11 +15,13 @@ namespace mvc.app.Controllers
     {
         private readonly ICourseService _courseService;
         private readonly ILogger<CoursesController> _logger;
+        private readonly IModuleService _moduleService;
 
-        public CoursesController(ICourseService courseService, ILogger<CoursesController> logger)
+        public CoursesController(ICourseService courseService, ILogger<CoursesController> logger, IModuleService moduleService)
         {
             _courseService = courseService;
             _logger = logger;
+            _moduleService = moduleService;
         }
 
         // GET: Courses
@@ -52,6 +54,19 @@ namespace mvc.app.Controllers
                 {
                     return NotFound();
                 }
+
+                // Explicitly cast id.Value to Guid (non-nullable)
+                var modules = await _moduleService.GetModulesByCourseIdAsync(id.Value);
+
+                // Map ModuleDTOs to Module entities if needed (see note below)
+                course.Modules = modules.Select(m => new Module
+                {
+                    ModuleId = m.ModuleId,
+                    Title = m.Title,
+                    Description = m.Description,
+                    OrderNumber = m.OrderNumber,
+                    CourseId = m.CourseId
+                }).ToList();
 
                 return View(course);
             }

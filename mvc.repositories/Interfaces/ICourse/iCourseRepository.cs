@@ -19,6 +19,7 @@ namespace mvc.repositories.Interfaces.ICourse
         Task<string> GetCourseImageContentTypeAsync(Guid courseId);
         Task<bool> CourseExistsAsync(Guid courseId);
 
+
         // New DTO-based methods
         Task<CoursesDTO> GetCourseDTOByIdAsync(Guid courseId);
         Task<CoursesDTO> CreateCourseFromDTOAsync(CoursesDTO courseDTO, IFormFile imageFile = null);
