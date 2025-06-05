@@ -61,5 +61,38 @@ namespace mvc.services.Implements
             // Authentication failed
             return null;
         }
+
+        public User GetUserByEmail(string email)
+        {
+            if (string.IsNullOrEmpty(email))
+                throw new ArgumentException("Email cannot be null or empty", nameof(email));
+
+            var user = _userRepository.GetUserByEmail(email);
+            return user;
+        }
+
+        public User CreateUser(User user)
+        {
+            return CreateUserInternal(user);
+        }
+
+        public User RegisterUser(User user) 
+        {
+            // RegisterUser no longer needs to set defaults as they're already 
+            // handled in the User class definition
+            return CreateUserInternal(user);
+        }
+
+        private User CreateUserInternal(User user)
+        {
+            if (user == null)
+                throw new ArgumentNullException(nameof(user), "User cannot be null");
+
+            var existingUser = _userRepository.GetUserByEmail(user.Email);
+            if (existingUser != null)
+                throw new Exception("User with this email already exists.");
+
+            return _userRepository.CreateUser(user);
+        }
     }
 }

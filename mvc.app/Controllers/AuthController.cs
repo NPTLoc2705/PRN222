@@ -14,9 +14,15 @@ namespace mvc.app.Controllers
         {
             _authService = authService;
         }
-
+        
         [HttpGet]
         public IActionResult Login()
+        {
+            return View();
+        }
+
+        [HttpGet]
+        public IActionResult Register()
         {
             return View();
         }
@@ -24,9 +30,18 @@ namespace mvc.app.Controllers
         [HttpPost]
         public IActionResult Login(LoginViewModel model)
         {
+            if (!ModelState.IsValid)
+                return View(model);
+            
             if (ModelState.IsValid)
             {
                 var user = _authService.AuthenticateUser(model.Email, model.Password);
+                
+                if (user == null)
+                {
+                    ModelState.AddModelError("", "Invalid email or password.");
+                    return View(model);
+                }
 
                 if (user != null)
                 {
@@ -50,6 +65,41 @@ namespace mvc.app.Controllers
         {
             HttpContext.Session.Clear(); // Clear session data
             return RedirectToAction("Login");
+        }
+        
+        [HttpPost]
+        public IActionResult Register(RegisterViewModel model)
+        {
+            if (!ModelState.IsValid)
+                return View(model);
+            
+            if (ModelState.IsValid)
+            {
+                var existingUser = _authService.GetUserByEmail(model.Email);
+
+                if (existingUser != null)
+                {
+                    ModelState.AddModelError("Email", "An account with this email already exists.");
+                    return View(model);
+                }
+                
+                var user = new User
+                {
+                    FullName = model.FullName,
+                    Email = model.Email,
+                    PhoneNumber = model.PhoneNumber,
+                    Address = model.Address,
+                    Password = model.Password
+                };
+                
+                user = _authService.RegisterUser(user);
+                
+                Console.WriteLine("User registered successfully: " + user.Id);
+                
+                return RedirectToAction("", ""); // Redirect to home page
+            }
+
+            return View(model);
         }
     }
 
