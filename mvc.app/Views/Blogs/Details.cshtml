@@ -1,36 +1,264 @@
 ﻿@model mvc.dataaccess.Entities.Blog
-
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = Model?.title ?? "Blog Post";
 }
 
-<h1>Details</h1>
+@section Styles {
+    <style>
+        /* Container */
+        .blog-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+        }
 
-<div>
-    <h4>Blog</h4>
-    <hr />
-    <dl class="row">
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.title)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.title)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.blog_content)
-        </dt>
-        <dd class="col-sm-10">
+        /* Header */
+        .blog-header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid #e5e5e5;
+        }
+
+        .blog-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 1rem;
+            line-height: 1.2;
+        }
+
+        .blog-date {
+            color: #666;
+            font-size: 1rem;
+        }
+
+        /* Featured Image */
+        .featured-image {
+            width: 100%;
+            max-height: 400px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 3rem;
+        }
+
+        /* Content */
+        .blog-content {
+            font-size: 1.125rem;
+            line-height: 1.8;
+            color: #333;
+        }
+
+            .blog-content p {
+                margin-bottom: 1.5rem;
+            }
+
+            .blog-content h1,
+            .blog-content h2,
+            .blog-content h3,
+            .blog-content h4,
+            .blog-content h5,
+            .blog-content h6 {
+                margin-top: 2rem;
+                margin-bottom: 1rem;
+                font-weight: 600;
+                color: #1a1a1a;
+            }
+
+            .blog-content h2 {
+                font-size: 1.75rem;
+            }
+
+            .blog-content h3 {
+                font-size: 1.5rem;
+            }
+
+            .blog-content ul,
+            .blog-content ol {
+                margin-bottom: 1.5rem;
+                padding-left: 2rem;
+            }
+
+            .blog-content li {
+                margin-bottom: 0.5rem;
+            }
+
+            .blog-content blockquote {
+                border-left: 4px solid #007bff;
+                padding-left: 1.5rem;
+                margin: 2rem 0;
+                font-style: italic;
+                color: #666;
+            }
+
+            /* Images in content */
+            .blog-content img {
+                max-width: 100% !important;
+                height: auto !important;
+                display: block;
+                margin: 2rem auto;
+                border-radius: 4px;
+            }
+
+            /* Tables */
+            .blog-content table {
+                width: 100%;
+                border-collapse: collapse;
+                margin: 2rem 0;
+            }
+
+            .blog-content th,
+            .blog-content td {
+                padding: 0.75rem;
+                text-align: left;
+                border-bottom: 1px solid #e5e5e5;
+            }
+
+            .blog-content th {
+                font-weight: 600;
+                border-bottom: 2px solid #333;
+            }
+
+        /* Actions */
+        .blog-actions {
+            margin-top: 4rem;
+            padding-top: 2rem;
+            border-top: 1px solid #e5e5e5;
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+
+            .blog-actions .btn {
+                padding: 0.75rem 1.5rem;
+                font-size: 1rem;
+            }
+
+        /* Empty state */
+        .empty-content {
+            text-align: center;
+            padding: 4rem 0;
+            color: #999;
+        }
+
+        /* Responsive */
+        @@media (max-width: 768px) {
+            .blog-container {
+                padding: 1rem;
+            }
+
+            .blog-title {
+                font-size: 1.875rem;
+            }
+
+            .blog-content {
+                font-size: 1rem;
+            }
+
+                .blog-content h2 {
+                    font-size: 1.5rem;
+                }
+
+                .blog-content h3 {
+                    font-size: 1.25rem;
+                }
+
+            .featured-image {
+                border-radius: 0;
+                margin-left: -1rem;
+                margin-right: -1rem;
+                width: calc(100% + 2rem);
+            }
+
+            .blog-actions {
+                flex-direction: column;
+            }
+
+                .blog-actions .btn {
+                    width: 100%;
+                }
+        }
+
+        /* Print friendly */
+        @@media print {
+            .blog-actions {
+                display: none;
+            }
+
+            .blog-container {
+                max-width: 100%;
+            }
+
+            .blog-content {
+                font-size: 12pt;
+            }
+        }
+    </style>
+}
+
+<div class="blog-container">
+    <!-- Header -->
+    <header class="blog-header">
+        <h1 class="blog-title">@(Model?.title ?? "Untitled")</h1>
+        <time class="blog-date" datetime="@DateTime.Now.ToString("yyyy-MM-dd")">
+            @DateTime.Now.ToString("MMMM dd, yyyy")
+        </time>
+    </header>
+
+    <!-- Featured Image -->
+    @if (Model?.ImageData != null && Model.ImageData.Length > 0)
+    {
+        <img src="data:image/jpeg;base64,@Convert.ToBase64String(Model.ImageData)"
+             alt="@Model.title"
+             class="featured-image" />
+    }
+
+    <!-- Content -->
+    <article class="blog-content">
+        @if (!string.IsNullOrEmpty(Model?.blog_content))
+        {
             @Html.Raw(Model.blog_content)
-        </dd>
-        @* <dt class="col-sm-2"> *@
-        @*     @Html.DisplayNameFor(model => model.ImageData) *@
-        @* </dt> *@
-        @* <dd class="col-sm-10"> *@
-        @*     <img src="data:image/jpeg;base64,@Convert.ToBase64String(Model.ImageData)" alt="Blog Image" style="max-width: 100%; height: auto;" /> *@
-        @* </dd> *@
-    </dl>
+        }
+        else
+        {
+            <div class="empty-content">
+                <p>No content available.</p>
+            </div>
+        }
+    </article>
+
+    <!-- Actions -->
+    <div class="blog-actions">
+        <a asp-action="Edit" asp-route-id="@Model?.Id" class="btn btn-primary">
+            <i class="bi bi-pencil me-2"></i>Edit
+        </a>
+        <a asp-action="Index" class="btn btn-secondary">
+            <i class="bi bi-arrow-left me-2"></i>Back to Articles
+        </a>
+    </div>
 </div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
-</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Make images clickable for full view
+            const images = document.querySelectorAll('.blog-content img');
+            images.forEach(img => {
+                img.style.cursor = 'pointer';
+                img.title = 'Click to view full size';
+                img.addEventListener('click', function() {
+                    window.open(this.src, '_blank');
+                });
+            });
+
+            // Add table wrapper for responsive
+            const tables = document.querySelectorAll('.blog-content table');
+            tables.forEach(table => {
+                const wrapper = document.createElement('div');
+                wrapper.style.overflowX = 'auto';
+                table.parentNode.insertBefore(wrapper, table);
+                wrapper.appendChild(table);
+            });
+        });
+    </script>
+}

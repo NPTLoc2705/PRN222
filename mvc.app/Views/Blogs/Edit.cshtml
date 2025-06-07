@@ -10,24 +10,39 @@
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Edit">
+        <!-- CẦN THÊM enctype -->
+        <form asp-action="Edit" enctype="multipart/form-data">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="Id" />
-            <div class="form-group">
-                <label asp-for="blog_content" class="control-label"></label>
-                <input asp-for="blog_content" class="form-control" />
-                <span asp-validation-for="blog_content" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="ImageData" class="control-label"></label>
-                <input asp-for="ImageData" class="form-control" />
-                <span asp-validation-for="ImageData" class="text-danger"></span>
-            </div>
+
             <div class="form-group">
                 <label asp-for="title" class="control-label"></label>
                 <input asp-for="title" class="form-control" />
                 <span asp-validation-for="title" class="text-danger"></span>
             </div>
+
+            <div class="form-group">
+                <label asp-for="blog_content" class="control-label"></label>
+                <div id="editor" style="height: 400px;"></div>
+                <textarea asp-for="blog_content" id="blogContent" style="display:none;"></textarea>
+                <span asp-validation-for="blog_content" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="ImageData" class="control-label"></label>
+
+                <!-- Hiển thị ảnh hiện tại nếu có -->
+                @if (Model.ImageData != null && Model.ImageData.Length > 0)
+                {
+                    var base64Image = "data:image/png;base64," + Convert.ToBase64String(Model.ImageData);
+                    <img src="@base64Image" alt="Current Image" class="img-thumbnail mb-2" style="max-height: 150px;" />
+                }
+
+                <input type="file" id="imageInput" accept="image/*" class="form-control" />
+                <input type="hidden" asp-for="ImageData" id="imageData" />
+                <span asp-validation-for="ImageData" class="text-danger"></span>
+            </div>
+
             <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary" />
             </div>
@@ -40,5 +55,49 @@
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+
+    <!-- Include Quill -->
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet" />
+    <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
+
+    <script>
+        var quill = new Quill('#editor', {
+            theme: 'snow',
+            modules: {
+                toolbar: [
+                    ['bold', 'italic', 'underline'],
+                    ['link', 'image'],
+                    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                    [{ 'align': [] }],
+                    ['clean']
+                ]
+            }
+        });
+
+        var blogContent = document.getElementById('blogContent');
+
+        // Gán lại nội dung cũ vào editor khi Edit
+        if (blogContent.value) {
+            quill.root.innerHTML = blogContent.value;
+        }
+
+        // Khi thay đổi nội dung -> đồng bộ vào textarea
+        quill.on('text-change', function () {
+            blogContent.value = quill.root.innerHTML;
+        });
+
+        // Đọc ảnh và convert sang base64
+        document.getElementById('imageInput').addEventListener('change', function (event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const base64String = e.target.result.split(',')[1];
+                    document.getElementById('imageData').value = base64String;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    </script>
 }
