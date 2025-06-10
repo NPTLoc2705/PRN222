@@ -22,7 +22,7 @@ namespace mvc.dataaccess.Entities
         public DbSet<CourseCategoryMapping> CourseCategoryMappings { get; set; }
         public DbSet<CoursePrerequisite> CoursePrerequisites { get; set; }
         public DbSet<UserCourseProgress> UserCourseProgresses { get; set; }
-
+        public DbSet<Booking> Bookings { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             // Configure table names
@@ -33,7 +33,7 @@ namespace mvc.dataaccess.Entities
             modelBuilder.Entity<Module>().ToTable("Modules");
             modelBuilder.Entity<Lesson>().ToTable("Lessons");
             modelBuilder.Entity<CourseCategory>().ToTable("CourseCategories");
-
+            modelBuilder.Entity<Booking>().ToTable("Bookings");
             // Configure primary keys
             modelBuilder.Entity<User>().HasKey(u => u.Id);
             modelBuilder.Entity<Course>(entity =>
