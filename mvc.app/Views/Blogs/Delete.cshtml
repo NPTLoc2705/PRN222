@@ -1,39 +1,325 @@
 ﻿@model mvc.dataaccess.Entities.Blog
 
 @{
-    ViewData["Title"] = "Delete";
+    ViewData["Title"] = "Delete Confirmation";
 }
 
-<h1>Delete</h1>
+@section Styles {
+    <style>
+        /* Container */
+        .delete-container {
+            max-width: 700px;
+            margin: 2rem auto;
+            padding: 0;
+        }
 
-<h3>Are you sure you want to delete this?</h3>
-<div>
-    <h4>Blog</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.blog_content)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.blog_content)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.ImageData)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.ImageData)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.title)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.title)
-        </dd>
-    </dl>
-    
-    <form asp-action="Delete">
-        <input type="hidden" asp-for="Id" />
-        <input type="submit" value="Delete" class="btn btn-danger" /> |
-        <a asp-action="Index">Back to List</a>
-    </form>
+        /* Warning Card */
+        .delete-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .delete-header {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+
+            .delete-header h1 {
+                margin: 0;
+                font-size: 2rem;
+                font-weight: 600;
+            }
+
+            .delete-header p {
+                margin: 0.5rem 0 0 0;
+                opacity: 0.9;
+                font-size: 1.1rem;
+            }
+
+        .warning-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            animation: pulse 2s infinite;
+        }
+
+        @@keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.1);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        /* Content */
+        .delete-content {
+            padding: 2rem;
+        }
+
+        .blog-preview {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .preview-label {
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 0.5rem;
+            display: block;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .preview-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #212529;
+            margin-bottom: 1rem;
+        }
+
+        .preview-content {
+            color: #6c757d;
+            font-size: 1rem;
+            line-height: 1.6;
+            max-height: 100px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .preview-image {
+            margin-top: 1rem;
+            text-align: center;
+        }
+
+            .preview-image img {
+                max-width: 100%;
+                max-height: 200px;
+                object-fit: cover;
+                border-radius: 8px;
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            }
+
+        .blog-meta {
+            display: flex;
+            gap: 2rem;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid #dee2e6;
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Warning Message */
+        .warning-message {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: start;
+            gap: 1rem;
+        }
+
+            .warning-message i {
+                font-size: 1.5rem;
+                margin-top: 0.2rem;
+            }
+
+        .warning-text {
+            flex: 1;
+        }
+
+            .warning-text strong {
+                display: block;
+                margin-bottom: 0.5rem;
+            }
+
+        /* Actions */
+        .delete-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            padding: 2rem;
+            background: #f8f9fa;
+            border-top: 1px solid #dee2e6;
+        }
+
+        .btn {
+            padding: 0.75rem 2rem;
+            font-size: 1rem;
+            font-weight: 500;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-delete {
+            background: #dc3545;
+            color: white;
+        }
+
+            .btn-delete:hover {
+                background: #c82333;
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+            }
+
+        .btn-cancel {
+            background: #6c757d;
+            color: white;
+        }
+
+            .btn-cancel:hover {
+                background: #5a6268;
+                transform: translateY(-2px);
+            }
+
+        /* Responsive */
+        @@media (max-width: 768px) {
+            .delete-container {
+                margin: 0;
+                border-radius: 0;
+            }
+
+            .delete-card {
+                border-radius: 0;
+                box-shadow: none;
+            }
+
+            .delete-actions {
+                flex-direction: column-reverse;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .blog-meta {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+        }
+    </style>
+}
+
+<div class="delete-container">
+    <div class="delete-card">
+        <div class="delete-header">
+            <i class="fas fa-exclamation-triangle warning-icon"></i>
+            <h1>Delete Confirmation</h1>
+            <p>Are you sure you want to delete this blog post?</p>
+        </div>
+
+        <div class="delete-content">
+            <div class="blog-preview">
+                <span class="preview-label">Blog Post to Delete</span>
+                <h2 class="preview-title">@(Model?.title ?? "Untitled")</h2>
+
+                <div class="preview-content">
+                    @{
+                        var contentPreview = "";
+                        if (!string.IsNullOrEmpty(Model?.blog_content))
+                        {
+                            // Remove HTML tags for preview
+                            contentPreview = System.Text.RegularExpressions.Regex.Replace(Model.blog_content, @"<[^>]+>", " ");
+                            contentPreview = System.Text.RegularExpressions.Regex.Replace(contentPreview, @"\s+", " ").Trim();
+
+                            if (contentPreview.Length > 200)
+                            {
+                                contentPreview = contentPreview.Substring(0, 200) + "...";
+                            }
+                        }
+                        else
+                        {
+                            contentPreview = "No content available";
+                        }
+                    }
+                    @contentPreview
+                </div>
+
+                @if (Model?.ImageData != null && Model.ImageData.Length > 0)
+                {
+                    <div class="preview-image">
+                        <img src="data:image/jpeg;base64,@Convert.ToBase64String(Model.ImageData)"
+                             alt="Blog featured image" />
+                    </div>
+                }
+
+                <div class="blog-meta">
+                    <div class="meta-item">
+                        <i class="fas fa-calendar"></i>
+                        <span>Created: @DateTime.Now.ToString("MMM dd, yyyy")</span>
+                    </div>
+                    @if (Model?.blog_content?.Contains("<img") == true)
+                    {
+                        <div class="meta-item">
+                            <i class="fas fa-image"></i>
+                            <span>Contains images</span>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <div class="warning-message">
+                <i class="fas fa-info-circle"></i>
+                <div class="warning-text">
+                    <strong>This action cannot be undone!</strong>
+                    Once deleted, this blog post and all its content will be permanently removed from the system.
+                </div>
+            </div>
+        </div>
+
+        <form asp-action="Delete" method="post">
+            <input type="hidden" asp-for="Id" />
+            <div class="delete-actions">
+                <a href="/Blogs/AdminBlog" class="btn btn-cancel">
+                    <i class="fas fa-times"></i>Cancel
+                </a>
+                <button type="submit" class="btn btn-delete">
+                    <i class="fas fa-trash"></i>Yes, Delete This Post
+                </button>
+            </div>
+        </form>
+    </div>
 </div>
+
+@section Scripts {
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <script>
+        // Add confirmation on delete button
+        document.querySelector('.btn-delete').addEventListener('click', function(e) {
+            if (!confirm('Final confirmation: Delete this blog post?')) {
+                e.preventDefault();
+            }
+        });
+    </script>
+}
