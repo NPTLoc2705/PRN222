@@ -153,5 +153,12 @@ namespace mvc.app.Controllers
         {
             return _context.Blogs.Any(e => e.Id == id);
         }
+
+        //delete soon
+        public async Task<IActionResult> AdminBlog()
+        {
+            var blogs = await _context.Blogs.ToListAsync(); //
+            return  View(blogs); // 
+        }
     }
 }
