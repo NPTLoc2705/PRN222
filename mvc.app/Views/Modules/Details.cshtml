@@ -1,0 +1,34 @@
+﻿@model mvc.dataaccess.ViewModels.ModuleDTO
+<h1>@Model.Title</h1>
+
+<dl class="row">
+    <dt>Description:</dt>
+    <dd>@Model.Description</dd>
+    <dt>Order:</dt>
+    <dd>@Model.OrderNumber</dd>
+</dl>
+
+<div>
+    <!-- Edit Link -->
+    <a asp-controller="Modules"
+       asp-action="Edit"
+       asp-route-courseId="@Model.CourseId"
+       asp-route-moduleId="@Model.ModuleId">
+        Edit
+    </a> |
+
+    <!-- Delete Link -->
+    <a asp-controller="Modules"
+       asp-action="Delete"
+       asp-route-courseId="@Model.CourseId"
+       asp-route-moduleId="@Model.ModuleId">
+        Delete
+    </a> |
+
+    <!-- Back to Course -->
+    <a asp-controller="Courses"
+       asp-action="Details"
+       asp-route-id="@Model.CourseId">
+        Back to Course
+    </a>
+</div>

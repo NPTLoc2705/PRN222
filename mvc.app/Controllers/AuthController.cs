@@ -6,6 +6,7 @@ using mvc.dataaccess.ViewModels;
 
 namespace mvc.app.Controllers
 {
+   
     public class AuthController : Controller
     {
         private readonly IAuthService _authService; // Inject your account service

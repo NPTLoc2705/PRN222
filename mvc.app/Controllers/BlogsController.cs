@@ -9,6 +9,7 @@ using mvc.dataaccess.Entities;
 
 namespace mvc.app.Controllers
 {
+   
     public class BlogsController : Controller
     {
         private readonly AppDbContext _context;
