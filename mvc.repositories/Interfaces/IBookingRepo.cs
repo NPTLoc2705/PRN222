@@ -3,15 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using mvc.dataaccess.Entities;
 
 namespace mvc.repositories.Interfaces
 {
     public interface IBookingRepo
     {
-        List<Booking> GetAllBookings();
-        Booking GetBookingById(int id);
-        void AddBooking(Booking booking);
-        void UpdateBooking(Booking booking);
-        void DeleteBookings(int id);
+        Task<List<Booking>> GetAllBookingsAsync();
+        Task<Booking?> GetBookingByIdAsync(int id);
+        Task AddBookingAsync(Booking booking);
+        Task UpdateBookingAsync(Booking booking);
+        Task DeleteBookingsAsync(int id);
     }
 }

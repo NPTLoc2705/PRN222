@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using mvc.dataaccess.Entities;
 using mvc.repositories.Interfaces;
 
@@ -16,36 +17,37 @@ namespace mvc.repositories.Implements
         {
             _context = context;
         }
-        public void AddBooking(Booking booking)
+
+        public async Task AddBookingAsync(Booking booking)
         {
-            _context.Add(booking);
-            _context.SaveChanges();
+            await _context.AddAsync(booking);
+            await _context.SaveChangesAsync();
         }
 
-        public void DeleteBookings(int id)
+        public async Task DeleteBookingsAsync(int id)
         {
-           var book= _context.Bookings.FirstOrDefault(b => b.Id == id);
-            _context.Remove(book);
+            var book = await _context.Bookings.FirstOrDefaultAsync(b => b.Id == id);
+            if (book != null)
+            {
+                _context.Remove(book);
+                await _context.SaveChangesAsync();
+            }
         }
 
-        public List<Booking> GetAllBookings()
+        public async Task<List<Booking>> GetAllBookingsAsync()
         {
-            return _context.ChangeTracker
-                .Entries<Booking>()
-                .Select(e => e.Entity)
-                .ToList();
+            return await _context.Bookings.ToListAsync();
         }
 
-        public Booking GetBookingById(int id)
+        public async Task<Booking?> GetBookingByIdAsync(int id)
         {
-            return _context.Bookings.FirstOrDefault(b => b.Id == id);
+            return await _context.Bookings.FirstOrDefaultAsync(b => b.Id == id);
         }
 
-
-        public void UpdateBooking(Booking booking)
+        public async Task UpdateBookingAsync(Booking booking)
         {
             _context.Update(booking);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
     }
 }

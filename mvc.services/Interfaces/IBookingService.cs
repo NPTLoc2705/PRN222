@@ -3,15 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using mvc.dataaccess.Entities;
 
 namespace mvc.services.Interfaces
 {
     public interface IBookingService
     {
-        List<Booking> GetAllBookingsAsync();
-        Booking GetBookingByIdAsync(int id);
-        void AddBookingAsync(Booking booking);
-        void UpdateBookingAsync(Booking booking);
-        void DeleteBookingAsync(int id);
+        Task<List<Booking>> GetAllBookingsAsync();
+        Task<Booking?> GetBookingByIdAsync(int id);
+        Task AddBookingAsync(Booking booking);
+        Task UpdateBookingAsync(Booking booking);
+        Task DeleteBookingAsync(int id);
     }
 }

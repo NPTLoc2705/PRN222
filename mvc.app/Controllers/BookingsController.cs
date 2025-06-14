@@ -23,14 +23,15 @@ namespace mvc.app.Controllers
         // GET: Bookings
         public async Task<IActionResult> Index()
         {
-            return View( _bookingService.GetAllBookingsAsync());
+            var list = await _bookingService.GetAllBookingsAsync();
+            return View(list);
         }
 
         // GET: Bookings/Details/5
         public async Task<IActionResult> Details(int id)
         {
-            
-            return View(_bookingService.GetBookingByIdAsync(id));
+            var book = await _bookingService.GetBookingByIdAsync(id);
+            return View(book);
         }
 
         // GET: Bookings/Create
@@ -62,7 +63,7 @@ namespace mvc.app.Controllers
                 return NotFound();
             }
 
-            var booking =_bookingService.GetBookingByIdAsync(id.Value);
+            var booking = await _bookingService.GetBookingByIdAsync(id.Value);
             if (booking == null)
             {
                 return NotFound();
@@ -113,7 +114,7 @@ namespace mvc.app.Controllers
                 return NotFound();
             }
 
-            var booking = _bookingService.GetBookingByIdAsync(id.Value);
+            var booking = await _bookingService.GetBookingByIdAsync(id.Value);
             if (booking == null)
             {
                 return NotFound();
@@ -130,10 +131,10 @@ namespace mvc.app.Controllers
             var booking = _bookingService.GetBookingByIdAsync(id);
             if (booking != null)
             {
-               _bookingService.DeleteBookingAsync(id);
+              await _bookingService.DeleteBookingAsync(id);
             }
 
-            await _context.SaveChangesAsync();
+            
             return RedirectToAction(nameof(Index));
         }
 

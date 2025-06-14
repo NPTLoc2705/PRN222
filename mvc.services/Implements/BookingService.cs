@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
+using mvc.dataaccess.Entities;
 using mvc.repositories.Interfaces;
 using mvc.services.Interfaces;
 
@@ -16,29 +15,29 @@ namespace mvc.services.Implements
             _bookingRepo = bookingRepo;
         }
 
-        public void AddBookingAsync(Booking booking)
+        public async Task AddBookingAsync(Booking booking)
         {
-            _bookingRepo.AddBooking(booking);
+            await _bookingRepo.AddBookingAsync(booking);
         }
 
-        public void DeleteBookingAsync(int id)
+        public async Task DeleteBookingAsync(int id)
         {
-            _bookingRepo.DeleteBookings(id);
+            await _bookingRepo.DeleteBookingsAsync(id);
         }
 
-        public List<Booking> GetAllBookingsAsync()
+        public async Task<List<Booking>> GetAllBookingsAsync()
         {
-            return _bookingRepo.GetAllBookings();
+            return await _bookingRepo.GetAllBookingsAsync();
         }
 
-        public Booking GetBookingByIdAsync(int id)
+        public async Task<Booking?> GetBookingByIdAsync(int id)
         {
-          return _bookingRepo.GetBookingById(id);
+            return await _bookingRepo.GetBookingByIdAsync(id);
         }
 
-        public void UpdateBookingAsync(Booking booking)
+        public async Task UpdateBookingAsync(Booking booking)
         {
-            _bookingRepo.UpdateBooking(booking);
+            await _bookingRepo.UpdateBookingAsync(booking);
         }
     }
 }
