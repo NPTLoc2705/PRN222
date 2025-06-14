@@ -321,8 +321,7 @@ namespace mvc.dataaccess.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier")
-                        .HasDefaultValueSql("NEWID()");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Address")
                         .IsRequired()
@@ -355,92 +354,6 @@ namespace mvc.dataaccess.Migrations
                     b.ToTable("Users", (string)null);
                 });
 
-            modelBuilder.Entity("mvc.dataaccess.Entities.Courses.CourseCategoryMapping", b =>
-                {
-                    b.HasOne("mvc.dataaccess.Entities.Courses.CourseCategory", "Category")
-                        .WithMany("CourseMappings")
-                        .HasForeignKey("CategoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("mvc.dataaccess.Entities.Courses.Course", "Course")
-                        .WithMany("CategoryMappings")
-                        .HasForeignKey("CourseId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Category");
-
-                    b.Navigation("Course");
-                });
-
-            modelBuilder.Entity("mvc.dataaccess.Entities.Courses.CoursePrerequisite", b =>
-                {
-                    b.HasOne("mvc.dataaccess.Entities.Courses.Course", "Course")
-                        .WithMany("Prerequisites")
-                        .HasForeignKey("CourseId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("mvc.dataaccess.Entities.Courses.Course", "PrerequisiteCourse")
-                        .WithMany("RequiredForCourses")
-                        .HasForeignKey("PrerequisiteCourseId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Course");
-
-                    b.Navigation("PrerequisiteCourse");
-                });
-
-            modelBuilder.Entity("mvc.dataaccess.Entities.Courses.Lesson", b =>
-                {
-                    b.HasOne("mvc.dataaccess.Entities.Courses.Module", "Module")
-                        .WithMany("Lessons")
-                        .HasForeignKey("ModuleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Module");
-                });
-
-            modelBuilder.Entity("mvc.dataaccess.Entities.Courses.Module", b =>
-                {
-                    b.HasOne("mvc.dataaccess.Entities.Courses.Course", "Course")
-                        .WithMany("Modules")
-                        .HasForeignKey("CourseId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Course");
-                });
-
-            modelBuilder.Entity("mvc.dataaccess.Entities.Courses.UserCourseProgress", b =>
-                {
-                    b.HasOne("mvc.dataaccess.Entities.Courses.Course", "Course")
-                        .WithMany("UserProgresses")
-                        .HasForeignKey("CourseId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("mvc.dataaccess.Entities.Courses.Lesson", "Lesson")
-                        .WithMany("UserProgresses")
-                        .HasForeignKey("LessonId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("mvc.dataaccess.Entities.User", "User")
-                        .WithMany("CourseProgresses")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Course");
-
-                    b.Navigation("Lesson");
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("mvc.dataaccess.Entities.Post", b =>
                 {
                     b.HasOne("mvc.dataaccess.Entities.User", "Staff")
@@ -450,39 +363,6 @@ namespace mvc.dataaccess.Migrations
                         .IsRequired();
 
                     b.Navigation("Staff");
-                });
-
-            modelBuilder.Entity("mvc.dataaccess.Entities.Courses.Course", b =>
-                {
-                    b.Navigation("CategoryMappings");
-
-                    b.Navigation("Modules");
-
-                    b.Navigation("Prerequisites");
-
-                    b.Navigation("RequiredForCourses");
-
-                    b.Navigation("UserProgresses");
-                });
-
-            modelBuilder.Entity("mvc.dataaccess.Entities.Courses.CourseCategory", b =>
-                {
-                    b.Navigation("CourseMappings");
-                });
-
-            modelBuilder.Entity("mvc.dataaccess.Entities.Courses.Lesson", b =>
-                {
-                    b.Navigation("UserProgresses");
-                });
-
-            modelBuilder.Entity("mvc.dataaccess.Entities.Courses.Module", b =>
-                {
-                    b.Navigation("Lessons");
-                });
-
-            modelBuilder.Entity("mvc.dataaccess.Entities.User", b =>
-                {
-                    b.Navigation("CourseProgresses");
                 });
 #pragma warning restore 612, 618
         }

@@ -1,8 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using mvc.dataaccess.Entities.Courses;
+using Microsoft.Extensions.Configuration.Json;
 using System;
-using System.IO;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace mvc.dataaccess.Entities
 {
@@ -11,7 +14,6 @@ namespace mvc.dataaccess.Entities
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {
         }
-
         public DbSet<User> Users { get; set; }
         public DbSet<Post> Posts { get; set; }
         public DbSet<Blog> Blogs { get; set; }
@@ -25,7 +27,6 @@ namespace mvc.dataaccess.Entities
         public DbSet<Booking> Bookings { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // Configure table names
             modelBuilder.Entity<User>().ToTable("Users");
             modelBuilder.Entity<Post>().ToTable("Posts");
             modelBuilder.Entity<Blog>().ToTable("Blogs");
@@ -167,30 +168,21 @@ namespace mvc.dataaccess.Entities
                 .Property(ucp => ucp.ProgressId)
                 .HasDefaultValueSql("NEWID()");
 
+            // Additional configurations can be added here
             base.OnModelCreating(modelBuilder);
         }
 
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            // Only configure if not already configured (this helps with DI scenarios)
-            if (!optionsBuilder.IsConfigured)
-            {
-                // Get the configuration from appsettings.json
-                var configuration = new ConfigurationBuilder()
-                    .SetBasePath(Directory.GetCurrentDirectory())
-                    .AddJsonFile("appsettings.json")
-                    .Build();
+        //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        //{
+        //    optionsBuilder.UseSqlServer(GetConnectionString());
+        //}
 
-                var connectionString = configuration.GetConnectionString("DefaultConnectionDB");
-
-                if (string.IsNullOrEmpty(connectionString))
-                {
-                    throw new InvalidOperationException("The connection string 'DefaultConnectionDB' was not found in appsettings.json");
-                }
-
-                optionsBuilder.UseSqlServer(connectionString);
-            }
-        }
-    
-}
+        //private string GetConnectionString()
+        //{
+        //    IConfiguration configuration = new ConfigurationBuilder()
+        //            .SetBasePath(Directory.GetCurrentDirectory())
+        //            .AddJsonFile("appsettings.json", true, true).Build();
+        //    return configuration["ConnectionStrings:DefaultConnectionDB"];
+        //}
+    }
 }

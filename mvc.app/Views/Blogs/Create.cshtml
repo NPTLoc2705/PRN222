@@ -1,49 +1,334 @@
 ﻿@model mvc.dataaccess.Entities.Blog
-
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Create New Blog";
 }
 
-<h1>Create</h1>
+<style>
+    .create-container {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 20px;
+    }
 
-<h4>Blog</h4>
+    .page-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 2rem;
+        margin: -20px -20px 30px -20px;
+        border-radius: 10px 10px 0 0;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
 
-<hr />
+        .page-header h1 {
+            margin: 0;
+            font-size: 2rem;
+        }
 
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create" enctype="multipart/form-data">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        .page-header p {
+            margin: 0.5rem 0 0 0;
+            opacity: 0.9;
+        }
+
+    .form-card {
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        padding: 30px;
+    }
+
+    .form-group {
+        margin-bottom: 25px;
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 8px;
+        display: block;
+    }
+
+    .form-control {
+        border: 2px solid #e1e5ee;
+        border-radius: 8px;
+        padding: 10px 15px;
+        font-size: 16px;
+        transition: all 0.3s ease;
+        width: 100%;
+    }
+
+        .form-control:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.1);
+            outline: none;
+        }
+
+    #editor {
+        border: 2px solid #e1e5ee;
+        border-radius: 8px;
+        min-height: 400px;
+        background: white;
+    }
+
+    .ql-toolbar {
+        border-top-left-radius: 8px;
+        border-top-right-radius: 8px;
+        border: none !important;
+        background: #f8f9fa;
+        padding: 15px !important;
+    }
+
+    .ql-container {
+        border-bottom-left-radius: 8px;
+        border-bottom-right-radius: 8px;
+        border: none !important;
+        font-size: 16px;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    .ql-editor {
+        min-height: 350px;
+        padding: 20px;
+    }
+
+    .image-upload-area {
+        border: 2px dashed #e1e5ee;
+        border-radius: 8px;
+        padding: 30px;
+        text-align: center;
+        background: #f8f9fa;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+    }
+
+        .image-upload-area:hover {
+            border-color: #667eea;
+            background: #f0f2ff;
+        }
+
+        .image-upload-area.has-image {
+            padding: 20px;
+            border-style: solid;
+        }
+
+    .upload-icon {
+        font-size: 3rem;
+        color: #cbd5e0;
+        margin-bottom: 1rem;
+    }
+
+    .upload-text {
+        color: #718096;
+        margin-bottom: 0.5rem;
+    }
+
+    .upload-hint {
+        font-size: 0.875rem;
+        color: #a0aec0;
+    }
+
+    #imageInput {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        cursor: pointer;
+    }
+
+    .image-preview-container {
+        display: none;
+        margin-top: 15px;
+    }
+
+    .image-preview {
+        max-width: 100%;
+        max-height: 300px;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .remove-image {
+        margin-top: 10px;
+        background: #e53e3e;
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: all 0.3s ease;
+    }
+
+        .remove-image:hover {
+            background: #c53030;
+        }
+
+    .action-buttons {
+        display: flex;
+        gap: 10px;
+        margin-top: 30px;
+        padding-top: 20px;
+        border-top: 1px solid #e1e5ee;
+    }
+
+    .btn {
+        padding: 10px 30px;
+        border-radius: 8px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        border: none;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .btn-create {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+
+        .btn-create:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+    .btn-cancel {
+        background: #6c757d;
+        color: white;
+    }
+
+        .btn-cancel:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+        }
+
+    .loading-spinner {
+        display: none;
+        margin-left: 10px;
+    }
+
+    .text-danger {
+        font-size: 14px;
+        margin-top: 5px;
+        display: block;
+    }
+
+    .character-count {
+        text-align: right;
+        font-size: 0.875rem;
+        color: #718096;
+        margin-top: 5px;
+    }
+
+    /* Success animation */
+    @@keyframes slideIn {
+        from {
+            transform: translateY(-20px);
+            opacity: 0;
+        }
+
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+
+    .form-card {
+        animation: slideIn 0.5s ease-out;
+    }
+
+    @@media (max-width: 768px) {
+        .create-container {
+            padding: 10px;
+        }
+
+        .form-card {
+            padding: 20px;
+        }
+
+        .action-buttons {
+            flex-direction: column;
+        }
+
+        .btn {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+</style>
+
+<div class="create-container">
+    <div class="page-header">
+        <h1><i class="fas fa-plus-circle me-2"></i>Create New Blog Post</h1>
+        <p>Share your thoughts and ideas with the world</p>
+    </div>
+
+    <div class="form-card">
+        <form asp-action="Create" enctype="multipart/form-data" id="createForm">
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
 
             <div class="form-group">
-                <label asp-for="title" class="control-label"></label>
-                <input asp-for="title" class="form-control" />
+                <label asp-for="title" class="form-label">
+                    <i class="fas fa-heading me-1"></i>Blog Title
+                </label>
+                <input asp-for="title" class="form-control" placeholder="Enter an engaging title..." maxlength="200" id="titleInput" />
+                <div class="character-count">
+                    <span id="titleCount">0</span> / 200 characters
+                </div>
                 <span asp-validation-for="title" class="text-danger"></span>
             </div>
 
             <div class="form-group">
-                <label asp-for="blog_content" class="control-label"></label>
-                <div id="editor" style="height: 400px;"></div>
+                <label asp-for="blog_content" class="form-label">
+                    <i class="fas fa-file-alt me-1"></i>Blog Content
+                </label>
+                <div id="editor"></div>
                 <textarea asp-for="blog_content" id="blogContent" style="display:none;"></textarea>
                 <span asp-validation-for="blog_content" class="text-danger"></span>
             </div>
 
             <div class="form-group">
-                <label asp-for="ImageData" class="control-label"></label>
-                <input type="file" id="imageInput" accept="image/*" class="form-control" />
+                <label asp-for="ImageData" class="form-label">
+                    <i class="fas fa-image me-1"></i>Featured Image (Optional)
+                </label>
+
+                <div class="image-upload-area" id="uploadArea">
+                    <i class="fas fa-cloud-upload-alt upload-icon"></i>
+                    <p class="upload-text">Click to upload or drag and drop</p>
+                    <p class="upload-hint">PNG, JPG, GIF up to 5MB</p>
+                    <input type="file" id="imageInput" accept="image/*" />
+                </div>
+
+                <div class="image-preview-container" id="previewContainer">
+                    <img id="imagePreview" class="image-preview" alt="Preview" />
+                    <br>
+                    <button type="button" class="remove-image" onclick="removeImage()">
+                        <i class="fas fa-times me-1"></i>Remove Image
+                    </button>
+                </div>
+
                 <input type="hidden" asp-for="ImageData" id="imageData" />
                 <span asp-validation-for="ImageData" class="text-danger"></span>
             </div>
 
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
+            <div class="action-buttons">
+                <button type="submit" class="btn btn-create" id="createBtn">
+                    <i class="fas fa-save"></i>Create Post
+                    <span class="loading-spinner">
+                        <i class="fas fa-spinner fa-spin"></i>
+                    </span>
+                </button>
+                <a href="/Blogs/AdminBlog" class="btn btn-cancel">
+                    <i class="fas fa-times"></i>Cancel
+                </a>
             </div>
         </form>
     </div>
-</div>
-
-<div>
-    <a asp-action="Index">Back to List</a>
 </div>
 
 @section Scripts {
@@ -51,7 +336,10 @@
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
 
-    <!-- Include Quill CSS and JS from CDN (can be hosted locally) -->
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <!-- Include Quill -->
     <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
     <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
 
@@ -59,12 +347,18 @@
         // Initialize Quill editor
         var quill = new Quill('#editor', {
             theme: 'snow',
+            placeholder: 'Start writing your amazing blog post...',
             modules: {
                 toolbar: [
-                    ['bold', 'italic', 'underline'],
-                    ['link', 'image'],
+                    [{ 'header': [1, 2, 3, false] }],
+                    ['bold', 'italic', 'underline', 'strike'],
+                    ['blockquote', 'code-block'],
                     [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                    [{ 'indent': '-1'}, { 'indent': '+1' }],
+                    [{ 'direction': 'rtl' }],
+                    [{ 'color': [] }, { 'background': [] }],
                     [{ 'align': [] }],
+                    ['link', 'image', 'video'],
                     ['clean']
                 ]
             }
@@ -76,22 +370,96 @@
             blogContent.value = quill.root.innerHTML;
         });
 
-        // Set initial content if editing existing blog
-        if (blogContent.value) {
-            quill.root.innerHTML = blogContent.value;
-        }
+        // Character counter for title
+        const titleInput = document.getElementById('titleInput');
+        const titleCount = document.getElementById('titleCount');
 
-        // Handle image file input
-        document.getElementById('imageInput').addEventListener('change', function(event) {
+        titleInput.addEventListener('input', function() {
+            titleCount.textContent = this.value.length;
+        });
+
+        // Image upload handling
+        const imageInput = document.getElementById('imageInput');
+        const uploadArea = document.getElementById('uploadArea');
+        const previewContainer = document.getElementById('previewContainer');
+        const imagePreview = document.getElementById('imagePreview');
+
+        // Drag and drop
+        uploadArea.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            this.style.borderColor = '#667eea';
+            this.style.background = '#f0f2ff';
+        });
+
+        uploadArea.addEventListener('dragleave', function(e) {
+            e.preventDefault();
+            this.style.borderColor = '#e1e5ee';
+            this.style.background = '#f8f9fa';
+        });
+
+        uploadArea.addEventListener('drop', function(e) {
+            e.preventDefault();
+            this.style.borderColor = '#e1e5ee';
+            this.style.background = '#f8f9fa';
+
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                imageInput.files = files;
+                handleImageSelect(files[0]);
+            }
+        });
+
+        imageInput.addEventListener('change', function(event) {
             const file = event.target.files[0];
             if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const base64String = e.target.result.split(',')[1];
-                    document.getElementById('imageData').value = base64String;
-                };
-                reader.readAsDataURL(file);
+                handleImageSelect(file);
             }
+        });
+
+        function handleImageSelect(file) {
+            // Check file size (5MB limit)
+            if (file.size > 5 * 1024 * 1024) {
+                alert('File size must be less than 5MB');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                // Show preview
+                imagePreview.src = e.target.result;
+                uploadArea.style.display = 'none';
+                previewContainer.style.display = 'block';
+
+                // Convert to base64
+                const base64String = e.target.result.split(',')[1];
+                document.getElementById('imageData').value = base64String;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function removeImage() {
+            imageInput.value = '';
+            document.getElementById('imageData').value = '';
+            uploadArea.style.display = 'block';
+            previewContainer.style.display = 'none';
+            imagePreview.src = '';
+        }
+
+        // Form submission
+        document.getElementById('createForm').addEventListener('submit', function(e) {
+            const createBtn = document.getElementById('createBtn');
+            const spinner = createBtn.querySelector('.loading-spinner');
+
+            // Validate title
+            if (!titleInput.value.trim()) {
+                e.preventDefault();
+                alert('Please enter a title for your blog post');
+                return;
+            }
+
+            // Show loading state
+            createBtn.disabled = true;
+            spinner.style.display = 'inline-block';
         });
     </script>
 }

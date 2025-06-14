@@ -3,9 +3,12 @@
   "defaultProvider": "cdnjs",
   "libraries": [
     {
-      "provider": "cdnjs",
       "library": "tailwindcss@2.2.19",
       "destination": "wwwroot/lib/tailwindcss/"
+    },
+    {
+      "library": "bootstrap@5.3.0",
+      "destination": "wwwroot/lib/bootstrap/"
     }
   ]
 }
