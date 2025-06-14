@@ -1,0 +1,192 @@
+﻿@model IEnumerable<Booking>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.BookingDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CustomerId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ConsultantId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.StartDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Status)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.BookingDate)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CustomerId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ConsultantId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.StartDate)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Status)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
+<style>
+    /* Headings */
+    h1 {
+        font-size: 2rem;
+        color: #e74c3c; /* Red warning tone */
+        margin-bottom: 20px;
+    }
+
+    h3 {
+        font-size: 1.25rem;
+        color: #c0392b;
+        margin-bottom: 20px;
+    }
+
+    h4 {
+        font-size: 1.3rem;
+        color: #2c3e50;
+        margin-bottom: 10px;
+    }
+
+    hr {
+        border: none;
+        border-top: 2px solid #eee;
+        margin: 15px 0;
+    }
+
+    /* Display list styling */
+    dl.row {
+        background-color: #fcfcfc;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 25px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    dt.col-sm-2 {
+        font-weight: 600;
+        color: #34495e;
+    }
+
+    dd.col-sm-10 {
+        color: #555;
+        margin-bottom: 15px;
+    }
+
+    /* Buttons */
+    .btn-danger {
+        background-color: #e74c3c;
+        border-color: #c0392b;
+        color: #fff;
+        padding: 10px 16px;
+        font-size: 1rem;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+        .btn-danger:hover {
+            background-color: #c0392b;
+        }
+
+    a {
+        color: #3498db;
+        text-decoration: none;
+        font-size: 1rem;
+        margin-left: 10px;
+    }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+    /* Responsive row layout */
+    .row {
+        margin-top: 30px;
+    }
+
+  
+    dl.row {
+        padding: 15px;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 25px;
+        background-color: #fff;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+        border-radius: 6px;
+        overflow: hidden;
+    }
+
+    thead {
+        background-color: #f4f6f8;
+        color: #2c3e50;
+    }
+
+        thead th {
+            text-align: left;
+            padding: 12px 16px;
+            font-weight: 600;
+            border-bottom: 2px solid #e1e1e1;
+        }
+
+    tbody tr {
+        border-bottom: 1px solid #eaeaea;
+        transition: background-color 0.2s ease;
+    }
+
+        tbody tr:hover {
+            background-color: #f9f9f9;
+        }
+
+    tbody td {
+        padding: 12px 16px;
+        color: #555;
+        vertical-align: middle;
+    }
+
+    td a {
+        color: #3498db;
+        text-decoration: none;
+        font-weight: 500;
+    }
+
+        td a:hover {
+            text-decoration: underline;
+        }
+
+    /* Responsive table */
+   
+</style>
