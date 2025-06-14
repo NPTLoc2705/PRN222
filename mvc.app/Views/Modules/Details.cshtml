@@ -1,0 +1,118 @@
+﻿@using mvc.dataaccess.ViewModels
+@model mvc.dataaccess.ViewModels.ModuleDTO
+@{
+    ViewData["Title"] = "Module Details";
+}
+
+<h1>@Model.Title</h1>
+
+<dl class="row">
+    <dt class="col-sm-2">Description:</dt>
+    <dd class="col-sm-10">@Model.Description</dd>
+
+    <dt class="col-sm-2">Order:</dt>
+    <dd class="col-sm-10">@Model.OrderNumber</dd>
+</dl>
+
+<!-- Lessons Section -->
+<div class="mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4>Module Lessons</h4>
+        <a asp-controller="Lessons"
+           asp-action="Create"
+           asp-route-courseId="@Model.CourseId"
+           asp-route-moduleId="@Model.ModuleId"
+           class="btn btn-primary">
+            <i class="fas fa-plus"></i> Add New Lesson
+        </a>
+    </div>
+
+    @if (ViewBag.Lessons != null && ((IEnumerable<LessonDTO>)ViewBag.Lessons).Any())
+    {
+        <div class="list-group">
+            @foreach (var lesson in (IEnumerable<LessonDTO>)ViewBag.Lessons)
+            {
+                <div class="list-group-item d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="mb-1">
+                            <a asp-controller="Lessons"
+                               asp-action="Details"
+                               asp-route-courseId="@Model.CourseId"
+                               asp-route-moduleId="@Model.ModuleId"
+                               asp-route-lessonId="@lesson.LessonId"
+                               class="text-decoration-none">
+                                @lesson.Title
+                            </a>
+                        </h6>
+                        <small class="text-muted">
+                            @lesson.ContentType | @lesson.Duration minutes
+                            @if (lesson.IsFreePreview)
+                            {
+                                <span class="badge bg-success ms-2">Free Preview</span>
+                            }
+                        </small>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="badge bg-secondary">Order: @lesson.OrderNumber</span>
+                        <div class="btn-group btn-group-sm">
+                            <a asp-controller="Lessons"
+                               asp-action="Edit"
+                               asp-route-courseId="@Model.CourseId"
+                               asp-route-moduleId="@Model.ModuleId"
+                               asp-route-lessonId="@lesson.LessonId"
+                               class="btn btn-outline-primary btn-sm">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <a asp-controller="Lessons"
+                               asp-action="Delete"
+                               asp-route-courseId="@Model.CourseId"
+                               asp-route-moduleId="@Model.ModuleId"
+                               asp-route-lessonId="@lesson.LessonId"
+                               class="btn btn-outline-danger btn-sm">
+                                <i class="fas fa-trash"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i>
+            No lessons have been added to this module yet.
+            <a asp-controller="Lessons"
+               asp-action="Create"
+               asp-route-courseId="@Model.CourseId"
+               asp-route-moduleId="@Model.ModuleId"
+               class="alert-link">Add the first lesson</a>.
+        </div>
+    }
+</div>
+
+<!-- Action Buttons -->
+<div class="mt-4">
+    <div class="btn-group">
+        <a asp-controller="Modules"
+           asp-action="Edit"
+           asp-route-courseId="@Model.CourseId"
+           asp-route-moduleId="@Model.ModuleId"
+           class="btn btn-warning">
+            <i class="fas fa-edit"></i> Edit Module
+        </a>
+        <a asp-controller="Courses"
+           asp-action="Details"
+           asp-route-id="@Model.CourseId"
+           class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back to Course
+        </a>
+        <a asp-controller="Modules"
+           asp-action="Delete"
+           asp-route-courseId="@Model.CourseId"
+           asp-route-moduleId="@Model.ModuleId"
+           class="btn btn-danger">
+            <i class="fas fa-trash"></i> Delete Module
+        </a>
+    </div>
+</div>

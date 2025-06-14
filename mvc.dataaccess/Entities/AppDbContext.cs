@@ -1,11 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Configuration.Json;
+using mvc.dataaccess.Entities.Courses;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.IO;
 
 namespace mvc.dataaccess.Entities
 {
@@ -14,6 +11,7 @@ namespace mvc.dataaccess.Entities
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {
         }
+
         public DbSet<User> Users { get; set; }
         public DbSet<Post> Posts { get; set; }
         public DbSet<Blog> Blogs { get; set; }
@@ -25,8 +23,10 @@ namespace mvc.dataaccess.Entities
         public DbSet<CoursePrerequisite> CoursePrerequisites { get; set; }
         public DbSet<UserCourseProgress> UserCourseProgresses { get; set; }
         public DbSet<Booking> Bookings { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            // Configure table names
             modelBuilder.Entity<User>().ToTable("Users");
             modelBuilder.Entity<Post>().ToTable("Posts");
             modelBuilder.Entity<Blog>().ToTable("Blogs");
@@ -35,6 +35,7 @@ namespace mvc.dataaccess.Entities
             modelBuilder.Entity<Lesson>().ToTable("Lessons");
             modelBuilder.Entity<CourseCategory>().ToTable("CourseCategories");
             modelBuilder.Entity<Booking>().ToTable("Bookings");
+
             // Configure primary keys
             modelBuilder.Entity<User>().HasKey(u => u.Id);
             modelBuilder.Entity<Course>(entity =>
@@ -172,6 +173,28 @@ namespace mvc.dataaccess.Entities
             base.OnModelCreating(modelBuilder);
         }
 
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            // Only configure if not already configured (this helps with DI scenarios)
+            if (!optionsBuilder.IsConfigured)
+            {
+                // Get the configuration from appsettings.json
+                var configuration = new ConfigurationBuilder()
+                    .SetBasePath(Directory.GetCurrentDirectory())
+                    .AddJsonFile("appsettings.json")
+                    .Build();
+
+                var connectionString = configuration.GetConnectionString("DefaultConnectionDB");
+
+                if (string.IsNullOrEmpty(connectionString))
+                {
+                    throw new InvalidOperationException("The connection string 'DefaultConnectionDB' was not found in appsettings.json");
+                }
+
+                optionsBuilder.UseSqlServer(connectionString);
+            }
+        }
+    
         //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         //{
         //    optionsBuilder.UseSqlServer(GetConnectionString());
