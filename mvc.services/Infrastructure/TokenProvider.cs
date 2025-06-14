@@ -41,7 +41,7 @@ namespace mvc.services.Infrastructure
                     new Claim(ClaimTypes.Name, user.FullName),
                     new Claim(ClaimTypes.Role, user.Role.ToString())
                 }),
-                Expires = DateTime.UtcNow.AddMinutes(double.Parse(_config["Jwt:ExpiresInMinutes"])), // Set token expiration time
+                Expires = DateTime.UtcNow.AddMinutes(double.Parse(_config["Jwt:ExpirationInMinutes"])), // Set token expiration time
                 SigningCredentials = credentials,
                 Issuer = _config["Jwt:Issuer"],
                 Audience = _config["Jwt:Audience"]
