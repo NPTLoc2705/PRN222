@@ -9,6 +9,7 @@ using mvc.dataaccess.Entities;
 
 namespace mvc.app.Controllers
 {
+   
     public class BlogsController : Controller
     {
         private readonly AppDbContext _context;
@@ -151,13 +152,6 @@ namespace mvc.app.Controllers
         private bool BlogExists(int id)
         {
             return _context.Blogs.Any(e => e.Id == id);
-        }
-
-        //delete soon
-        public async Task<IActionResult> AdminBlog()
-        {
-            var blogs = await _context.Blogs.ToListAsync(); //
-            return  View(blogs); // 
         }
     }
 }

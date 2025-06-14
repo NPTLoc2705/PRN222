@@ -1,0 +1,52 @@
+﻿@model IEnumerable<mvc.dataaccess.ViewModels.LessonDTO>
+@{
+    ViewData["Title"] = "Lessons";
+    var courseId = ViewBag.CourseId;
+    var module = ViewBag.Module;
+}
+
+<h1>Lessons in @module.Title</h1>
+
+<p>
+    <a asp-action="Create" asp-route-courseId="@courseId" asp-route-moduleId="@module.ModuleId" class="btn btn-primary">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Type</th>
+            <th>Duration</th>
+            <th>Preview</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.OrderBy(l => l.OrderNumber))
+        {
+            <tr>
+                <td>@Html.DisplayFor(modelItem => item.Title)</td>
+                <td>@Html.DisplayFor(modelItem => item.ContentType)</td>
+                <td>@item.Duration minutes</td>
+                <td>@(item.IsFreePreview ? "Yes" : "No")</td>
+                <td>
+                    <a asp-action="Edit"
+                       asp-route-courseId="@courseId"
+                       asp-route-moduleId="@module.ModuleId"
+                       asp-route-lessonId="@item.LessonId">Edit</a> |
+                    <a asp-action="Details"
+                       asp-route-courseId="@courseId"
+                       asp-route-moduleId="@module.ModuleId"
+                       asp-route-lessonId="@item.LessonId">Details</a> |
+                    <a asp-action="Delete"
+                       asp-route-courseId="@courseId"
+                       asp-route-moduleId="@module.ModuleId"
+                       asp-route-lessonId="@item.LessonId">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<div>
+    <a asp-controller="Modules" asp-action="Details" asp-route-courseId="@courseId" asp-route-moduleId="@module.ModuleId">Back to Module</a>
+</div>
