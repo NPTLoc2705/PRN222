@@ -1,17 +1,19 @@
-using mvc.dataaccess.Entities;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration.Json;
-using mvc.services.Interfaces;
-using mvc.services.Implements;
+using Microsoft.IdentityModel.Tokens;
+using mvc.dataaccess.Entities;
+using mvc.repositories.Implements;
 using mvc.repositories.Interfaces;
 using mvc.repositories.Implements;
 using mvc.repositories.Interfaces.ICourse;
 using mvc.repositories.Implements.CourseRepo;
 using Scalar.AspNetCore;
 using mvc.services.Implementations;
+using mvc.services.Implements;
 using mvc.services.Infrastructure;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
+using mvc.services.Interfaces;
+using System.Data;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -83,6 +85,12 @@ if (!app.Environment.IsDevelopment())
 app.MapScalarApiReference();
 app.UseSwagger();
 app.UseSwaggerUI();
+
+app.MapControllerRoute(
+       name: "default",
+       pattern: "{controller=Home}/{action=Index}/{id?}"
+   );
+
 app.UseHttpsRedirection();
 app.UseRouting();
 
