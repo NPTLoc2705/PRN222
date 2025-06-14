@@ -1,13 +1,14 @@
-using mvc.dataaccess.Entities;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration.Json;
-using mvc.services.Interfaces;
-using mvc.services.Implements;
-using mvc.repositories.Interfaces;
-using mvc.repositories.Implements;
-using mvc.services.Infrastructure;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using mvc.dataaccess.Entities;
+using mvc.repositories.Implements;
+using mvc.repositories.Interfaces;
+using mvc.services.Implements;
+using mvc.services.Infrastructure;
+using mvc.services.Interfaces;
+using System.Data;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -42,6 +43,33 @@ builder.Services.AddAuthentication(options =>
         ValidAudience = builder.Configuration["Jwt:Audience"],
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Secret"]))
     };
+
+    options.Events = new JwtBearerEvents
+    {
+        OnMessageReceived = context =>
+        {
+            if (context.Request.Cookies.ContainsKey("AuthToken"))
+            {
+                context.Token = context.Request.Cookies["AuthToken"];
+            }
+            return Task.CompletedTask;
+        }
+    };
+
+});
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("RequireAdminRole", policy =>
+        policy.RequireRole(SystemRole.Admin.ToString()));
+    options.AddPolicy("RequireManagerRole", policy =>
+        policy.RequireRole(SystemRole.Manager.ToString()));
+    options.AddPolicy("RequireConsultant", policy =>
+        policy.RequireRole(SystemRole.Consultant.ToString()));
+    options.AddPolicy("RequireStaffRole", policy =>
+        policy.RequireRole(SystemRole.Staff.ToString()));
+    options.AddPolicy("RequireMemberRole", policy =>
+        policy.RequireRole(SystemRole.Member.ToString()));
 });
 
 builder.Services.AddDbContext<AppDbContext>(
@@ -57,6 +85,11 @@ if (!app.Environment.IsDevelopment())
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
+
+app.MapControllerRoute(
+       name: "default",
+       pattern: "{controller=Home}/{action=Index}/{id?}"
+   );
 
 app.UseHttpsRedirection();
 app.UseRouting();

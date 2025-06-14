@@ -47,16 +47,25 @@ namespace mvc.app.Controllers
                 {
                     // Generate JWT token
                     string token = _authService.GenerateToken(user);
-                    
+                    Console.WriteLine("Generated JWT Token: " + token);
+
                     // Store token in session
-                    HttpContext.Session.SetString("JWTToken", token);
-                    
+                    HttpContext.Session.SetString("Token", token);
+
+                    Response.Cookies.Append("AuthToken", token, new CookieOptions
+                    {
+                        HttpOnly = true,
+                        Secure = true, // recommend using HTTPS
+                        SameSite = SameSiteMode.Strict,
+                        Expires = DateTimeOffset.UtcNow.AddMinutes(60)
+                    });
+
                     // Also store user information for backward compatibility
                     HttpContext.Session.SetString("UserId", user.Id.ToString());
                     HttpContext.Session.SetString("Username", user.FullName);
                     HttpContext.Session.SetString("UserRole", user.Role.ToString());
                     
-                    return RedirectToAction("Homepage", "Home");
+                    return RedirectToAction("", "");
                 }
                 else
                 {
