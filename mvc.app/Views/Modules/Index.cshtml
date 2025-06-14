@@ -1,0 +1,41 @@
+﻿@model IEnumerable<mvc.dataaccess.ViewModels.ModuleDTO>
+@{
+    ViewData["Title"] = "Modules";
+    var courseId = ViewBag.CourseId; // Passed from the controller
+}
+
+<h1>Modules for Course</h1>
+
+<p>
+    <a asp-action="Create" asp-route-courseId="@courseId">Create New Module</a>
+</p>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Description</th>
+            <th>Order</th>
+            <th>Created At</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var module in Model)
+        {
+            <tr>
+                <td>@module.Title</td>
+                <td>@module.Description</td>
+                <td>@module.OrderNumber</td>
+                <td>@module.CreatedAt.ToString("yyyy-MM-dd")</td>
+                <td>
+                    <a asp-action="Edit" asp-route-moduleId="@module.ModuleId" asp-route-courseId="@courseId">Edit</a> |
+                    <a asp-action="Details" asp-route-moduleId="@module.ModuleId" asp-route-courseId="@courseId">Details</a> |
+                    <a asp-action="Delete" asp-route-moduleId="@module.ModuleId" asp-route-courseId="@courseId">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<a asp-controller="Courses" asp-action="Details" asp-route-id="@courseId">Back to Course</a>

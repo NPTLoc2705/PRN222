@@ -1,0 +1,77 @@
+﻿@model mvc.dataaccess.ViewModels.LessonDTO
+@{
+    ViewData["Title"] = "Lesson Details";
+    var courseId = ViewBag.CourseId;
+    var module = ViewBag.Module;
+}
+
+<h1>Lesson Details</h1>
+
+<div>
+    <h4>@Model.Title</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Title)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Title)
+        </dd>
+        <dt class="col-sm-2">
+            Content Type
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.ContentType)
+        </dd>
+        @if (!string.IsNullOrEmpty(Model.ContentUrl))
+        {
+            <dt class="col-sm-2">
+                Content Link
+            </dt>
+            <dd class="col-sm-10">
+                <a href="@Model.ContentUrl" target="_blank">View Content</a>
+            </dd>
+        }
+        <dt class="col-sm-2">
+            Duration
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Duration) minutes
+        </dd>
+        <dt class="col-sm-2">
+            Free Preview
+        </dt>
+        <dd class="col-sm-10">
+            @(Model.IsFreePreview ? "Yes" : "No")
+        </dd>
+        <dt class="col-sm-2">
+            Module
+        </dt>
+        <dd class="col-sm-10">
+            @Model.ModuleTitle
+        </dd>
+        <dt class="col-sm-2">
+            Course
+        </dt>
+        <dd class="col-sm-10">
+            @Model.CourseTitle
+        </dd>
+        <dt class="col-sm-2">
+            Created
+        </dt>
+        <dd class="col-sm-10">
+            @Model.CreatedAt.ToString("d")
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit"
+       asp-route-courseId="@courseId"
+       asp-route-moduleId="@module.ModuleId"
+       asp-route-lessonId="@Model.LessonId"
+       class="btn btn-primary">Edit</a>
+    <a asp-action="Index"
+       asp-route-courseId="@courseId"
+       asp-route-moduleId="@module.ModuleId"
+       class="btn btn-secondary">Back to List</a>
+</div>
