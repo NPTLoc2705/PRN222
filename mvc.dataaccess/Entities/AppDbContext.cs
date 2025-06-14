@@ -192,5 +192,18 @@ namespace mvc.dataaccess.Entities
             }
         }
     
+        //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        //{
+        //    optionsBuilder.UseSqlServer(GetConnectionString());
+        //}
+
+        //private string GetConnectionString()
+        //{
+        //    IConfiguration configuration = new ConfigurationBuilder()
+        //            .SetBasePath(Directory.GetCurrentDirectory())
+        //            .AddJsonFile("appsettings.json", true, true).Build();
+        //    return configuration["ConnectionStrings:DefaultConnectionDB"];
+        //}
+    }
 }
 }

@@ -29,5 +29,25 @@ namespace mvc.repositories.Implements
                 throw new Exception("An error occurred while retrieving the user by email.", ex);
             }
         }
+
+        public User CreateUser(User user)
+        {
+            try
+            {
+                if (user == null)
+                {
+                    throw new ArgumentNullException(nameof(user), "User cannot be null");
+                }
+
+                _context.Users.Add(user);
+                _context.SaveChanges();
+                return user;
+            }
+            catch (Exception ex)
+            {
+                // Log the exception (not implemented here)
+                throw new Exception("An error occurred while creating the user.", ex);
+            }
+        }
     }
 }
