@@ -3,7 +3,11 @@
 @{
     ViewData["Title"] = "Details";
 }
-
+@section Styles {
+    <style>
+        /* Paste CSS here */
+    </style>
+}
 <h1>Details</h1>
 
 <div>
@@ -46,3 +50,50 @@
     <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
     <a asp-action="Index">Back to List</a>
 </div>
+<style>
+    h1 {
+        font-size: 2rem;
+        color: #2c3e50;
+        margin-bottom: 20px;
+    }
+
+    h4 {
+        font-size: 1.5rem;
+        color: #34495e;
+        margin-bottom: 15px;
+    }
+
+    hr {
+        border: none;
+        border-top: 2px solid #ddd;
+        margin: 15px 0;
+    }
+
+    dl.row {
+        background-color: #f9f9f9;
+        border: 1px solid #e1e1e1;
+        padding: 20px;
+        border-radius: 8px;
+    }
+
+    dt.col-sm-2 {
+        font-weight: 600;
+        color: #2c3e50;
+    }
+
+    dd.col-sm-10 {
+        margin-bottom: 15px;
+        color: #555;
+    }
+
+    a {
+        color: #3498db;
+        text-decoration: none;
+        margin-right: 10px;
+    }
+
+        a:hover {
+            text-decoration: underline;
+            color: #1d6fa5;
+        }
+</style>
