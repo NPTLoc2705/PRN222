@@ -1,4 +1,5 @@
-﻿using System;
+﻿using mvc.dataaccess.Entities.Courses;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -25,5 +26,6 @@ namespace mvc.dataaccess.Entities
         public string Address { get; set; }
         public string Password { get; set; }
         public bool IsActive { get; set; } = true;
+        public ICollection<UserCourseProgress> CourseProgresses { get; set; }
     }
 }
