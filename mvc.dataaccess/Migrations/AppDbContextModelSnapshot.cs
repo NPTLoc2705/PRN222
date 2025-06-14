@@ -22,6 +22,31 @@ namespace mvc.dataaccess.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("mvc.dataaccess.Entities.Blog", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<byte[]>("ImageData")
+                        .IsRequired()
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<string>("blog_content")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(MAX)");
+
+                    b.Property<string>("title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Blogs", (string)null);
+                });
+
             modelBuilder.Entity("mvc.dataaccess.Entities.Post", b =>
                 {
                     b.Property<Guid>("Id")

@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using mvc.dataaccess.Entities;
 using mvc.repositories.Interfaces;
+using mvc.services.Infrastructure;
 using mvc.services.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -14,11 +15,13 @@ namespace mvc.services.Implements
     {
         private readonly IUserRepository _userRepository;
         private readonly IConfiguration _config;
+        private readonly TokenProvider _tokenProvider;
 
-        public AuthService(IUserRepository userRepository, IConfiguration config)
+        public AuthService(IUserRepository userRepository, IConfiguration config, TokenProvider tokenProvider)
         {
             _userRepository = userRepository;
             _config = config;
+            _tokenProvider = tokenProvider;
         }
 
         public User AuthenticateUser(string email, string password)
@@ -60,6 +63,16 @@ namespace mvc.services.Implements
 
             // Authentication failed
             return null;
+        }
+
+        public string GenerateToken(User user)
+        {
+            if (user == null)
+            {
+                throw new ArgumentNullException(nameof(user), "User cannot be null.");
+            }
+
+            return _tokenProvider.Create(user);
         }
 
         public User GetUserByEmail(string email)

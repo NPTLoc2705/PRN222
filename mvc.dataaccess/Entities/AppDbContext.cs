@@ -14,31 +14,29 @@ namespace mvc.dataaccess.Entities
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {
         }
-
-
-
         public DbSet<User> Users { get; set; }
         public DbSet<Post> Posts { get; set; }
-
+        public DbSet<Blog> Blogs { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<User>().ToTable("Users");
             modelBuilder.Entity<Post>().ToTable("Posts");
+            modelBuilder.Entity<Blog>().ToTable("Blogs");
             // Additional configurations can be added here
             base.OnModelCreating(modelBuilder);
         }
 
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            optionsBuilder.UseSqlServer(GetConnectionString());
-        }
+        //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        //{
+        //    optionsBuilder.UseSqlServer(GetConnectionString());
+        //}
 
-        private string GetConnectionString()
-        {
-            IConfiguration configuration = new ConfigurationBuilder()
-                    .SetBasePath(Directory.GetCurrentDirectory())
-                    .AddJsonFile("appsettings.json", true, true).Build();
-            return configuration["ConnectionStrings:DefaultConnectionDB"];
-        }
+        //private string GetConnectionString()
+        //{
+        //    IConfiguration configuration = new ConfigurationBuilder()
+        //            .SetBasePath(Directory.GetCurrentDirectory())
+        //            .AddJsonFile("appsettings.json", true, true).Build();
+        //    return configuration["ConnectionStrings:DefaultConnectionDB"];
+        //}
     }
 }

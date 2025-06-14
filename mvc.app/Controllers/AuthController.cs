@@ -8,7 +8,7 @@ namespace mvc.app.Controllers
 {
     public class AuthController : Controller
     {
-        private readonly IAuthService _authService; // Inject your account service
+        private readonly IAuthService _authService;
 
         public AuthController(IAuthService authService)
         {
@@ -45,12 +45,18 @@ namespace mvc.app.Controllers
 
                 if (user != null)
                 {
-                    // Store user information in session
+                    // Generate JWT token
+                    string token = _authService.GenerateToken(user);
+                    
+                    // Store token in session
+                    HttpContext.Session.SetString("JWTToken", token);
+                    
+                    // Also store user information for backward compatibility
                     HttpContext.Session.SetString("UserId", user.Id.ToString());
                     HttpContext.Session.SetString("Username", user.FullName);
-                    Console.WriteLine(user.Role);
-
-                    return RedirectToAction("", ""); // Redirect to home page
+                    HttpContext.Session.SetString("UserRole", user.Role.ToString());
+                    
+                    return RedirectToAction("Homepage", "Home");
                 }
                 else
                 {
@@ -102,5 +108,4 @@ namespace mvc.app.Controllers
             return View(model);
         }
     }
-
 }
