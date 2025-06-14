@@ -4,156 +4,143 @@
     ViewData["Title"] = "Drug Articles";
 }
 
-<style>
-    /* Custom styles to complement Bootstrap */
-    .hover-shadow {
-        transition: all 0.3s ease;
-    }
-
-        .hover-shadow:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
         }
 
-    /* Hide images in article excerpts */
-    .article-excerpt img {
-        display: none !important;
-    }
-
-    /* Style for rich text content */
-    .article-excerpt {
-        max-height: 4.5em; /* Approximately 3 lines */
-        overflow: hidden;
-        position: relative;
-        line-height: 1.5em;
-    }
-
-        /* Fade out effect at bottom */
-        .article-excerpt::after {
-            content: "...";
-            position: absolute;
-            bottom: 0;
-            right: 0;
-            padding-left: 40px;
-            background: linear-gradient(to right, transparent, white 50%);
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
         }
 
-        /* Remove extra spacing from rich text elements */
-        .article-excerpt p {
-            margin-bottom: 0.5rem;
+        h1 {
+            text-align: center;
+            color: #1a3c5e;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
-            .article-excerpt p:last-child {
-                margin-bottom: 0;
+        .article-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .article-card {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+            .article-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
             }
 
-    /* Ensure all cards have same height */
-    .card {
-        height: 100%;
-    }
-</style>
+        .article-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            display: block;
+        }
 
-<div class="py-4">
-    <h1 class="text-center text-primary mb-5 text-uppercase">Drug Articles</h1>
+        .no-image {
+            width: 100%;
+            height: 200px;
+            background: #e0e0e0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            font-style: italic;
+        }
 
-    @if (!Model.Any())
-    {
-        <div class="alert alert-info text-center" role="alert">
-            <i class="bi bi-info-circle"></i> No articles available at this time.
-        </div>
-    }
-    else
-    {
-        <div class="row g-4">
+        .article-content {
+            padding: 15px;
+        }
+
+        .article-title {
+            font-size: 1.5em;
+            margin: 0 0 10px;
+            color: #1a3c5e;
+            line-height: 1.3;
+        }
+
+        .article-excerpt {
+            font-size: 1em;
+            color: #555;
+            line-height: 1.6;
+            margin: 0;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .article-link {
+            display: inline-block;
+            margin-top: 10px;
+            color: #007bff;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+            .article-link:hover {
+                text-decoration: underline;
+            }
+        @@media (max-width: 600px) {
+            .article-grid
+
+        {
+            grid-template-columns: 1fr;
+        }
+
+        h1 {
+            font-size: 2em;
+        }
+
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Drug Articles</h1>
+        <div class="article-grid">
             @foreach (var item in Model)
             {
-                <div class="col-12 col-md-6 col-lg-4">
-                    <div class="card h-100 shadow-sm hover-shadow">
-                        @if (item.ImageData != null)
-                        {
-                            <img src="data:image/jpeg;base64,@Convert.ToBase64String(item.ImageData)"
-                                 alt="@item.title"
-                                 class="card-img-top"
-                                 style="height: 200px; object-fit: cover;">
-                        }
-                        else
-                        {
-                            <div class="bg-light d-flex align-items-center justify-content-center text-muted"
-                                 style="height: 200px;">
-                                <i class="bi bi-image fs-1"></i>
-                                <span class="ms-2">No Image Available</span>
-                            </div>
-                        }
-                        <div class="card-body d-flex flex-column">
-                            <h5 class="card-title text-primary">@Html.DisplayFor(modelItem => item.title)</h5>
-                            <div class="article-excerpt card-text flex-grow-1">
-                                @Html.Raw(item.blog_content)
-                            </div>
-                            <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-primary mt-3">
-                                Read More <i class="bi bi-arrow-right"></i>
-                            </a>
-                        </div>
+                <div class="article-card">
+                    @if (item.ImageData != null)
+                    {
+                        <img src="data:image/jpeg;base64,@Convert.ToBase64String(item.ImageData)" alt="@item.title" class="article-image" />
+                    }
+                    else
+                    {
+                        <div class="no-image">No Image Available</div>
+                    }
+                    <div class="article-content">
+                        <h2 class="article-title">@Html.DisplayFor(modelItem => item.title)</h2>
+                        <p class="article-excerpt">@Html.DisplayFor(modelItem => item.blog_content)</p>
+                        <a asp-action="Details" asp-route-id="@item.Id" class="article-link">Read More</a>
                     </div>
                 </div>
             }
         </div>
-    }
-</div>
-
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Process all article excerpts
-        const excerpts = document.querySelectorAll('.article-excerpt');
-
-        excerpts.forEach(function(excerpt) {
-            // Create a temporary element to parse HTML properly
-            const temp = document.createElement('div');
-            temp.innerHTML = excerpt.innerHTML;
-
-            // Remove all images
-            temp.querySelectorAll('img').forEach(img => img.remove());
-
-            // Remove all media elements
-            temp.querySelectorAll('video, iframe, object, embed').forEach(el => el.remove());
-
-            // Remove empty elements
-            temp.querySelectorAll('p, div, span').forEach(el => {
-                if (!el.textContent.trim()) {
-                    el.remove();
-                }
-            });
-
-            // Get clean text content
-            let textContent = temp.textContent || temp.innerText || '';
-
-            // Clean up the text
-            textContent = textContent
-                .replace(/\s+/g, ' ')  // Replace multiple spaces with single space
-                .replace(/>\s+</g, '><')  // Remove spaces between tags
-                .replace(/[\r\n]+/g, ' ')  // Replace line breaks with spaces
-                .trim();  // Remove leading/trailing whitespace
-
-            // Remove any standalone HTML entities or special characters
-            textContent = textContent
-                .replace(/^[>&<\s]+/, '')  // Remove leading special chars
-                .replace(/[>&<\s]+$/, '');  // Remove trailing special chars
-
-            // Truncate if needed
-            const maxLength = 150;
-            if (textContent.length > maxLength) {
-                // Try to break at a word boundary
-                const truncated = textContent.substring(0, maxLength);
-                const lastSpace = truncated.lastIndexOf(' ');
-
-                if (lastSpace > maxLength * 0.8) {
-                    textContent = truncated.substring(0, lastSpace) + '...';
-                } else {
-                    textContent = truncated + '...';
-                }
-            }
-
-            // Set the clean text
-            excerpt.textContent = textContent || 'No content available';
-        });
-    });
-</script>
+    </div>
+</body>
+</html>
