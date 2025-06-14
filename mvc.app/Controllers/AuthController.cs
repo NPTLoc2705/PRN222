@@ -53,6 +53,7 @@ namespace mvc.app.Controllers
                     // Store token in session
                     HttpContext.Session.SetString("Token", token);
 
+                    
                     Response.Cookies.Append("AuthToken", token, new CookieOptions
                     {
                         HttpOnly = true,

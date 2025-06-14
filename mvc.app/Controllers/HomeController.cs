@@ -14,10 +14,12 @@ public class HomeController : Controller
         _logger = logger;
     }
 
-    [Authorize(Roles = "Member, Staff, Consultant, Manager, Admin")]
+    //[Authorize(Roles = "Member, Staff, Consultant, Manager, Admin")]
+    [AllowAnonymous]
     public IActionResult Index()
     {
-        var username = User.Identity?.Name ?? "Guest";
+        var username = User.Identity?.Name;
+        Console.WriteLine($"Username: {username}");
         ViewData["UserMessage"] = $"Welcome, {username}.";
         return View("Homepage");
     }
