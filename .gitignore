@@ -27,3 +27,4 @@ PRN222.Server/.cache/
 # Ignore system files
 Thumbs.db
 Desktop.ini
+mvc.app/appsettings.json

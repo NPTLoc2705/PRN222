@@ -1,0 +1,59 @@
+﻿@{
+    ViewData["Title"] = "Booking";
+}
+
+<style>
+    .booking-card {
+        border-radius: 18px;
+        box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+        background: #fff;
+        padding: 2.5rem 2rem;
+        margin-top: 2rem;
+    }
+
+    .booking-title {
+        font-size: 2.2rem;
+        font-weight: 700;
+        color: #2c3e50;
+        margin-bottom: 0.75rem;
+    }
+
+    .booking-subtitle {
+        font-size: 1.1rem;
+        color: #6c757d;
+        margin-bottom: 2rem;
+    }
+
+    .booking-btn {
+        font-size: 1.15rem;
+        padding: 0.75rem 0;
+        border-radius: 8px;
+        font-weight: 600;
+        background: #007bff;
+        border: none;
+        transition: background 0.2s;
+    }
+
+        .booking-btn:hover {
+            background: #0056b3;
+            color: #fff;
+        }
+</style>
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="booking-card">
+                <h1 class="booking-title text-center">Booking</h1>
+                <h6 class="booking-subtitle text-center">
+                    Schedule your consultation easily
+                </h6>
+                <div class="d-grid">
+                    <a asp-action="UserBooking" class="btn booking-btn">
+                        Book a Consultant
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
