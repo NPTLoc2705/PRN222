@@ -19,11 +19,30 @@ namespace mvc.app.Controllers
             _context = context;
             _bookingService = bookingService;
         }
+        public async Task<IActionResult> Booking()
+        {
+            var customerIdObj = HttpContext.Session.GetString("UserId");
+            if (customerIdObj == null)
+            {
+                // Handle missing session (e.g., redirect to login)
+                return RedirectToAction("Login", "Auth");
+            }
+            return View();
+        }
+
 
         // GET: Bookings
+
         public async Task<IActionResult> Index()
         {
-            var list = await _bookingService.GetAllBookingsAsync();
+            var customerIdObj = HttpContext.Session.GetString("UserId");
+            var role = HttpContext.Session.GetString("Role");
+            if (customerIdObj == null|| role == "Admin")
+            {
+                // Handle missing session (e.g., redirect to login)
+                return RedirectToAction("Login", "Auth");
+            }
+                var list = await _bookingService.GetAllBookingsAsync();
             return View(list);
         }
 
@@ -39,7 +58,10 @@ namespace mvc.app.Controllers
         {
             return View();
         }
-
+        public async Task<IActionResult> UserBooking()
+        {
+            return View();
+        }
         // POST: Bookings/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
@@ -49,12 +71,33 @@ namespace mvc.app.Controllers
         {
             if (ModelState.IsValid)
             {
-               _bookingService.AddBookingAsync(booking);
+                booking.Status = BookStatus.Ongoing;
+                await _bookingService.AddBookingAsync(booking);
                 return RedirectToAction(nameof(Index));
             }
             return View(booking);
         }
-
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UserBooking([Bind("Id,ConsultantId,StartDate")] Booking booking)
+        {
+            if (ModelState.IsValid)
+            {
+                // Retrieve CustomerId from session
+                var customerIdObj = HttpContext.Session.GetString("UserId");
+                if (customerIdObj == null)
+                {
+                    // Handle missing session (e.g., redirect to login)
+                    return RedirectToAction("Login", "Auth");
+                }
+                booking.CustomerId = Guid.Parse(customerIdObj);
+                booking.BookingDate = DateTime.Now; // Set the booking date to now
+                booking.Status = BookStatus.Pending; // Set the initial status to Pending
+                await _bookingService.AddBookingAsync(booking);
+                return RedirectToAction(nameof(Index));
+            }
+            return View(booking);
+        }
         // GET: Bookings/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
@@ -87,7 +130,7 @@ namespace mvc.app.Controllers
             {
                 try
                 {
-                    _bookingService.UpdateBookingAsync(booking);
+                    await _bookingService.UpdateBookingAsync(booking);
                     
                 }
                 catch (DbUpdateConcurrencyException)
@@ -128,13 +171,11 @@ namespace mvc.app.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var booking = _bookingService.GetBookingByIdAsync(id);
-            if (booking != null)
-            {
-              await _bookingService.DeleteBookingAsync(id);
-            }
-
             
+              await _bookingService.DeleteBookingAsync(id);
+            
+
+
             return RedirectToAction(nameof(Index));
         }
 

@@ -1,0 +1,123 @@
+﻿@model Booking
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h1>Create</h1>
+
+<h4>Booking</h4>
+<hr />
+<div class="row justify-content-center">
+    <div class="col-md-4 booking-create-container">
+        <form asp-action="UserBooking">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>            
+            <div class="form-group">
+                <label asp-for="ConsultantId" class="control-label"></label>
+                <input asp-for="ConsultantId" class="form-control" />
+                <span asp-validation-for="ConsultantId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="StartDate" class="control-label"></label>
+                <input asp-for="StartDate" class="form-control" />
+                <span asp-validation-for="StartDate" class="text-danger"></span>
+            </div>
+           
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
+
+<style>
+    h1, h4 {
+        color: #2c3e50;
+    }
+
+    hr {
+        border-top: 2px solid #eee;
+        margin-bottom: 20px;
+    }
+
+    form {
+        background-color: #fff;
+        padding: 20px;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+    .control-label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: 600;
+        color: #34495e;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 10px;
+        font-size: 1rem;
+        border-radius: 4px;
+        border: 1px solid #ccc;
+        transition: border-color 0.3s ease-in-out;
+    }
+
+        .form-control:focus {
+            border-color: #3498db;
+            outline: none;
+            box-shadow: 0 0 3px rgba(52, 152, 219, 0.4);
+        }
+
+    .text-danger {
+        color: #e74c3c;
+        font-size: 0.875rem;
+    }
+
+    .btn-primary {
+        background-color: #3498db;
+        border-color: #2980b9;
+        color: white;
+        padding: 10px 16px;
+        font-size: 1rem;
+        border-radius: 4px;
+        transition: background-color 0.3s ease;
+    }
+
+        .btn-primary:hover {
+            background-color: #2980b9;
+        }
+
+    a {
+        color: #3498db;
+        text-decoration: none;
+        display: inline-block;
+        margin-top: 15px;
+    }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+    .row {
+        margin-top: 30px;
+    }
+
+    }
+</style>
+

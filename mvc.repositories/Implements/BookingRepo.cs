@@ -27,6 +27,14 @@ namespace mvc.repositories.Implements
         public async Task DeleteBookingsAsync(int id)
         {
             var book = await _context.Bookings.FirstOrDefaultAsync(b => b.Id == id);
+            // Ensure that each BookingRepo instance is used for a single operation at a time.
+            // DbContext is not thread-safe. Do not share BookingRepo (and thus DbContext) across threads or requests.
+            // If using dependency injection, use AddScoped<AppDbContext>() and AddScoped<BookingRepo>() in your DI setup.
+            // Example (in Program.cs or Startup.cs):
+            // services.AddDbContext<AppDbContext>(options => ...);
+            // services.AddScoped<IBookingRepo, BookingRepo>();
+
+            // No code changes are needed in BookingRepo itself, but ensure you do not use the same BookingRepo instance concurrently.
             if (book != null)
             {
                 _context.Remove(book);
