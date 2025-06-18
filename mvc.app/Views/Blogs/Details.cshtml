@@ -1,36 +1,501 @@
 ﻿@model mvc.dataaccess.Entities.Blog
-
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = Model?.title ?? "Blog Post";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h1>Details</h1>
+@section Styles {
+    <style>
+        /* Container */
+        .blog-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+            background: #ffffff;
+            min-height: 100vh;
+        }
 
-<div>
-    <h4>Blog</h4>
-    <hr />
-    <dl class="row">
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.title)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.title)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.blog_content)
-        </dt>
-        <dd class="col-sm-10">
+        /* Header */
+        .blog-header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding-bottom: 2rem;
+            border-bottom: 2px solid #f0f0f0;
+            position: relative;
+        }
+
+        .blog-title {
+            font-size: 3rem;
+            font-weight: 800;
+            color: #1a1a1a;
+            margin-bottom: 1rem;
+            line-height: 1.2;
+            letter-spacing: -0.02em;
+        }
+
+        .blog-meta {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 2rem;
+            color: #666;
+            font-size: 1rem;
+        }
+
+        .blog-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+            .blog-meta-item i {
+                opacity: 0.7;
+            }
+
+        /* Featured Image Container */
+        .featured-image-container {
+            margin-bottom: 3rem;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            background: #f8f9fa;
+            cursor: zoom-in;
+        }
+
+        .featured-image {
+            width: 100%;
+            height: auto;
+            display: block;
+            /* Remove max-height to show full image */
+            object-fit: contain;
+            transition: transform 0.3s ease;
+        }
+
+        .featured-image-container:hover .featured-image {
+            transform: scale(1.02);
+        }
+
+        /* Content */
+        .blog-content {
+            font-size: 1.25rem;
+            line-height: 1.8;
+            color: #2c3e50;
+            font-family: 'Georgia', serif;
+        }
+
+            .blog-content p {
+                margin-bottom: 1.75rem;
+                text-align: justify;
+            }
+
+            .blog-content h1,
+            .blog-content h2,
+            .blog-content h3,
+            .blog-content h4,
+            .blog-content h5,
+            .blog-content h6 {
+                margin-top: 2.5rem;
+                margin-bottom: 1.25rem;
+                font-weight: 700;
+                color: #1a1a1a;
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            }
+
+            .blog-content h2 {
+                font-size: 2rem;
+                position: relative;
+                padding-bottom: 0.5rem;
+            }
+
+                .blog-content h2:after {
+                    content: '';
+                    position: absolute;
+                    bottom: 0;
+                    left: 0;
+                    width: 50px;
+                    height: 3px;
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                }
+
+            .blog-content h3 {
+                font-size: 1.6rem;
+            }
+
+            .blog-content ul,
+            .blog-content ol {
+                margin-bottom: 1.75rem;
+                padding-left: 2.5rem;
+            }
+
+            .blog-content li {
+                margin-bottom: 0.75rem;
+            }
+
+            .blog-content blockquote {
+                border-left: 4px solid #667eea;
+                padding: 1.5rem 2rem;
+                margin: 2.5rem 0;
+                font-style: italic;
+                color: #555;
+                background: #f8f9fa;
+                border-radius: 0 8px 8px 0;
+            }
+
+            /* Images in content - IMPORTANT: Show actual size */
+            .blog-content img {
+                width: auto !important;
+                max-width: 100% !important;
+                height: auto !important;
+                display: block;
+                margin: 2.5rem auto;
+                border-radius: 8px;
+                box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+                cursor: zoom-in;
+                transition: all 0.3s ease;
+            }
+
+                .blog-content img:hover {
+                    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+                    transform: translateY(-2px);
+                }
+
+            /* Code blocks */
+            .blog-content pre {
+                background: #2d3748;
+                color: #e2e8f0;
+                padding: 1.5rem;
+                border-radius: 8px;
+                overflow-x: auto;
+                margin: 2rem 0;
+            }
+
+            .blog-content code {
+                background: #e2e8f0;
+                color: #2d3748;
+                padding: 0.25rem 0.5rem;
+                border-radius: 4px;
+                font-family: 'Consolas', monospace;
+                font-size: 0.9em;
+            }
+
+            .blog-content pre code {
+                background: none;
+                color: inherit;
+                padding: 0;
+            }
+
+            /* Tables */
+            .blog-content table {
+                width: 100%;
+                border-collapse: collapse;
+                margin: 2rem 0;
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+                border-radius: 8px;
+                overflow: hidden;
+            }
+
+            .blog-content th,
+            .blog-content td {
+                padding: 1rem;
+                text-align: left;
+                border-bottom: 1px solid #e5e5e5;
+            }
+
+            .blog-content th {
+                font-weight: 600;
+                background: #f8f9fa;
+                color: #2d3748;
+            }
+
+            .blog-content tr:hover {
+                background: #f8f9fa;
+            }
+
+        /* Actions */
+        .blog-actions {
+            margin-top: 4rem;
+            padding-top: 2rem;
+            border-top: 2px solid #f0f0f0;
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+            .blog-actions .btn {
+                padding: 0.875rem 2rem;
+                font-size: 1rem;
+                border-radius: 8px;
+                font-weight: 500;
+                transition: all 0.3s ease;
+                text-decoration: none;
+                display: inline-flex;
+                align-items: center;
+                gap: 0.5rem;
+            }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+        }
+
+            .btn-primary:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+            }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+            border: none;
+        }
+
+            .btn-secondary:hover {
+                background: #5a6268;
+                transform: translateY(-2px);
+            }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+            border: none;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+            .btn-danger:hover {
+                background: #c82333;
+                transform: translateY(-2px);
+            }
+
+        /* Empty state */
+        .empty-content {
+            text-align: center;
+            padding: 6rem 0;
+            color: #999;
+        }
+
+            .empty-content i {
+                font-size: 4rem;
+                margin-bottom: 1rem;
+                opacity: 0.3;
+            }
+
+        /* Image viewer modal */
+        .image-modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.95);
+            cursor: zoom-out;
+        }
+
+        .image-modal-content {
+            margin: auto;
+            display: block;
+            max-width: 90%;
+            max-height: 90%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .image-modal-close {
+            position: absolute;
+            top: 20px;
+            right: 35px;
+            color: #f1f1f1;
+            font-size: 40px;
+            font-weight: bold;
+            transition: 0.3s;
+            cursor: pointer;
+        }
+
+            .image-modal-close:hover {
+                color: #bbb;
+            }
+
+        /* Responsive */
+        @@media (max-width: 768px) {
+            .blog-container {
+                padding: 1rem;
+            }
+
+            .blog-title {
+                font-size: 2rem;
+            }
+
+            .blog-content {
+                font-size: 1.1rem;
+            }
+
+                .blog-content h2 {
+                    font-size: 1.6rem;
+                }
+
+                .blog-content h3 {
+                    font-size: 1.3rem;
+                }
+
+            .featured-image-container {
+                border-radius: 0;
+                margin-left: -1rem;
+                margin-right: -1rem;
+                width: calc(100% + 2rem);
+            }
+
+            .blog-actions {
+                flex-direction: column;
+            }
+
+                .blog-actions .btn {
+                    width: 100%;
+                    justify-content: center;
+                }
+
+            .blog-meta {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+        }
+
+        /* Print friendly */
+        @@media print {
+            .blog-actions,
+            .image-modal {
+                display: none !important;
+            }
+
+            .blog-container {
+                max-width: 100%;
+                padding: 0;
+            }
+
+            .blog-content {
+                font-size: 12pt;
+            }
+
+                .blog-content img {
+                    max-width: 100% !important;
+                    page-break-inside: avoid;
+                }
+        }
+    </style>
+}
+
+<div class="blog-container">
+    <!-- Header -->
+    <header class="blog-header">
+        <h1 class="blog-title">@(Model?.title ?? "Untitled")</h1>
+        <div class="blog-meta">
+            <div class="blog-meta-item">
+                <i class="fas fa-calendar-alt"></i>
+                <time datetime="@DateTime.Now.ToString("yyyy-MM-dd")">
+                    @DateTime.Now.ToString("MMMM dd, yyyy")
+                </time>
+            </div>
+            <div class="blog-meta-item">
+                <i class="fas fa-clock"></i>
+                <span>5 min read</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Featured Image -->
+    @if (Model?.ImageData != null && Model.ImageData.Length > 0)
+    {
+        <div class="featured-image-container">
+            <img src="data:image/jpeg;base64,@Convert.ToBase64String(Model.ImageData)"
+                 alt="@Model.title"
+                 class="featured-image"
+                 onclick="openImageModal(this)" />
+        </div>
+    }
+
+    <!-- Content -->
+    <article class="blog-content">
+        @if (!string.IsNullOrEmpty(Model?.blog_content))
+        {
             @Html.Raw(Model.blog_content)
-        </dd>
-        @* <dt class="col-sm-2"> *@
-        @*     @Html.DisplayNameFor(model => model.ImageData) *@
-        @* </dt> *@
-        @* <dd class="col-sm-10"> *@
-        @*     <img src="data:image/jpeg;base64,@Convert.ToBase64String(Model.ImageData)" alt="Blog Image" style="max-width: 100%; height: auto;" /> *@
-        @* </dd> *@
-    </dl>
+        }
+        else
+        {
+            <div class="empty-content">
+                <i class="fas fa-file-alt"></i>
+                <h3>No content available</h3>
+                <p>This blog post doesn't have any content yet.</p>
+            </div>
+        }
+    </article>
+
+    <!-- Actions -->
+    <div class="blog-actions">
+        <a asp-action="Edit" asp-route-id="@Model?.Id" class="btn btn-primary">
+            <i class="fas fa-edit"></i>Edit
+        </a>
+        <a href="/Blogs/AdminBlog" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i>Back to Admin
+        </a>
+        <a href="/Blogs/Delete/@Model?.Id" class="btn btn-danger">
+            <i class="fas fa-trash"></i>Delete
+        </a>
+    </div>
 </div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+
+<!-- Image Modal -->
+<div id="imageModal" class="image-modal" onclick="closeImageModal()">
+    <span class="image-modal-close">&times;</span>
+    <img class="image-modal-content" id="modalImage">
 </div>
+
+@section Scripts {
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <script>
+        // Image modal functionality
+        function openImageModal(img) {
+            const modal = document.getElementById('imageModal');
+            const modalImg = document.getElementById('modalImage');
+            modal.style.display = 'block';
+            modalImg.src = img.src;
+        }
+
+        function closeImageModal() {
+            document.getElementById('imageModal').style.display = 'none';
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Make all content images clickable
+            const contentImages = document.querySelectorAll('.blog-content img');
+            contentImages.forEach(img => {
+                img.onclick = function() {
+                    openImageModal(this);
+                };
+            });
+
+            // Close modal with Escape key
+            document.addEventListener('keydown', function(event) {
+                if (event.key === 'Escape') {
+                    closeImageModal();
+                }
+            });
+
+            // Add table wrapper for responsive
+            const tables = document.querySelectorAll('.blog-content table');
+            tables.forEach(table => {
+                const wrapper = document.createElement('div');
+                wrapper.style.overflowX = 'auto';
+                wrapper.style.marginBottom = '2rem';
+                table.parentNode.insertBefore(wrapper, table);
+                wrapper.appendChild(table);
+            });
+        });
+    </script>
+}
