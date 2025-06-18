@@ -10,7 +10,7 @@ namespace mvc.services.Interfaces
     public interface IBlogService
     {
         List<Blog> GetAll();
-        Blog GetById(int id);
+        Blog GetById(Guid id);
         void Add(Blog blog);
         void Update(Blog blog);
         void Delete(Blog blog);
