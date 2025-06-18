@@ -153,5 +153,10 @@ namespace mvc.app.Controllers
         {
             return _context.Blogs.Any(e => e.Id == id);
         }
+        public IActionResult AdminBlog()
+        {
+            var blogs = _context.Blogs.ToList();
+            return View(blogs); 
+        }
     }
 }

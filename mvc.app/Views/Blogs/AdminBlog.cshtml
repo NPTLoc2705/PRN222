@@ -1,14 +1,26 @@
 ﻿@model IEnumerable<mvc.dataaccess.Entities.Blog>
 @{
     ViewData["Title"] = "AdminManager";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
 <style>
+    /* Fix table layout để text không tràn */
+    .table {
+        table-layout: fixed;
+        width: 100%;
+    }
+
     .blog-content-preview {
         max-width: 500px;
         color: #555;
         font-size: 0.9em;
         line-height: 1.4;
+        /* Thêm để fix overflow */
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        display: block;
     }
 
         .blog-content-preview:hover {
@@ -17,7 +29,7 @@
         }
 
         /* Style for empty content */
-        .blog-content-preview .empty-content {
+        .blog-content-preview:has-text("(No text content)") {
             color: #999;
             font-style: italic;
         }
@@ -29,6 +41,9 @@
 
     .table td {
         vertical-align: middle;
+        /* Thêm để prevent overflow */
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 
     .content-badge {
@@ -39,6 +54,8 @@
         font-weight: 500;
         margin-left: 0.5rem;
         white-space: nowrap;
+        /* Thêm để badge không bị wrap */
+        flex-shrink: 0;
     }
 
         .content-badge.has-image {
@@ -91,7 +108,7 @@
         <a href="@Url.Action("Create", "Blogs")" class="btn btn-primary">
             <i class="fa fa-plus-circle me-1"></i>Create New Blog
         </a>
-        <a href="@Url.Action("Blogs")" class="btn btn-secondary">
+        <a href="@Url.Action("", "Blogs")" class="btn btn-secondary">
             <i class="fa fa-arrow-left me-1"></i>Back to List
         </a>
     </div>
@@ -119,7 +136,6 @@
                             <div class="blog-content-preview" data-blogid="@item.Id" title="Click to view full content">
                                 @{
                                     var content = item.blog_content ?? "";
-                                    var cssClass = "";
 
                                     // Remove all img tags including base64 content
                                     content = System.Text.RegularExpressions.Regex.Replace(content, @"<img[^>]*>", "", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
@@ -134,14 +150,13 @@
                                     if (string.IsNullOrWhiteSpace(content))
                                     {
                                         content = "(No text content)";
-                                        cssClass = "empty-content";
                                     }
                                     else if (content.Length > 100)
                                     {
                                         content = content.Substring(0, 100) + "...";
                                     }
                                 }
-                                <span class="@cssClass">@content</span>
+                                @content
                             </div>
                             @if (item.blog_content != null && item.blog_content.Contains("<img"))
                             {
@@ -204,26 +219,8 @@ else
     </script>
 }
 
-@* 
-    Nếu bạn muốn thêm modal để xem full content, thêm đoạn này:
+ 
     
-    <!-- Modal for full content -->
-    <div class="modal fade" id="contentModal" tabindex="-1">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Blog Content</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body" id="modalContent">
-                    <!-- Content will be inserted here -->
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                </div>
-            </div>
-        </div>
-    </div>
     
     <script>
         $('.blog-content-preview').css('cursor', 'pointer').on('click', function() {
@@ -235,41 +232,5 @@ else
             $('#contentModal').modal('show');
         });
     </script>
-*@
 
-@* 
-    ALTERNATIVE: Server-side content processing
-    
-    Trong Controller, bạn có thể xử lý content trước khi gửi đến View:
-    
-    public ActionResult AdminManager()
-    {
-        var blogs = db.Blogs.Select(b => new BlogViewModel
-        {
-            Id = b.Id,
-            title = b.title,
-            blog_content = b.blog_content,
-            // Tạo preview không có hình ảnh
-            ContentPreview = StripHtmlImages(b.blog_content, 200)
-        }).ToList();
-        
-        return View(blogs);
-    }
-    
-    private string StripHtmlImages(string html, int maxLength)
-    {
-        if (string.IsNullOrEmpty(html)) return "";
-        
-        // Remove images
-        html = Regex.Replace(html, @"<img[^>]*>", "[Image]", RegexOptions.IgnoreCase);
-        
-        // Strip HTML tags but keep text
-        html = Regex.Replace(html, @"<[^>]+>", " ");
-        
-        // Truncate
-        if (html.Length > maxLength)
-            html = html.Substring(0, maxLength) + "...";
-            
-        return html.Trim();
-    }
-*@
+
