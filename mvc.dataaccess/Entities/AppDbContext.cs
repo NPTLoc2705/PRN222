@@ -168,7 +168,17 @@ namespace mvc.dataaccess.Entities
             modelBuilder.Entity<UserCourseProgress>()
                 .Property(ucp => ucp.ProgressId)
                 .HasDefaultValueSql("NEWID()");
+           /* modelBuilder.Entity<Booking>()
+                .HasOne(b => b.Customer)
+                .WithMany(u => u.CustomerBookings)
+                .HasForeignKey(b => b.Customer.Id)
+                .OnDelete(DeleteBehavior.Restrict); // Prevent cascade delete issues
 
+            modelBuilder.Entity<Booking>()
+                .HasOne(b => b.Consultant)
+                .WithMany(u => u.ConsultantBookings)
+                .HasForeignKey(b => b.Consultant.Id)
+                .OnDelete(DeleteBehavior.Restrict);*/
             // Additional configurations can be added here
             base.OnModelCreating(modelBuilder);
         }

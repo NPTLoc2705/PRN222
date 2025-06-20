@@ -4,189 +4,771 @@
     ViewData["Title"] = "Index";
 }
 
-<h1>Index</h1>
+<div class="page-container">
+    <div class="header-section">
+        <h1 class="page-title">Booking Management</h1>
+        <p class="page-subtitle">Manage all your bookings in one place</p>
+    </div>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.BookingDate)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.CustomerId)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ConsultantId)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.StartDate)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Status)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.BookingDate)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CustomerId)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ConsultantId)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.StartDate)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Status)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+    <div class="action-bar">
+        <a asp-action="Create" class="btn btn-primary">
+            <span class="btn-icon">➕</span>
+            <span class="btn-text">Create New Booking</span>
+        </a>
+        <div class="search-container">
+            <input type="text" class="search-input" placeholder="Search bookings..." />
+            <span class="search-icon">🔍</span>
+        </div>
+    </div>
+
+    <div class="table-container">
+        <div class="table-wrapper">
+            <table class="booking-table">
+                <thead>
+                    <tr>
+                        <th class="sortable">
+                            <div class="th-content">
+                                <span class="th-icon">📅</span>
+                                @Html.DisplayNameFor(model => model.BookingDate)
+                                <span class="sort-indicator">↕</span>
+                            </div>
+                        </th>
+                        <th class="sortable">
+                            <div class="th-content">
+                                <span class="th-icon">👤</span>
+                                @Html.DisplayNameFor(model => model.CustomerId)
+                                <span class="sort-indicator">↕</span>
+                            </div>
+                        </th>
+                        <th class="sortable">
+                            <div class="th-content">
+                                <span class="th-icon">💼</span>
+                                @Html.DisplayNameFor(model => model.ConsultantId)
+                                <span class="sort-indicator">↕</span>
+                            </div>
+                        </th>
+                        <th class="sortable">
+                            <div class="th-content">
+                                <span class="th-icon">🕐</span>
+                                @Html.DisplayNameFor(model => model.StartDate)
+                                <span class="sort-indicator">↕</span>
+                            </div>
+                        </th>
+                        <th class="sortable">
+                            <div class="th-content">
+                                <span class="th-icon">📊</span>
+                                @Html.DisplayNameFor(model => model.Status)
+                                <span class="sort-indicator">↕</span>
+                            </div>
+                        </th>
+                        <th class="actions-header">
+                            <span class="th-icon">⚙️</span>
+                            Actions
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr class="table-row">
+                            <td class="booking-date">
+                                <div class="cell-content">
+                                    @Html.DisplayFor(modelItem => item.BookingDate)
+                                </div>
+                            </td>
+                            <td class="customer-id">
+                                <div class="cell-content">
+                                    <span class="data-badge customer-badge">
+                                        @Html.DisplayFor(modelItem => item.CustomerId)
+                                    </span>
+                                </div>
+                            </td>
+                            <td class="consultant-id">
+                                <div class="cell-content">
+                                    <span class="data-badge consultant-badge">
+                                        @Html.DisplayFor(modelItem => item.ConsultantId)
+                                    </span>
+                                </div>
+                            </td>
+                            <td class="start-date">
+                                <div class="cell-content">
+                                    @Html.DisplayFor(modelItem => item.StartDate)
+                                </div>
+                            </td>
+                            <td class="status">
+                                <div class="cell-content">
+                                    <span class="status-badge status-active">
+                                        @Html.DisplayFor(modelItem => item.Status)
+                                    </span>
+                                </div>
+                            </td>
+                            <td class="actions">
+                                <div class="action-buttons">
+                                    <a asp-action="Edit" asp-route-id="@item.Id" class="action-btn edit-btn">
+                                        <span class="action-icon">✏️</span>
+                                        <span class="action-text">Edit</span>
+                                    </a>
+                                    <a asp-action="Details" asp-route-id="@item.Id" class="action-btn details-btn">
+                                        <span class="action-icon">👁️</span>
+                                        <span class="action-text">Details</span>
+                                    </a>
+                                    <a asp-action="Delete" asp-route-id="@item.Id" class="action-btn delete-btn">
+                                        <span class="action-icon">🗑️</span>
+                                        <span class="action-text">Delete</span>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="pagination-container">
+        <div class="pagination-info">
+            <span class="info-text">Showing 1-10 of 25 bookings</span>
+        </div>
+        <div class="pagination-controls">
+            <button class="pagination-btn prev-btn" disabled>
+                <span class="pagination-icon">←</span>
+                Previous
+            </button>
+            <div class="page-numbers">
+                <span class="page-number active">1</span>
+                <span class="page-number">2</span>
+                <span class="page-number">3</span>
+                <span class="page-dots">...</span>
+                <span class="page-number">10</span>
+            </div>
+            <button class="pagination-btn next-btn">
+                Next
+                <span class="pagination-icon">→</span>
+            </button>
+        </div>
+    </div>
+</div>
+
 <style>
-    /* Headings */
-    h1 {
-        font-size: 2rem;
-        color: #e74c3c; /* Red warning tone */
-        margin-bottom: 20px;
+    /* CSS Variables */
+    :root {
+        --primary-color: #667eea;
+        --primary-dark: #5a67d8;
+        --primary-light: #a3bffa;
+        --secondary-color: #ed8936;
+        --success-color: #38a169;
+        --danger-color: #e53e3e;
+        --warning-color: #d69e2e;
+        --info-color: #3182ce;
+        --white: #ffffff;
+        --gray-50: #f9fafb;
+        --gray-100: #f3f4f6;
+        --gray-200: #e5e7eb;
+        --gray-300: #d1d5db;
+        --gray-400: #9ca3af;
+        --gray-500: #6b7280;
+        --gray-600: #4b5563;
+        --gray-700: #374151;
+        --gray-800: #1f2937;
+        --gray-900: #111827;
+        --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        --radius-sm: 0.25rem;
+        --radius-md: 0.375rem;
+        --radius-lg: 0.5rem;
+        --radius-xl: 0.75rem;
+        --transition-fast: 0.15s ease-in-out;
+        --transition-normal: 0.3s ease-in-out;
+        --transition-slow: 0.5s ease-in-out;
     }
 
-    h3 {
+    /* Global Styles */
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        background: linear-gradient(135deg, #f6f9fc 0%, #e9ecef 100%);
+        margin: 0;
+        padding: 0;
+        line-height: 1.6;
+        color: var(--gray-800);
+    }
+
+    /* Page Container */
+    .page-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 2rem;
+        min-height: 100vh;
+    }
+
+    /* Header Section */
+    .header-section {
+        text-align: center;
+        margin-bottom: 3rem;
+    }
+
+    .page-title {
+        font-size: 3rem;
+        font-weight: 800;
+        color: var(--gray-900);
+        margin: 0 0 0.5rem 0;
+        letter-spacing: -0.025em;
+        background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        text-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .page-subtitle {
         font-size: 1.25rem;
-        color: #c0392b;
-        margin-bottom: 20px;
+        color: var(--gray-600);
+        margin: 0;
+        font-weight: 400;
     }
 
-    h4 {
-        font-size: 1.3rem;
-        color: #2c3e50;
-        margin-bottom: 10px;
+    /* Action Bar */
+    .action-bar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        padding: 1.5rem;
+        background: var(--white);
+        border-radius: var(--radius-xl);
+        box-shadow: var(--shadow-md);
+        border: 1px solid var(--gray-200);
     }
 
-    hr {
-        border: none;
-        border-top: 2px solid #eee;
-        margin: 15px 0;
-    }
-
-    /* Display list styling */
-    dl.row {
-        background-color: #fcfcfc;
-        border: 1px solid #ddd;
-        border-radius: 8px;
-        padding: 20px;
-        margin-bottom: 25px;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-    }
-
-    dt.col-sm-2 {
+    /* Primary Button */
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.875rem 1.5rem;
+        font-size: 1rem;
         font-weight: 600;
-        color: #34495e;
-    }
-
-    dd.col-sm-10 {
-        color: #555;
-        margin-bottom: 15px;
-    }
-
-    /* Buttons */
-    .btn-danger {
-        background-color: #e74c3c;
-        border-color: #c0392b;
-        color: #fff;
-        padding: 10px 16px;
-        font-size: 1rem;
-        border-radius: 4px;
+        border-radius: var(--radius-lg);
+        border: none;
         cursor: pointer;
-        transition: background-color 0.3s ease;
-    }
-
-        .btn-danger:hover {
-            background-color: #c0392b;
-        }
-
-    a {
-        color: #3498db;
+        transition: all var(--transition-normal);
         text-decoration: none;
-        font-size: 1rem;
-        margin-left: 10px;
-    }
-
-        a:hover {
-            text-decoration: underline;
-        }
-
-    /* Responsive row layout */
-    .row {
-        margin-top: 30px;
-    }
-
-  
-    dl.row {
-        padding: 15px;
-    }
-
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 25px;
-        background-color: #fff;
-        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
-        border-radius: 6px;
+        position: relative;
         overflow: hidden;
     }
 
-    thead {
-        background-color: #f4f6f8;
-        color: #2c3e50;
+    .btn-primary {
+        background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+        color: var(--white);
+        box-shadow: var(--shadow-md);
     }
 
-        thead th {
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary-color));
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+            box-shadow: var(--shadow-sm);
+        }
+
+    .btn-icon {
+        margin-right: 0.5rem;
+        font-size: 0.875rem;
+        transition: transform var(--transition-fast);
+    }
+
+    .btn-text {
+        transition: transform var(--transition-fast);
+    }
+
+    .btn:hover .btn-icon {
+        transform: translateX(-2px);
+    }
+
+    .btn:hover .btn-text {
+        transform: translateX(2px);
+    }
+
+    /* Search Container */
+    .search-container {
+        position: relative;
+        display: flex;
+        align-items: center;
+    }
+
+    .search-input {
+        width: 300px;
+        padding: 0.875rem 1rem;
+        padding-right: 3rem;
+        font-size: 1rem;
+        border: 2px solid var(--gray-200);
+        border-radius: var(--radius-lg);
+        background-color: var(--gray-50);
+        transition: all var(--transition-normal);
+    }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            background-color: var(--white);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            transform: translateY(-1px);
+        }
+
+        .search-input:hover:not(:focus) {
+            border-color: var(--gray-300);
+            background-color: var(--white);
+        }
+
+    .search-icon {
+        position: absolute;
+        right: 1rem;
+        color: var(--gray-400);
+        font-size: 1.125rem;
+        pointer-events: none;
+        transition: color var(--transition-fast);
+    }
+
+    .search-input:focus + .search-icon {
+        color: var(--primary-color);
+    }
+
+    /* Table Container */
+    .table-container {
+        background: var(--white);
+        border-radius: var(--radius-xl);
+        box-shadow: var(--shadow-lg);
+        overflow: hidden;
+        border: 1px solid var(--gray-200);
+        margin-bottom: 2rem;
+    }
+
+    .table-wrapper {
+        overflow-x: auto;
+    }
+
+    /* Booking Table */
+    .booking-table {
+        width: 100%;
+        border-collapse: collapse;
+        background: var(--white);
+    }
+
+        /* Table Header */
+        .booking-table thead {
+            background: linear-gradient(135deg, var(--gray-50), var(--gray-100));
+            border-bottom: 2px solid var(--gray-200);
+        }
+
+        .booking-table th {
+            padding: 1.25rem 1rem;
             text-align: left;
-            padding: 12px 16px;
-            font-weight: 600;
-            border-bottom: 2px solid #e1e1e1;
+            font-weight: 700;
+            color: var(--gray-700);
+            font-size: 0.875rem;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            position: relative;
         }
 
-    tbody tr {
-        border-bottom: 1px solid #eaeaea;
-        transition: background-color 0.2s ease;
+        .booking-table tbody tr {
+            height: 70px; /* Adjust this value as needed */
+            vertical-align: middle;
+        }
+
+    .th-content {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
     }
 
-        tbody tr:hover {
-            background-color: #f9f9f9;
+    .th-icon {
+        font-size: 1rem;
+        opacity: 0.7;
+    }
+
+    .sortable {
+        cursor: pointer;
+        transition: all var(--transition-fast);
+        user-select: none;
+    }
+
+        .sortable:hover {
+            background-color: var(--gray-100);
+            color: var(--primary-color);
         }
 
-    tbody td {
-        padding: 12px 16px;
-        color: #555;
+            .sortable:hover .th-icon,
+            .sortable:hover .sort-indicator {
+                opacity: 1;
+                color: var(--primary-color);
+            }
+
+    .sort-indicator {
+        margin-left: auto;
+        opacity: 0.5;
+        font-size: 0.875rem;
+        transition: all var(--transition-fast);
+    }
+
+    .actions-header {
+        text-align: center;
+    }
+
+    /* Table Body */
+    .booking-table tbody tr {
+        border-bottom: 1px solid var(--gray-200);
+        transition: all var(--transition-normal);
+    }
+
+    .table-row:hover {
+        background: linear-gradient(135deg, var(--gray-50), rgba(102, 126, 234, 0.02));
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    .booking-table td {
+        padding: 1.25rem 1rem;
         vertical-align: middle;
+        color: var(--gray-700);
+        font-size: 0.925rem;
     }
 
-    td a {
-        color: #3498db;
+    .cell-content {
+        display: flex;
+        align-items: center;
+        height: 100%;
+        min-height: 3rem; /* Ensures consistent height */
+    }
+
+    /* Data Badges */
+    .data-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.375rem 0.75rem;
+        font-size: 0.875rem;
+        font-weight: 600;
+        border-radius: var(--radius-lg);
+        transition: all var(--transition-fast);
+    }
+
+    .customer-badge {
+        background-color: rgba(56, 161, 105, 0.1);
+        color: var(--success-color);
+        border: 1px solid rgba(56, 161, 105, 0.2);
+    }
+
+    .consultant-badge {
+        background-color: rgba(237, 137, 54, 0.1);
+        color: var(--secondary-color);
+        border: 1px solid rgba(237, 137, 54, 0.2);
+    }
+
+    .data-badge:hover {
+        transform: translateY(-1px);
+        box-shadow: var(--shadow-sm);
+    }
+
+    /* Status Badge */
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.375rem 0.875rem;
+        font-size: 0.875rem;
+        font-weight: 600;
+        border-radius: var(--radius-lg);
+        transition: all var(--transition-fast);
+    }
+
+    .status-active {
+        background-color: rgba(56, 161, 105, 0.15);
+        color: var(--success-color);
+        border: 1px solid rgba(56, 161, 105, 0.3);
+    }
+
+    .status-badge:hover {
+        transform: scale(1.05);
+        box-shadow: var(--shadow-sm);
+    }
+
+    /* Action Buttons */
+    .action-buttons {
+        display: flex;
+        gap: 0.5rem;
+        justify-content: center;
+    }
+
+    .action-btn {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.5rem 0.75rem;
+        font-size: 0.875rem;
+        font-weight: 500;
+        border-radius: var(--radius-md);
         text-decoration: none;
+        transition: all var(--transition-normal);
+        border: 1px solid transparent;
+        min-width: 80px;
+        justify-content: center;
+    }
+
+    .action-icon {
+        margin-right: 0.25rem;
+        font-size: 0.75rem;
+        transition: transform var(--transition-fast);
+    }
+
+    .action-text {
+        transition: transform var(--transition-fast);
+    }
+
+    .edit-btn {
+        background-color: rgba(49, 130, 206, 0.1);
+        color: var(--info-color);
+        border-color: rgba(49, 130, 206, 0.2);
+    }
+
+        .edit-btn:hover {
+            background-color: var(--info-color);
+            color: var(--white);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+    .details-btn {
+        background-color: rgba(107, 114, 128, 0.1);
+        color: var(--gray-600);
+        border-color: rgba(107, 114, 128, 0.2);
+    }
+
+        .details-btn:hover {
+            background-color: var(--gray-600);
+            color: var(--white);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+    .delete-btn {
+        background-color: rgba(229, 62, 62, 0.1);
+        color: var(--danger-color);
+        border-color: rgba(229, 62, 62, 0.2);
+    }
+
+        .delete-btn:hover {
+            background-color: var(--danger-color);
+            color: var(--white);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+    .action-btn:hover .action-icon {
+        transform: scale(1.2);
+    }
+
+    .action-btn:hover .action-text {
+        transform: translateX(1px);
+    }
+
+    /* Pagination Container */
+    .pagination-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1.5rem;
+        background: var(--white);
+        border-radius: var(--radius-xl);
+        box-shadow: var(--shadow-md);
+        border: 1px solid var(--gray-200);
+    }
+
+    .pagination-info .info-text {
+        color: var(--gray-600);
+        font-size: 0.925rem;
         font-weight: 500;
     }
 
-        td a:hover {
-            text-decoration: underline;
+    .pagination-controls {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .pagination-btn {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.625rem 1rem;
+        font-size: 0.925rem;
+        font-weight: 500;
+        border: 1px solid var(--gray-300);
+        border-radius: var(--radius-md);
+        background: var(--white);
+        color: var(--gray-700);
+        cursor: pointer;
+        transition: all var(--transition-normal);
+        text-decoration: none;
+    }
+
+        .pagination-btn:hover:not(:disabled) {
+            background: var(--primary-color);
+            color: var(--white);
+            border-color: var(--primary-color);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-sm);
         }
 
-    /* Responsive table */
-   
+        .pagination-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            background: var(--gray-100);
+            color: var(--gray-400);
+        }
+
+    .pagination-icon {
+        font-size: 0.875rem;
+        transition: transform var(--transition-fast);
+    }
+
+    .prev-btn .pagination-icon {
+        margin-right: 0.5rem;
+    }
+
+    .next-btn .pagination-icon {
+        margin-left: 0.5rem;
+    }
+
+    .pagination-btn:hover:not(:disabled) .pagination-icon {
+        transform: translateX(2px);
+    }
+
+    .prev-btn:hover:not(:disabled) .pagination-icon {
+        transform: translateX(-2px);
+    }
+
+    .page-numbers {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .page-number {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 2.5rem;
+        height: 2.5rem;
+        font-size: 0.925rem;
+        font-weight: 500;
+        border: 1px solid var(--gray-300);
+        border-radius: var(--radius-md);
+        background: var(--white);
+        color: var(--gray-700);
+        cursor: pointer;
+        transition: all var(--transition-normal);
+        text-decoration: none;
+    }
+
+        .page-number:hover {
+            background: var(--primary-light);
+            border-color: var(--primary-color);
+            color: var(--primary-dark);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .page-number.active {
+            background: var(--primary-color);
+            border-color: var(--primary-color);
+            color: var(--white);
+            font-weight: 600;
+            box-shadow: var(--shadow-md);
+        }
+
+    .page-dots {
+        color: var(--gray-400);
+        font-weight: 600;
+        padding: 0 0.5rem;
+    }
+
+    /* Hover Effects for Table Rows */
+    .table-row {
+        position: relative;
+    }
+
+        .table-row::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--primary-color);
+            opacity: 0;
+            transition: opacity var(--transition-normal);
+        }
+
+        .table-row:hover::before {
+            opacity: 1;
+        }
+
+    /* Focus States for Accessibility */
+    .sortable:focus,
+    .action-btn:focus,
+    .pagination-btn:focus,
+    .page-number:focus,
+    .search-input:focus {
+        outline: 2px solid var(--primary-color);
+        outline-offset: 2px;
+    }
+
+    /* Smooth Scrolling for Table */
+    .table-wrapper::-webkit-scrollbar {
+        height: 8px;
+    }
+
+    .table-wrapper::-webkit-scrollbar-track {
+        background: var(--gray-100);
+        border-radius: var(--radius-sm);
+    }
+
+    .table-wrapper::-webkit-scrollbar-thumb {
+        background: var(--gray-300);
+        border-radius: var(--radius-sm);
+        transition: background var(--transition-fast);
+    }
+
+        .table-wrapper::-webkit-scrollbar-thumb:hover {
+            background: var(--gray-400);
+        }
+
+    /* Empty State Styling */
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        color: var(--gray-500);
+    }
+
+    .empty-state-icon {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+        opacity: 0.5;
+    }
+
+    .empty-state-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: var(--gray-700);
+    }
+
+    .empty-state-description {
+        font-size: 1rem;
+        margin-bottom: 2rem;
+    }
 </style>
