@@ -11,6 +11,7 @@ namespace mvc.repositories.Interfaces
     {
         public User GetUserByEmail(string email);
         
+        public User GetUserById(string userId);
         public User CreateUser(User user);
     }
 }
