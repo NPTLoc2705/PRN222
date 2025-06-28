@@ -1,137 +1,645 @@
-﻿    @model Booking
+﻿@model Booking
+@{
+    ViewData["Title"] = "Create";
+}
 
-    @{
-        ViewData["Title"] = "Create";
-    }
+<div class="page-container">
+    <div class="header-section">
+        <h1 class="page-title">Create New Booking</h1>
+        <p class="page-subtitle">Schedule your appointment with ease</p>
+    </div>
 
-    <h1>Create</h1>
+    <div class="form-wrapper">
+        <div class="form-container">
+            <form asp-action="Create" class="booking-form">
+                <div asp-validation-summary="ModelOnly" class="validation-summary"></div>
 
-    <h4>Booking</h4>
-    <hr />
-    <div class="row justify-content-center">
-        <div class="col-md-4 booking-create-container">
-            <form asp-action="Create">
-                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                <div class="form-group">
-                    <label asp-for="BookingDate" class="control-label"></label>
-                    <input asp-for="BookingDate" class="form-control" />
-                    <span asp-validation-for="BookingDate" class="text-danger"></span>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label asp-for="BookingDate" class="form-label">
+                            <i class="icon-calendar"></i>
+                            Booking Date
+                        </label>
+                        <div class="input-wrapper">
+                            <input asp-for="BookingDate" class="form-input" type="datetime-local" />
+                            <span class="input-focus-border"></span>
+                        </div>
+                        <span asp-validation-for="BookingDate" class="field-error"></span>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label asp-for="CustomerId" class="control-label"></label>
-                    <input asp-for="CustomerId" class="form-control" />
-                    <span asp-validation-for="CustomerId" class="text-danger"></span>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label asp-for="CustomerId" class="form-label">
+                            <i class="icon-user"></i>
+                            Customer ID
+                        </label>
+                        <div class="input-wrapper">
+                            <input asp-for="CustomerId" class="form-input" type="text" placeholder="Enter customer ID" />
+                            <span class="input-focus-border"></span>
+                        </div>
+                        <span asp-validation-for="CustomerId" class="field-error"></span>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label asp-for="ConsultantId" class="control-label"></label>
-                    <input asp-for="ConsultantId" class="form-control" />
-                    <span asp-validation-for="ConsultantId" class="text-danger"></span>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label asp-for="ConsultantId" class="form-label">
+                            <i class="icon-briefcase"></i>
+                            Consultant ID
+                        </label>
+                        <div class="input-wrapper">
+                            <input asp-for="ConsultantId" class="form-input" type="text" placeholder="Enter consultant ID" />
+                            <span class="input-focus-border"></span>
+                        </div>
+                        <span asp-validation-for="ConsultantId" class="field-error"></span>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label asp-for="StartDate" class="control-label"></label>
-                    <input asp-for="StartDate" class="form-control" />
-                    <span asp-validation-for="StartDate" class="text-danger"></span>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label asp-for="StartDate" class="form-label">
+                            <i class="icon-clock"></i>
+                            Start Date
+                        </label>
+                        <div class="input-wrapper">
+                            <input asp-for="StartDate" class="form-input" type="datetime-local" />
+                            <span class="input-focus-border"></span>
+                        </div>
+                        <span asp-validation-for="StartDate" class="field-error"></span>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label asp-for="Status" class="control-label"></label>
-                    <select asp-for="Status" class="form-control"></select>
-                    <span asp-validation-for="Status" class="text-danger"></span>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label asp-for="Status" class="form-label">
+                            <i class="icon-status"></i>
+                            Status
+                        </label>
+                        <div class="select-wrapper">
+                            <select asp-for="Status" class="form-select"
+                                    asp-items="Html.GetEnumSelectList<BookStatus>()">
+                                <option value="" disabled selected>Select status</option>
+                            </select>
+                            <span class="select-arrow"></span>
+                        </div>
+                        <span asp-validation-for="Status" class="field-error"></span>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <input type="submit" value="Create" class="btn btn-primary" />
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">
+                        <span class="btn-text">Create Booking</span>
+                        <span class="btn-icon">→</span>
+                    </button>
                 </div>
             </form>
         </div>
     </div>
 
-    <div>
-        <a asp-action="Index">Back to List</a>
+    <div class="navigation-section">
+        <a asp-action="Index" class="back-link">
+            <span class="back-icon">←</span>
+            Back to List
+        </a>
     </div>
+</div>
 
-    @section Scripts {
-        @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+}
 
 <style>
-    h1, h4 {
-        color: #2c3e50;
+    /* CSS Variables for consistent theming */
+    :root {
+        --primary-color: #667eea;
+        --primary-dark: #5a67d8;
+        --primary-light: #a3bffa;
+        --secondary-color: #ed8936;
+        --success-color: #38a169;
+        --danger-color: #e53e3e;
+        --warning-color: #d69e2e;
+        --gray-50: #f9fafb;
+        --gray-100: #f3f4f6;
+        --gray-200: #e5e7eb;
+        --gray-300: #d1d5db;
+        --gray-400: #9ca3af;
+        --gray-500: #6b7280;
+        --gray-600: #4b5563;
+        --gray-700: #374151;
+        --gray-800: #1f2937;
+        --gray-900: #111827;
+        --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        --radius-sm: 0.25rem;
+        --radius-md: 0.375rem;
+        --radius-lg: 0.5rem;
+        --radius-xl: 0.75rem;
+        --transition-fast: 0.15s ease-in-out;
+        --transition-normal: 0.3s ease-in-out;
+        --transition-slow: 0.5s ease-in-out;
     }
 
-    hr {
-        border-top: 2px solid #eee;
-        margin-bottom: 20px;
+    /* Global Styles */
+    * {
+        box-sizing: border-box;
     }
 
-    form {
-        background-color: #fff;
-        padding: 20px;
-        border: 1px solid #e0e0e0;
-        border-radius: 8px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    body {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        margin: 0;
+        padding: 0;
     }
 
-    .form-group {
-        margin-bottom: 15px;
+    /* Page Container */
+    .page-container {
+        min-height: 100vh;
+        padding: 2rem 1rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        animation: fadeIn 0.6s ease-out;
+    }
+/* 
+    keyframes fadeIn {
+        from
+
+    {
+        opacity: 0;
+        transform: translateY(20px);
     }
 
-    .control-label {
-        display: block;
-        margin-bottom: 5px;
-        font-weight: 600;
-        color: #34495e;
+    to {
+        opacity: 1;
+        transform: translateY(0);
     }
 
-    .form-control {
+    }
+ */
+    /* Header Section */
+    .header-section {
+        text-align: center;
+        margin-bottom: 3rem;
+        animation: slideDown 0.8s ease-out;
+    }
+
+    /* keyframes slideDown {
+        from
+
+    {
+        opacity: 0;
+        transform: translateY(-30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    } */
+
+    .page-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: white;
+        margin: 0 0 0.5rem 0;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        letter-spacing: -0.025em;
+    }
+
+    .page-subtitle {
+        font-size: 1.125rem;
+        color: rgba(255, 255, 255, 0.8);
+        margin: 0;
+        font-weight: 400;
+    }
+
+    /* Form Wrapper */
+    .form-wrapper {
         width: 100%;
-        padding: 10px;
-        font-size: 1rem;
-        border-radius: 4px;
-        border: 1px solid #ccc;
-        transition: border-color 0.3s ease-in-out;
+        max-width: 500px;
+        animation: slideUp 0.8s ease-out 0.2s both;
     }
 
-        .form-control:focus {
-            border-color: #3498db;
-            outline: none;
-            box-shadow: 0 0 3px rgba(52, 152, 219, 0.4);
+/*     keyframes slideUp {
+        from
+
+    {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    }
+ */
+    /* Form Container */
+    .form-container {
+        background: white;
+        border-radius: var(--radius-xl);
+        box-shadow: var(--shadow-xl);
+        overflow: hidden;
+        transition: all var(--transition-normal);
+    }
+
+        .form-container:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
         }
 
-    .text-danger {
-        color: #e74c3c;
+    /* Booking Form */
+    .booking-form {
+        padding: 2.5rem;
+    }
+
+    /* Form Rows */
+    .form-row {
+        margin-bottom: 1.5rem;
+        animation: fadeInUp 0.6s ease-out both;
+    }
+
+        .form-row:nth-child(1) {
+            animation-delay: 0.1s;
+        }
+
+        .form-row:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .form-row:nth-child(3) {
+            animation-delay: 0.3s;
+        }
+
+        .form-row:nth-child(4) {
+            animation-delay: 0.4s;
+        }
+
+        .form-row:nth-child(5) {
+            animation-delay: 0.5s;
+        }
+/* 
+    keyframes fadeInUp {
+        from
+
+    {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    } */
+
+    /* Form Group */
+    .form-group {
+        position: relative;
+    }
+
+    /* Form Labels */
+    .form-label {
+        display: flex;
+        align-items: center;
+        font-weight: 600;
+        color: var(--gray-700);
+        margin-bottom: 0.5rem;
         font-size: 0.875rem;
+        letter-spacing: 0.025em;
+        transition: color var(--transition-fast);
+    }
+
+        .form-label i {
+            margin-right: 0.5rem;
+            width: 1rem;
+            height: 1rem;
+            opacity: 0.7;
+            transition: opacity var(--transition-fast);
+        }
+
+    .form-group:hover .form-label i {
+        opacity: 1;
+    }
+
+    /* Icon Styles */
+    .icon-calendar::before {
+        content: "📅";
+    }
+
+    .icon-user::before {
+        content: "👤";
+    }
+
+    .icon-briefcase::before {
+        content: "💼";
+    }
+
+    .icon-clock::before {
+        content: "🕐";
+    }
+
+    .icon-status::before {
+        content: "📊";
+    }
+
+    /* Input Wrapper */
+    .input-wrapper {
+        position: relative;
+        overflow: hidden;
+        border-radius: var(--radius-lg);
+    }
+
+    /* Form Inputs */
+    .form-input {
+        width: 100%;
+        padding: 0.875rem 1rem;
+        font-size: 1rem;
+        border: 2px solid var(--gray-200);
+        border-radius: var(--radius-lg);
+        background-color: var(--gray-50);
+        transition: all var(--transition-normal);
+        position: relative;
+        z-index: 1;
+    }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            background-color: white;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            transform: translateY(-1px);
+        }
+
+        .form-input:hover:not(:focus) {
+            border-color: var(--gray-300);
+            background-color: white;
+        }
+
+        .form-input::placeholder {
+            color: var(--gray-400);
+            transition: color var(--transition-fast);
+        }
+
+        .form-input:focus::placeholder {
+            color: var(--gray-300);
+        }
+
+    /* Input Focus Border Animation */
+    .input-focus-border {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 0;
+        height: 2px;
+        background: linear-gradient(90deg, var(--primary-color), var(--primary-light));
+        transition: width var(--transition-normal);
+        border-radius: var(--radius-sm);
+    }
+
+    .form-input:focus + .input-focus-border {
+        width: 100%;
+    }
+
+    /* Select Wrapper */
+    .select-wrapper {
+        position: relative;
+        overflow: hidden;
+        border-radius: var(--radius-lg);
+    }
+
+    /* Form Select */
+    .form-select {
+        width: 100%;
+        padding: 0.875rem 1rem;
+        padding-right: 3rem;
+        font-size: 1rem;
+        border: 2px solid var(--gray-200);
+        border-radius: var(--radius-lg);
+        background-color: var(--gray-50);
+        appearance: none;
+        cursor: pointer;
+        transition: all var(--transition-normal);
+        position: relative;
+        z-index: 1;
+    }
+
+        .form-select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            background-color: white;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            transform: translateY(-1px);
+        }
+
+        .form-select:hover:not(:focus) {
+            border-color: var(--gray-300);
+            background-color: white;
+        }
+
+    /* Select Arrow */
+    .select-arrow {
+        position: absolute;
+        top: 50%;
+        right: 1rem;
+        transform: translateY(-50%);
+        width: 0;
+        height: 0;
+        border-left: 5px solid transparent;
+        border-right: 5px solid transparent;
+        border-top: 6px solid var(--gray-400);
+        pointer-events: none;
+        transition: all var(--transition-fast);
+    }
+
+    .form-select:focus + .select-arrow {
+        border-top-color: var(--primary-color);
+        transform: translateY(-50%) rotate(180deg);
+    }
+
+    /* Validation Summary */
+    .validation-summary {
+        background-color: rgba(229, 62, 62, 0.1);
+        border: 1px solid rgba(229, 62, 62, 0.2);
+        border-radius: var(--radius-lg);
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+        color: var(--danger-color);
+        animation: shake 0.6s ease-in-out;
+    }
+
+   /*  keyframes shake {
+        0%, 100%
+
+    {
+        transform: translateX(0);
+    }
+
+    25% {
+        transform: translateX(-5px);
+    }
+
+    75% {
+        transform: translateX(5px);
+    }
+
+    } */
+
+    /* Field Errors */
+    .field-error {
+        display: block;
+        color: var(--danger-color);
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+        animation: fadeIn var(--transition-normal);
+    }
+
+    /* Form Actions */
+    .form-actions {
+        margin-top: 2rem;
+        animation: fadeInUp 0.6s ease-out 0.6s both;
+    }
+
+    /* Primary Button */
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.875rem 2rem;
+        font-size: 1rem;
+        font-weight: 600;
+        border-radius: var(--radius-lg);
+        border: none;
+        cursor: pointer;
+        transition: all var(--transition-normal);
+        text-decoration: none;
+        position: relative;
+        overflow: hidden;
+        min-width: 160px;
     }
 
     .btn-primary {
-        background-color: #3498db;
-        border-color: #2980b9;
+        background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
         color: white;
-        padding: 10px 16px;
-        font-size: 1rem;
-        border-radius: 4px;
-        transition: background-color 0.3s ease;
+        box-shadow: var(--shadow-md);
     }
 
         .btn-primary:hover {
-            background-color: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary-color));
         }
 
-    a {
-        color: #3498db;
+        .btn-primary:active {
+            transform: translateY(0);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left var(--transition-slow);
+        }
+
+        .btn-primary:hover::before {
+            left: 100%;
+        }
+
+    /* Button Text and Icon */
+    .btn-text {
+        transition: transform var(--transition-fast);
+    }
+
+    .btn-icon {
+        margin-left: 0.5rem;
+        transition: transform var(--transition-fast);
+    }
+
+    .btn:hover .btn-text {
+        transform: translateX(-2px);
+    }
+
+    .btn:hover .btn-icon {
+        transform: translateX(4px);
+    }
+
+    /* Navigation Section */
+    .navigation-section {
+        margin-top: 2rem;
+        animation: fadeIn 0.6s ease-out 0.8s both;
+    }
+
+    /* Back Link */
+    .back-link {
+        display: inline-flex;
+        align-items: center;
+        color: white;
         text-decoration: none;
-        display: inline-block;
-        margin-top: 15px;
+        font-weight: 500;
+        padding: 0.5rem 1rem;
+        border-radius: var(--radius-lg);
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        transition: all var(--transition-normal);
+        border: 1px solid rgba(255, 255, 255, 0.2);
     }
 
-        a:hover {
-            text-decoration: underline;
+        .back-link:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
         }
 
-    .row {
-        margin-top: 30px;
+    .back-icon {
+        margin-right: 0.5rem;
+        transition: transform var(--transition-fast);
     }
 
-   
+    .back-link:hover .back-icon {
+        transform: translateX(-2px);
+    }
+
+    /* Responsive Design */
+    
+
+ 
+
+    /* Loading States */
+    .btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none !important;
+    }
+
+        .btn:disabled::before {
+            display: none;
+        }
+
+    /* Focus Visible for Accessibility */
+    .btn:focus-visible,
+    .form-input:focus-visible,
+    .form-select:focus-visible,
+    .back-link:focus-visible {
+        outline: 2px solid var(--primary-color);
+        outline-offset: 2px;
+    }
+
+    /* Reduced Motion */
+    
 
     }
 </style>
-

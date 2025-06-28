@@ -75,6 +75,15 @@ namespace mvc.services.Implements
             return _tokenProvider.Create(user);
         }
 
+        public User GetUserById(string id)
+        {
+            if (string.IsNullOrEmpty(id))
+                throw new ArgumentException("Email cannot be null or empty", nameof(id));
+
+            var user = _userRepository.GetUserById(id);
+            return user;
+        }
+
         public User GetUserByEmail(string email)
         {
             if (string.IsNullOrEmpty(email))

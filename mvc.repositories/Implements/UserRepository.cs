@@ -49,5 +49,25 @@ namespace mvc.repositories.Implements
                 throw new Exception("An error occurred while creating the user.", ex);
             }
         }
+
+        public User GetUserById(string userId)
+        {
+            try
+            {
+                if (userId != null)
+                {
+                    var id = Guid.Parse(userId); // Ensure the userId is a valid Guid
+                    return _context.Users.FirstOrDefault(c => c.Id.Equals(id));
+
+                }
+                return null; // Return null if userId is null or invalid
+            }
+            catch (Exception ex)
+            {
+
+                throw new Exception("An error occurred while retrieving the user by ID.", ex);
+            }
+
+        }
     }
 }
