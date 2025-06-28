@@ -28,17 +28,13 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<ICourseRepository, CourseRepository>();
 builder.Services.AddScoped<IModuleRepository, ModuleRepository>();
 builder.Services.AddScoped<IBookingRepo, BookingRepo>();
+builder.Services.AddScoped<IBlogRepo, BlogRepo>();
 //Injection Service
 builder.Services.AddScoped<IBookingService, BookingService>();
 builder.Services.AddScoped<IModuleService, ModuleService>();
 builder.Services.AddScoped<ICourseService, CourseService>();
 builder.Services.AddScoped<ILessonRepository, LessonRepository>();
-
-
-//Injection Service
-builder.Services.AddScoped<IModuleService, ModuleService>();
-builder.Services.AddScoped<ICourseService, CourseService>();
-builder.Services.AddScoped<ILessonService, LessonService>();
+builder.Services.AddScoped<IBlogService, BlogService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddSession(options =>
 {
@@ -80,7 +76,7 @@ if (!app.Environment.IsDevelopment())
     app.UseExceptionHandler("/Home/Error");
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
-   
+
 }
 app.MapScalarApiReference();
 app.UseSwagger();

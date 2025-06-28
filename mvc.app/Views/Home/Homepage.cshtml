@@ -45,6 +45,7 @@
             list-style: none;
             display: flex;
             gap: 20px;
+            align-items: center;
         }
 
             nav ul li a {
@@ -58,6 +59,15 @@
                 nav ul li a:hover {
                     color: #00a79d;
                 }
+
+        .user-welcome {
+            color: #00a79d;
+            font-weight: bold;
+            font-size: 16px;
+            padding: 8px 12px;
+            background: #f0f9f8;
+            border-radius: 5px;
+        }
 
         /* Hero Section */
         .hero {
@@ -179,29 +189,7 @@
                     text-decoration: underline;
                 }
 
-        /* Responsive Design
-         (max-width: 768px) {
-            .hero-content h1
-
-        {
-            font-size: 32px;
-        }
-
-        .hero-content p {
-            font-size: 18px;
-        }
-
-        .header-container {
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        nav ul {
-            flex-direction: column;
-            text-align: center;
-        }
-
-        } */
+     
     </style>
 </head>
 <body>
@@ -218,13 +206,19 @@
                     <li><a href="/Blogs">Blog</a></li>
                     <li><a href="#">Get Involved</a></li>
                     <li><a href="#">Contact</a></li>
-					<li><a href="/Courses">Course</a></li>
+                    <li><a href="/Courses">Course</a></li>
                     <li><a href="/Bookings">Booking</a></li>
-					<li><a href="/Courses">Course</a></li>
-					<li><a href="/Auth/Login">Login</a></li>
-                    <li><a href="#">Contact</a></li>
-                    <li>@ViewData["UserMessage"]</li>
-                    <li><a asp-controller="Auth" asp-action="Logout">Logout</a></li>
+
+                    @if (ViewData["IsLoggedIn"] != null && (bool)ViewData["IsLoggedIn"])
+                    {
+                        <li><span class="user-welcome">@ViewData["UserMessage"]</span></li>
+                        <li><a asp-controller="Auth" asp-action="Logout">Logout</a></li>
+                    }
+                    else
+                    {
+                        <li><a href="/Auth/Login">Login</a></li>
+                        <li><a href="/Auth/Register">Register</a></li>
+                    }
                 </ul>
             </nav>
         </div>

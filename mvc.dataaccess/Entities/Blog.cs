@@ -9,11 +9,14 @@ namespace mvc.dataaccess.Entities
 {
     public class Blog
     {
-        public int Id { get; set; }
+        public Guid Id { get; set; }
 
         [Column(TypeName = "nvarchar(MAX)")]
         public string blog_content { get; set; }
         public byte[] ImageData { get; set; }
         public string title { get; set; }
+
+        public Guid UserId { get; set; }
+        public User User { get; set; }
     }
 }

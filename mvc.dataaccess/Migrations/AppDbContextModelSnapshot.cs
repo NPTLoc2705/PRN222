@@ -52,15 +52,16 @@ namespace mvc.dataaccess.Migrations
 
             modelBuilder.Entity("mvc.dataaccess.Entities.Blog", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<byte[]>("ImageData")
                         .IsRequired()
                         .HasColumnType("varbinary(max)");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("blog_content")
                         .IsRequired()
@@ -71,6 +72,8 @@ namespace mvc.dataaccess.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Blogs", (string)null);
                 });
@@ -353,6 +356,17 @@ namespace mvc.dataaccess.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Users", (string)null);
+                });
+
+            modelBuilder.Entity("mvc.dataaccess.Entities.Blog", b =>
+                {
+                    b.HasOne("mvc.dataaccess.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("mvc.dataaccess.Entities.Courses.CourseCategoryMapping", b =>
