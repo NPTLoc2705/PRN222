@@ -20,7 +20,7 @@ namespace mvc.services.Implements
 
         public List<Blog> GetAll() => _repository.GetAll();
 
-        public Blog GetById(int id) => _repository.GetById(id);
+        public Blog GetById(Guid id) => _repository.GetById(id);
 
         public void Add(Blog blog) => _repository.Add(blog);
 

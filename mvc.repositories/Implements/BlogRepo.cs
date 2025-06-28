@@ -19,7 +19,7 @@ namespace mvc.repositories.Implements
 
         public List<Blog> GetAll() => _context.Blogs.ToList();
 
-        public Blog GetById(int id) => _context.Blogs.Find(id);
+        public Blog GetById(Guid id) => _context.Blogs.Find(id);
 
         public void Add(Blog blog)
         {

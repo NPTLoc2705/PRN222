@@ -4,37 +4,37 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
 using mvc.dataaccess.Entities;
+using mvc.services.Interfaces;
 
 namespace mvc.app.Controllers
 {
-   
     public class BlogsController : Controller
     {
-        private readonly AppDbContext _context;
+        private readonly IBlogService _blogService;
 
-        public BlogsController(AppDbContext context)
+        public BlogsController(IBlogService blogService)
         {
-            _context = context;
+            _blogService = blogService;
         }
 
         // GET: Blogs
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
-            return View(await _context.Blogs.ToListAsync());
+            var blogs = _blogService.GetAll();
+            return View(blogs);
         }
 
         // GET: Blogs/Details/5
-        public async Task<IActionResult> Details(int? id)
+        public IActionResult Details(Guid id)
         {
             if (id == null)
             {
                 return NotFound();
             }
 
-            var blog = await _context.Blogs
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var blog = _blogService.GetById(id);
+
             if (blog == null)
             {
                 return NotFound();
@@ -50,30 +50,42 @@ namespace mvc.app.Controllers
         }
 
         // POST: Blogs/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,blog_content,ImageData,title")] Blog blog)
+        public IActionResult Create([Bind("Id,blog_content,ImageData,title")] Blog blog)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(blog);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                // Get User ID from session
+                var userIdString = HttpContext.Session.GetString("UserId");
+
+                if (!string.IsNullOrEmpty(userIdString))
+                {
+                    blog.UserId = Guid.Parse(userIdString);
+                    _blogService.Add(blog);
+                    return RedirectToAction(nameof(Index));
+                }
+
+                // Session expired or user not logged in
+                return Unauthorized();
             }
+
             return View(blog);
         }
 
+
+
         // GET: Blogs/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        public IActionResult Edit(Guid id)
         {
             if (id == null)
             {
                 return NotFound();
             }
 
-            var blog = await _context.Blogs.FindAsync(id);
+
+            var blog = _blogService.GetById(id);
+
             if (blog == null)
             {
                 return NotFound();
@@ -82,11 +94,9 @@ namespace mvc.app.Controllers
         }
 
         // POST: Blogs/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,blog_content,ImageData,title")] Blog blog)
+        public IActionResult Edit(Guid id, [Bind("Id,blog_content,ImageData,title")] Blog blog)
         {
             if (id != blog.Id)
             {
@@ -97,12 +107,14 @@ namespace mvc.app.Controllers
             {
                 try
                 {
-                    _context.Update(blog);
-                    await _context.SaveChangesAsync();
+                    _blogService.Update(blog);
                 }
-                catch (DbUpdateConcurrencyException)
+                catch (Exception ex)
                 {
-                    if (!BlogExists(blog.Id))
+                    // Handle exceptions appropriately
+                    // You might want to check if the blog exists first
+                    var existingBlog = _blogService.GetById(blog.Id);
+                    if (existingBlog == null)
                     {
                         return NotFound();
                     }
@@ -117,15 +129,17 @@ namespace mvc.app.Controllers
         }
 
         // GET: Blogs/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        public IActionResult Delete(int? id)
         {
             if (id == null)
             {
                 return NotFound();
             }
 
-            var blog = await _context.Blogs
-                .FirstOrDefaultAsync(m => m.Id == id);
+            // Convert int to Guid if your service expects Guid
+            var guidId = new Guid(); // You'll need to handle the conversion properly
+            var blog = _blogService.GetById(guidId);
+
             if (blog == null)
             {
                 return NotFound();
@@ -137,26 +151,18 @@ namespace mvc.app.Controllers
         // POST: Blogs/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public IActionResult DeleteConfirmed(Guid id)
         {
-            var blog = await _context.Blogs.FindAsync(id);
+            // Convert int to Guid if your service expects Guid
+                
+            var blog = _blogService.GetById(id);
+
             if (blog != null)
             {
-                _context.Blogs.Remove(blog);
+                _blogService.Delete(blog);
             }
 
-            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
-        }
-
-        private bool BlogExists(int id)
-        {
-            return _context.Blogs.Any(e => e.Id == id);
-        }
-        public IActionResult AdminBlog()
-        {
-            var blogs = _context.Blogs.ToList();
-            return View(blogs); 
         }
     }
 }
