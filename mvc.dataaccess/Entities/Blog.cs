@@ -17,6 +17,6 @@ namespace mvc.dataaccess.Entities
         public string title { get; set; }
 
         public Guid UserId { get; set; }
-        public User User { get; set; }
+        public virtual User User { get; set; }
     }
 }

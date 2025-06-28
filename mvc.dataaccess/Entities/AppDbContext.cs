@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using mvc.dataaccess.Entities.Courses;
+using mvc.dataaccess.Entities.Surveys;
 using System;
 using System.IO;
 
@@ -23,6 +24,14 @@ namespace mvc.dataaccess.Entities
         public DbSet<CoursePrerequisite> CoursePrerequisites { get; set; }
         public DbSet<UserCourseProgress> UserCourseProgresses { get; set; }
         public DbSet<Booking> Bookings { get; set; }
+
+        // Survey DbSets - Simplified
+        public DbSet<Survey> Surveys { get; set; }
+        public DbSet<SurveyQuestion> SurveyQuestions { get; set; }
+        public DbSet<QuestionOption> QuestionOptions { get; set; }
+        public DbSet<SurveyResponse> SurveyResponses { get; set; }
+        public DbSet<UserAnswer> UserAnswers { get; set; }
+        public DbSet<RecommendedAction> RecommendedActions { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -131,6 +140,66 @@ namespace mvc.dataaccess.Entities
                 .HasForeignKey(ucp => ucp.LessonId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            // Survey Table Configurations
+            modelBuilder.Entity<Survey>().ToTable("Surveys");
+            modelBuilder.Entity<SurveyQuestion>().ToTable("SurveyQuestions");
+            modelBuilder.Entity<QuestionOption>().ToTable("QuestionOptions");
+            modelBuilder.Entity<SurveyResponse>().ToTable("SurveyResponses");
+            modelBuilder.Entity<UserAnswer>().ToTable("UserAnswers");
+            modelBuilder.Entity<RecommendedAction>().ToTable("RecommendedActions");
+
+            // Survey Relationships
+            modelBuilder.Entity<SurveyQuestion>()
+                .HasOne(sq => sq.Survey)
+                .WithMany(s => s.Questions)
+                .HasForeignKey(sq => sq.SurveyId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<QuestionOption>()
+                .HasOne(qo => qo.Question)
+                .WithMany(q => q.Options)
+                .HasForeignKey(qo => qo.QuestionId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<SurveyResponse>()
+                .HasOne(sr => sr.Survey)
+                .WithMany(s => s.Responses)
+                .HasForeignKey(sr => sr.SurveyId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<SurveyResponse>()
+                .HasOne(sr => sr.Member)
+                .WithMany()
+                .HasForeignKey(sr => sr.MemberId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<UserAnswer>()
+                .HasOne(ua => ua.Response)
+                .WithMany(r => r.Answers)
+                .HasForeignKey(ua => ua.ResponseId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<UserAnswer>()
+                .HasOne(ua => ua.Question)
+                .WithMany()
+                .HasForeignKey(ua => ua.QuestionId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<UserAnswer>()
+                .HasOne(ua => ua.Option)
+                .WithMany()
+                .HasForeignKey(ua => ua.OptionId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<RecommendedAction>()
+                .HasOne(ra => ra.Response)
+                .WithMany()
+                .HasForeignKey(ra => ra.ResponseId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Blog>()
+                .HasOne(b => b.User);
+
             // Configure CourseCategoryMapping relationships
             modelBuilder.Entity<CourseCategoryMapping>()
                 .HasOne(cc => cc.Course)
@@ -143,6 +212,8 @@ namespace mvc.dataaccess.Entities
                 .WithMany(c => c.CourseMappings)
                 .HasForeignKey(cc => cc.CategoryId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+
 
             // Configure GUID default values for SQL Server
             modelBuilder.Entity<User>()
@@ -168,17 +239,44 @@ namespace mvc.dataaccess.Entities
             modelBuilder.Entity<UserCourseProgress>()
                 .Property(ucp => ucp.ProgressId)
                 .HasDefaultValueSql("NEWID()");
-           /* modelBuilder.Entity<Booking>()
-                .HasOne(b => b.Customer)
-                .WithMany(u => u.CustomerBookings)
-                .HasForeignKey(b => b.Customer.Id)
-                .OnDelete(DeleteBehavior.Restrict); // Prevent cascade delete issues
 
-            modelBuilder.Entity<Booking>()
-                .HasOne(b => b.Consultant)
-                .WithMany(u => u.ConsultantBookings)
-                .HasForeignKey(b => b.Consultant.Id)
-                .OnDelete(DeleteBehavior.Restrict);*/
+            // Survey GUID defaults
+            modelBuilder.Entity<Survey>()
+                .Property(s => s.SurveyId)
+                .HasDefaultValueSql("NEWID()");
+
+            modelBuilder.Entity<SurveyQuestion>()
+                .Property(sq => sq.QuestionId)
+                .HasDefaultValueSql("NEWID()");
+
+            modelBuilder.Entity<QuestionOption>()
+                .Property(qo => qo.OptionId)
+                .HasDefaultValueSql("NEWID()");
+
+            modelBuilder.Entity<SurveyResponse>()
+                .Property(sr => sr.ResponseId)
+                .HasDefaultValueSql("NEWID()");
+
+            modelBuilder.Entity<UserAnswer>()
+                .Property(ua => ua.AnswerId)
+                .HasDefaultValueSql("NEWID()");
+
+            modelBuilder.Entity<RecommendedAction>()
+                .Property(ra => ra.ActionId)
+                .HasDefaultValueSql("NEWID()");
+
+
+            /* modelBuilder.Entity<Booking>()
+                 .HasOne(b => b.Customer)
+                 .WithMany(u => u.CustomerBookings)
+                 .HasForeignKey(b => b.Customer.Id)
+                 .OnDelete(DeleteBehavior.Restrict); // Prevent cascade delete issues
+
+             modelBuilder.Entity<Booking>()
+                 .HasOne(b => b.Consultant)
+                 .WithMany(u => u.ConsultantBookings)
+                 .HasForeignKey(b => b.Consultant.Id)
+                 .OnDelete(DeleteBehavior.Restrict);*/
             // Additional configurations can be added here
             base.OnModelCreating(modelBuilder);
         }

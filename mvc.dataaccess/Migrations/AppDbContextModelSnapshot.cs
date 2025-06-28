@@ -320,6 +320,196 @@ namespace mvc.dataaccess.Migrations
                     b.ToTable("Posts", (string)null);
                 });
 
+            modelBuilder.Entity("mvc.dataaccess.Entities.Surveys.QuestionOption", b =>
+                {
+                    b.Property<Guid>("OptionId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier")
+                        .HasDefaultValueSql("NEWID()");
+
+                    b.Property<string>("OptionText")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
+
+                    b.Property<int>("OrderIndex")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("QuestionId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Score")
+                        .HasColumnType("int");
+
+                    b.HasKey("OptionId");
+
+                    b.HasIndex("QuestionId");
+
+                    b.ToTable("QuestionOptions", (string)null);
+                });
+
+            modelBuilder.Entity("mvc.dataaccess.Entities.Surveys.RecommendedAction", b =>
+                {
+                    b.Property<Guid>("ActionId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier")
+                        .HasDefaultValueSql("NEWID()");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<bool>("IsCompleted")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("RequiredRiskLevel")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("ResponseId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
+
+                    b.HasKey("ActionId");
+
+                    b.HasIndex("ResponseId");
+
+                    b.ToTable("RecommendedActions", (string)null);
+                });
+
+            modelBuilder.Entity("mvc.dataaccess.Entities.Surveys.Survey", b =>
+                {
+                    b.Property<Guid>("SurveyId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier")
+                        .HasDefaultValueSql("NEWID()");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
+
+                    b.HasKey("SurveyId");
+
+                    b.ToTable("Surveys", (string)null);
+                });
+
+            modelBuilder.Entity("mvc.dataaccess.Entities.Surveys.SurveyQuestion", b =>
+                {
+                    b.Property<Guid>("QuestionId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier")
+                        .HasDefaultValueSql("NEWID()");
+
+                    b.Property<int>("OrderIndex")
+                        .HasColumnType("int");
+
+                    b.Property<string>("QuestionText")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<Guid>("SurveyId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("QuestionId");
+
+                    b.HasIndex("SurveyId");
+
+                    b.ToTable("SurveyQuestions", (string)null);
+                });
+
+            modelBuilder.Entity("mvc.dataaccess.Entities.Surveys.SurveyResponse", b =>
+                {
+                    b.Property<Guid>("ResponseId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier")
+                        .HasDefaultValueSql("NEWID()");
+
+                    b.Property<DateTime?>("CompletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsCompleted")
+                        .HasColumnType("bit");
+
+                    b.Property<Guid>("MemberId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("RiskLevel")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("SurveyId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("TotalScore")
+                        .HasColumnType("int");
+
+                    b.HasKey("ResponseId");
+
+                    b.HasIndex("MemberId");
+
+                    b.HasIndex("SurveyId");
+
+                    b.ToTable("SurveyResponses", (string)null);
+                });
+
+            modelBuilder.Entity("mvc.dataaccess.Entities.Surveys.UserAnswer", b =>
+                {
+                    b.Property<Guid>("AnswerId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier")
+                        .HasDefaultValueSql("NEWID()");
+
+                    b.Property<Guid>("OptionId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("QuestionId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("ResponseId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Score")
+                        .HasColumnType("int");
+
+                    b.HasKey("AnswerId");
+
+                    b.HasIndex("OptionId");
+
+                    b.HasIndex("QuestionId");
+
+                    b.HasIndex("ResponseId");
+
+                    b.ToTable("UserAnswers", (string)null);
+                });
+
             modelBuilder.Entity("mvc.dataaccess.Entities.User", b =>
                 {
                     b.Property<Guid>("Id")
@@ -466,6 +656,85 @@ namespace mvc.dataaccess.Migrations
                     b.Navigation("Staff");
                 });
 
+            modelBuilder.Entity("mvc.dataaccess.Entities.Surveys.QuestionOption", b =>
+                {
+                    b.HasOne("mvc.dataaccess.Entities.Surveys.SurveyQuestion", "Question")
+                        .WithMany("Options")
+                        .HasForeignKey("QuestionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Question");
+                });
+
+            modelBuilder.Entity("mvc.dataaccess.Entities.Surveys.RecommendedAction", b =>
+                {
+                    b.HasOne("mvc.dataaccess.Entities.Surveys.SurveyResponse", "Response")
+                        .WithMany()
+                        .HasForeignKey("ResponseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Response");
+                });
+
+            modelBuilder.Entity("mvc.dataaccess.Entities.Surveys.SurveyQuestion", b =>
+                {
+                    b.HasOne("mvc.dataaccess.Entities.Surveys.Survey", "Survey")
+                        .WithMany("Questions")
+                        .HasForeignKey("SurveyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Survey");
+                });
+
+            modelBuilder.Entity("mvc.dataaccess.Entities.Surveys.SurveyResponse", b =>
+                {
+                    b.HasOne("mvc.dataaccess.Entities.User", "Member")
+                        .WithMany()
+                        .HasForeignKey("MemberId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("mvc.dataaccess.Entities.Surveys.Survey", "Survey")
+                        .WithMany("Responses")
+                        .HasForeignKey("SurveyId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Member");
+
+                    b.Navigation("Survey");
+                });
+
+            modelBuilder.Entity("mvc.dataaccess.Entities.Surveys.UserAnswer", b =>
+                {
+                    b.HasOne("mvc.dataaccess.Entities.Surveys.QuestionOption", "Option")
+                        .WithMany()
+                        .HasForeignKey("OptionId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("mvc.dataaccess.Entities.Surveys.SurveyQuestion", "Question")
+                        .WithMany()
+                        .HasForeignKey("QuestionId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("mvc.dataaccess.Entities.Surveys.SurveyResponse", "Response")
+                        .WithMany("Answers")
+                        .HasForeignKey("ResponseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Option");
+
+                    b.Navigation("Question");
+
+                    b.Navigation("Response");
+                });
+
             modelBuilder.Entity("mvc.dataaccess.Entities.Courses.Course", b =>
                 {
                     b.Navigation("CategoryMappings");
@@ -492,6 +761,23 @@ namespace mvc.dataaccess.Migrations
             modelBuilder.Entity("mvc.dataaccess.Entities.Courses.Module", b =>
                 {
                     b.Navigation("Lessons");
+                });
+
+            modelBuilder.Entity("mvc.dataaccess.Entities.Surveys.Survey", b =>
+                {
+                    b.Navigation("Questions");
+
+                    b.Navigation("Responses");
+                });
+
+            modelBuilder.Entity("mvc.dataaccess.Entities.Surveys.SurveyQuestion", b =>
+                {
+                    b.Navigation("Options");
+                });
+
+            modelBuilder.Entity("mvc.dataaccess.Entities.Surveys.SurveyResponse", b =>
+                {
+                    b.Navigation("Answers");
                 });
 
             modelBuilder.Entity("mvc.dataaccess.Entities.User", b =>
