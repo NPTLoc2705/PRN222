@@ -5,7 +5,7 @@
 namespace mvc.dataaccess.Migrations
 {
     /// <inheritdoc />
-    public partial class update : Migration
+    public partial class CompleteSchema : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

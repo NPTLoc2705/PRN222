@@ -12,8 +12,8 @@ using mvc.dataaccess.Entities;
 namespace mvc.dataaccess.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250618080444_updateBooking")]
-    partial class updateBooking
+    [Migration("20250625053054_CompleteSchema")]
+    partial class CompleteSchema
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
