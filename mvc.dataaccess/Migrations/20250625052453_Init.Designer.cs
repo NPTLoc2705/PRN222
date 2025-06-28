@@ -12,8 +12,13 @@ using mvc.dataaccess.Entities;
 namespace mvc.dataaccess.Migrations
 {
     [DbContext(typeof(AppDbContext))]
+<<<<<<<< HEAD:mvc.dataaccess/Migrations/20250625052453_Init.Designer.cs
     [Migration("20250625052453_Init")]
     partial class Init
+========
+    [Migration("20250618083717_updateBooking")]
+    partial class updateBooking
+>>>>>>>> origin/main:mvc.dataaccess/Migrations/20250618083717_updateBooking.Designer.cs
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

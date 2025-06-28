@@ -14,10 +14,13 @@ namespace mvc.app.Controllers
     {
         private readonly AppDbContext _context;
         private readonly IBookingService _bookingService;
-        public BookingsController(AppDbContext context,IBookingService bookingService)
+        private readonly IAuthService _userService;
+
+        public BookingsController(AppDbContext context,IBookingService bookingService, IAuthService service)
         {
             _context = context;
             _bookingService = bookingService;
+            _userService = service;
         }
         public async Task<IActionResult> Booking()
         {
@@ -29,7 +32,24 @@ namespace mvc.app.Controllers
             }
             return View();
         }
+        public async Task<IActionResult> ConsultanView()
+        {
+            var bookings = await _bookingService.GetAllBookingsAsync();
 
+            // Join bookings with users to create UserBookingRequest view models
+            var userBookingRequests = (from booking in bookings
+                                       join user in _context.Users on booking.CustomerId equals user.Id
+                                       select new mvc.dataaccess.ViewModels.UserBookingRequest
+                                       {
+                                           customerId = user.Id,
+                                           UserName = user.FullName, // Adjust property names as needed
+                                           Email = user.Email,
+                                           PhoneNumber = user.PhoneNumber,
+                                           BookingDate = booking.BookingDate
+                                       }).ToList();
+
+            return View(userBookingRequests);
+        }
 
         // GET: Bookings
 
@@ -59,9 +79,12 @@ namespace mvc.app.Controllers
             return View();
         }
         public async Task<IActionResult> UserBooking()
-        {
+        {   
             return View();
         }
+
+
+
         // POST: Bookings/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.

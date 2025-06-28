@@ -14,6 +14,7 @@ namespace mvc.services.Interfaces
         
         public User GetUserByEmail(string email);
         
+        public User GetUserById(string userId);
         public User CreateUser(User user);
         
         public User RegisterUser(User user);
