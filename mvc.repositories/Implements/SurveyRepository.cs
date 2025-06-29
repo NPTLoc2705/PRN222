@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using mvc.dataaccess.Entities;
 using mvc.dataaccess.Entities.Surveys;
+using mvc.repositories.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace mvc.repositories.Implements
 {
-    public class SurveyRepository
+    public class SurveyRepository : ISurveyRepository
     {
         private readonly AppDbContext _context;
 

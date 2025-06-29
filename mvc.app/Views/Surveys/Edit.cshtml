@@ -1,0 +1,75 @@
+﻿@model mvc.dataaccess.Entities.Surveys.Survey
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drug-Free World - Edit Survey</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        :root { --primary-color: #00a79d; --secondary-color: #008c83; --background-color: #f8f9fa; --text-color: #333; --shadow: 0 2px 10px rgba(0, 0, 0, 0.1); }
+        body { line-height: 1.6; color: var(--text-color); background-color: var(--background-color); padding-top: 80px; }
+        .content-container { max-width: 600px; margin: 40px auto; padding: 32px 24px; background: #fff; border-radius: 12px; box-shadow: var(--shadow); }
+        h1, h4 { color: var(--primary-color); font-weight: 700; margin-bottom: 18px; }
+        hr { margin: 18px 0; border: none; border-top: 1.5px solid #e0e0e0; }
+        .form-group { margin-bottom: 18px; }
+        .form-control { width: 100%; padding: 10px 14px; border: 1px solid #ccc; border-radius: 6px; font-size: 1rem; transition: border 0.2s; }
+        .form-control:focus { border-color: var(--primary-color); outline: none; }
+        .btn-primary { background: var(--primary-color); color: #fff; border: none; padding: 12px 28px; border-radius: 6px; font-weight: 500; transition: background 0.3s, box-shadow 0.3s; box-shadow: var(--shadow); }
+        .btn-primary:hover { background: var(--secondary-color); box-shadow: 0 4px 16px 0 rgba(0, 167, 157, 0.12); }
+        .text-danger { color: #dc3545; font-size: 0.95em; }
+        .form-check-label { font-weight: 500; }
+        .form-check-input { margin-right: 8px; }
+        a { color: var(--primary-color); text-decoration: none; font-weight: 500; }
+        a:hover { color: var(--secondary-color); text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div class="content-container">
+        <h1>Edit Survey</h1>
+        <h4>Survey</h4>
+        <hr />
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="SurveyId" />
+            <div class="form-group">
+                <label asp-for="Title" class="control-label"></label>
+                <input asp-for="Title" class="form-control" />
+                <span asp-validation-for="Title" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Description" class="control-label"></label>
+                <input asp-for="Description" class="form-control" />
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Type" class="control-label"></label>
+                <select asp-for="Type" class="form-control"></select>
+                <span asp-validation-for="Type" class="text-danger"></span>
+            </div>
+            <div class="form-group form-check">
+                <label class="form-check-label">
+                    <input class="form-check-input" asp-for="IsActive" /> @Html.DisplayNameFor(model => model.IsActive)
+                </label>
+            </div>
+            <div class="form-group">
+                <label asp-for="CreatedAt" class="control-label"></label>
+                <input asp-for="CreatedAt" class="form-control" />
+                <span asp-validation-for="CreatedAt" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+        <div style="margin-top: 18px;">
+            <a asp-action="Index">Back to List</a>
+        </div>
+    </div>
+    @section Scripts {
+        @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    }
+</body>

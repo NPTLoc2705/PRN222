@@ -1,5 +1,6 @@
 ﻿using mvc.dataaccess.Entities.Surveys;
 using mvc.repositories.Interfaces;
+using mvc.services.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace mvc.services.Implements
 {
-    public class SurveyService
+    public class SurveyService : ISurveyService
     {
         private readonly ISurveyRepository _surveyRepository;
 

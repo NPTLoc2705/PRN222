@@ -5,7 +5,6 @@ using Microsoft.IdentityModel.Tokens;
 using mvc.dataaccess.Entities;
 using mvc.repositories.Implements;
 using mvc.repositories.Interfaces;
-using mvc.repositories.Implements;
 using mvc.repositories.Interfaces.ICourse;
 using mvc.repositories.Implements.CourseRepo;
 using Scalar.AspNetCore;
@@ -24,12 +23,14 @@ builder.Services.AddControllersWithViews();
 
 //Injection Repo
 builder.Services.AddScoped<TokenProvider>();
+builder.Services.AddScoped<ISurveyRepository, SurveyRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<ICourseRepository, CourseRepository>();
 builder.Services.AddScoped<IModuleRepository, ModuleRepository>();
 builder.Services.AddScoped<IBookingRepo, BookingRepo>();
 builder.Services.AddScoped<IBlogRepo, BlogRepo>();
 //Injection Service
+builder.Services.AddScoped<ISurveyService, SurveyService>();
 builder.Services.AddScoped<IBookingService, BookingService>();
 builder.Services.AddScoped<IModuleService, ModuleService>();
 builder.Services.AddScoped<ICourseService, CourseService>();

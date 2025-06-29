@@ -1,0 +1,305 @@
+﻿@model IEnumerable<mvc.dataaccess.Entities.Surveys.Survey>
+
+@{
+    ViewData["Title"] = "Surveys";
+}
+
+@* Index.cshtml for Surveys *@
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drug-Free World - Surveys</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        :root {
+            --primary-color: #00a79d;
+            --secondary-color: #008c83;
+            --background-color: #f8f9fa;
+            --text-color: #333;
+            --shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--background-color);
+            padding-top: 80px;
+        }
+
+        /* Header Styles */
+        header {
+            background: #fff;
+            box-shadow: var(--shadow);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+        }
+
+        .logo img {
+            height: 50px;
+            transition: transform 0.3s;
+        }
+
+            .logo img:hover {
+                transform: scale(1.05);
+            }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+            nav ul li a {
+                text-decoration: none;
+                color: var(--text-color);
+                font-weight: 500;
+                font-size: 16px;
+                transition: all 0.3s;
+                padding: 8px 12px;
+                border-radius: 5px;
+            }
+
+                nav ul li a:hover {
+                    color: var(--primary-color);
+                    background: rgba(0, 167, 157, 0.1);
+                }
+
+        .user-welcome {
+            color: var(--primary-color);
+            font-weight: 600;
+            font-size: 16px;
+            padding: 8px 12px;
+            background: rgba(0, 167, 157, 0.1);
+            border-radius: 5px;
+        }
+
+        /* Main Content Styles */
+        .content-container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .create-new {
+            margin-bottom: 30px;
+        }
+
+            .create-new a {
+                background: var(--primary-color);
+                color: #fff;
+                padding: 12px 24px;
+                text-decoration: none;
+                border-radius: 5px;
+                font-weight: 500;
+                transition: all 0.3s;
+                display: inline-block;
+            }
+
+                .create-new a:hover {
+                    background: var(--secondary-color);
+                    transform: translateY(-2px);
+                    box-shadow: var(--shadow);
+                }
+
+        /* Table Styles */
+        .table-container {
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 0;
+        }
+
+            .table thead {
+                background: rgba(0, 167, 157, 0.1);
+            }
+
+            .table th {
+                padding: 15px;
+                text-align: left;
+                font-weight: 600;
+                color: var(--primary-color);
+            }
+
+            .table td {
+                padding: 15px;
+                border-bottom: 1px solid #eee;
+            }
+
+            .table tbody tr {
+                transition: all 0.3s;
+            }
+
+                .table tbody tr:hover {
+                    background: rgba(0, 167, 157, 0.05);
+                }
+
+                .table tbody tr:last-child td {
+                    border-bottom: none;
+                }
+
+        /* Action Links */
+        .action-links a {
+            text-decoration: none;
+            color: var(--primary-color);
+            margin-right: 15px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+            .action-links a:hover {
+                color: var(--secondary-color);
+            }
+
+        /* Status Indicators */
+        .status-active {
+            color: #28a745;
+            font-weight: 500;
+        }
+
+        .status-inactive {
+            color: #dc3545;
+            font-weight: 500;
+        }
+
+        .surveys-heading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 18px;
+            padding: 30px 0 18px 0;
+            font-size: clamp(2.3rem, 4vw, 3.5rem);
+            font-weight: 700;
+            color: transparent;
+            letter-spacing: 1px;
+            background: linear-gradient(90deg, #00796b 10%, #45e1b8 60%, #00bfae 100%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 8px 32px rgba(0,121,107,0.14), 0 2px 8px rgba(0,0,0,0.06), 0 2.5px 9px rgba(0,121,107,0.10);
+            border-radius: 18px;
+            box-shadow: 0 4px 24px 0 rgba(0, 121, 107, 0.12);
+            position: relative;
+            overflow: hidden;
+            min-height: 90px;
+            transition: box-shadow 0.3s;
+        }
+
+        .surveys-heading:hover {
+            box-shadow: 0 8px 32px 0 rgba(0, 121, 107, 0.18);
+        }
+
+        .surveys-heading-accent {
+            position: absolute;
+            right: 5%;
+            top: 22%;
+            width: 64px;
+            height: 64px;
+            background: radial-gradient(circle at 60% 40%, #00796b22 0%, transparent 70%);
+            z-index: 0;
+            pointer-events: none;
+            filter: blur(2.5px);
+            animation: accentPulse 2.5s infinite alternate;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <div class="logo">
+                <img src="https://via.placeholder.com/150x50?text=DrugFreeWorld" alt="Drug Free World Logo">
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/">About</a></li>
+                    <li><a href="/">Education</a></li>
+                    <li><a href="/Blogs">Blog</a></li>
+                    <li><a href="/Courses">Course</a></li>
+                    <li><a href="/Bookings">Booking</a></li>
+                    <li><a href="/Surveys">Surveys</a></li>
+
+                    @if (ViewData["IsLoggedIn"] != null && (bool)ViewData["IsLoggedIn"])
+                    {
+                        <li><span class="user-welcome">@ViewData["UserMessage"]</span></li>
+                        <li><a asp-controller="Auth" asp-action="Logout">Logout</a></li>
+                    }
+                    else
+                    {
+                        <li><a href="/Auth/Login">Login</a></li>
+                        <li><a href="/Auth/Register">Register</a></li>
+                    }
+                </ul>
+            </nav>
+        </div>
+    </header>
+    <div class="content-container">
+        <h1 class="surveys-heading">
+            Surveys to determine the level of drug abuse in the community
+            <span class="surveys-heading-accent"></span>
+        </h1>
+        <div class="create-new">
+            <a asp-action="Create">Create New Survey</a>
+        </div>
+        <div class="table-container">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>@Html.DisplayNameFor(model => model.Title)</th>
+                        <th>@Html.DisplayNameFor(model => model.Description)</th>
+                        <th>@Html.DisplayNameFor(model => model.Type)</th>
+                        <th>@Html.DisplayNameFor(model => model.IsActive)</th>
+                        <th>@Html.DisplayNameFor(model => model.CreatedAt)</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@Html.DisplayFor(modelItem => item.Title)</td>
+                            <td>@Html.DisplayFor(modelItem => item.Description)</td>
+                            <td>@Html.DisplayFor(modelItem => item.Type)</td>
+                            <td>
+                                <span class="@(item.IsActive ? "status-active" : "status-inactive")">
+                                    @Html.DisplayFor(modelItem => item.IsActive)
+                                </span>
+                            </td>
+                            <td>@Html.DisplayFor(modelItem => item.CreatedAt)</td>
+                            <td class="action-links">
+                                <a asp-action="Edit" asp-route-id="@item.SurveyId">Edit</a>
+                                <a asp-action="Details" asp-route-id="@item.SurveyId">Details</a>
+                                <a asp-action="Delete" asp-route-id="@item.SurveyId">Delete</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
