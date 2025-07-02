@@ -19,14 +19,119 @@ namespace mvc.repositories.Implements
             _context = context;
         }
 
+        #region Question and Option Management
+
+        public async Task<QuestionOption> GetOptionByIdAsync(Guid optonId)
+        {
+            var option = await _context.QuestionOptions.FindAsync(optonId);
+            return option;
+        }
+
+        public async Task<SurveyQuestion> AddQuestionAsync(SurveyQuestion question)
+        {
+            _context.SurveyQuestions.Add(question);
+            await _context.SaveChangesAsync();
+            return question;
+        }
+
+        public async Task<SurveyQuestion> UpdateQuestionAsync(SurveyQuestion question)
+        {
+            _context.SurveyQuestions.Update(question);
+            await _context.SaveChangesAsync();
+            return question;
+        }
+
+        public async Task<bool> DeleteQuestionAsync(Guid questionId)
+        {
+            var question = await _context.SurveyQuestions.FindAsync(questionId);
+            if (question == null)
+                return false;
+
+            _context.SurveyQuestions.Remove(question);
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<QuestionOption> AddOptionAsync(QuestionOption option)
+        {
+            _context.QuestionOptions.Add(option);
+            await _context.SaveChangesAsync();
+            return option;
+        }
+
+        public async Task<QuestionOption> UpdateOptionAsync(QuestionOption option)
+        {
+            _context.QuestionOptions.Update(option);
+            await _context.SaveChangesAsync();
+            return option;
+        }
+
+        public async Task<bool> DeleteOptionAsync(Guid optionId)
+        {
+            var option = await _context.QuestionOptions.FindAsync(optionId);
+            if (option == null)
+                return false;
+
+            _context.QuestionOptions.Remove(option);
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<SurveyQuestion> GetQuestionWithOptionsAsync(Guid questionId)
+        {
+            return await _context.SurveyQuestions
+                .Include(q => q.Options.OrderBy(o => o.OrderIndex))
+                .FirstOrDefaultAsync(q => q.QuestionId == questionId);
+        }
+
+        #endregion
+
+        #region CRUD Actions
+
         public async Task<IEnumerable<Survey>> GetAllSurveysAsync()
         {
             return await _context.Surveys
                 .Where(s => s.IsActive)
-                .OrderBy(s => s.Title)
+                .OrderBy(s => s.CreatedAt)
                 .ToListAsync();
         }
 
+        public async Task<Survey> GetByIdAsync(Guid id)
+        {
+            return await _context.Surveys
+                .Include(s => s.Questions)
+                .FirstOrDefaultAsync(s => s.SurveyId == id);
+        }
+
+        public async Task<Survey> AddAsync(Survey survey)
+        {
+            _context.Surveys.Add(survey);
+            await _context.SaveChangesAsync();
+            return survey;
+        }
+
+        public async Task<Survey> UpdateAsync(Survey survey)
+        {
+            _context.Surveys.Update(survey);
+            await _context.SaveChangesAsync();
+            return survey;
+        }
+
+        public async Task<bool> DeleteAsync(Guid id)
+        {
+            var survey = await _context.Surveys.FindAsync(id);
+            if (survey == null)
+                return false;
+
+            _context.Surveys.Remove(survey);
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+
+        #endregion
+
+        #region Survey Actions
         public async Task<Survey> GetSurveyWithQuestionsAsync(Guid surveyId)
         {
             return await _context.Surveys
@@ -199,5 +304,7 @@ namespace mvc.repositories.Implements
 
             _context.RecommendedActions.AddRange(actions);
         }
+
+        #endregion
     }
 }

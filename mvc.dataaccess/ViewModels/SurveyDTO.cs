@@ -10,6 +10,9 @@ namespace mvc.dataaccess.ViewModels
 {
     public class SurveyDTO
     {
+        public Survey Survey { get; set; }
+        public List<SurveyQuestionDTO> QuestionDtos { get; set; } = new List<SurveyQuestionDTO>();
+
         public class SurveyListViewModel
         {
             public IEnumerable<Survey> Surveys { get; set; }

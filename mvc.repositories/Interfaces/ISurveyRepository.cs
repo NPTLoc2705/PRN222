@@ -15,5 +15,19 @@ namespace mvc.repositories.Interfaces
         Task<bool> SaveAnswerAsync(Guid responseId, Guid questionId, Guid optionId);
         Task<SurveyResponse> CompleteSurveyAsync(Guid responseId);
         Task<IEnumerable<SurveyResponse>> GetUserSurveyHistoryAsync(Guid memberId);
+        Task<Survey> GetByIdAsync(Guid id);
+        Task<Survey> AddAsync(Survey survey);
+        Task<Survey> UpdateAsync(Survey survey);
+        Task<bool> DeleteAsync(Guid id);
+
+        // Add these method signatures to your interface
+        Task<SurveyQuestion> AddQuestionAsync(SurveyQuestion question);
+        Task<SurveyQuestion> UpdateQuestionAsync(SurveyQuestion question);
+        Task<bool> DeleteQuestionAsync(Guid questionId);
+        Task<QuestionOption> AddOptionAsync(QuestionOption option);
+        Task<QuestionOption> UpdateOptionAsync(QuestionOption option);
+        Task<bool> DeleteOptionAsync(Guid optionId);
+        Task<SurveyQuestion> GetQuestionWithOptionsAsync(Guid questionId);
+        Task<QuestionOption> GetOptionByIdAsync(Guid optionId);
     }
 }

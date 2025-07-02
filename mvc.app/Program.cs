@@ -21,6 +21,10 @@ builder.Services.AddSwaggerGen();
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
+// builder.Logging.AddEventLog(); // Comment out if present
+
 //Injection Repo
 builder.Services.AddScoped<TokenProvider>();
 builder.Services.AddScoped<ISurveyRepository, SurveyRepository>();

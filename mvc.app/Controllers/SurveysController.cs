@@ -20,7 +20,7 @@ namespace mvc.app.Controllers
         // GET: Surveys
         public async Task<IActionResult> Index()
         {
-            var surveys = await _surveyService.GetAvailableSurveysAsync();
+            var surveys = await _surveyService.GetAllSurveysAsync();
             var model = new SurveyDTO.SurveyListViewModel { Surveys = surveys };
             return View(model.Surveys);
         }
@@ -33,7 +33,8 @@ namespace mvc.app.Controllers
                 return NotFound();
             }
 
-            var survey = await _surveyService.GetSurveyAsync(id);
+            // Use GetSurveyWithQuestionsAndOptionsAsync instead of GetSurveyByIdAsync
+            var survey = await _surveyService.GetSurveyWithQuestionsAndOptionsAsync(id);
             if (survey == null)
             {
                 return NotFound();
@@ -50,17 +51,19 @@ namespace mvc.app.Controllers
         // POST: Surveys/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("SurveyId,Title,Description,Type,IsActive,CreatedAt")] Survey survey)
+        public async Task<IActionResult> Create(SurveyDTO model)
         {
-            if (ModelState.IsValid)
-            {
-                survey.SurveyId = Guid.NewGuid();
-                // You may need to implement an AddSurveyAsync in ISurveyService/Repository
-                // await _surveyService.AddSurveyAsync(survey);
-                // For now, just return to Index
-                return RedirectToAction(nameof(Index));
-            }
-            return View(survey);
+
+            model.Survey.SurveyId = Guid.NewGuid();
+            model.Survey.CreatedAt = DateTime.UtcNow;
+
+            // Use the comprehensive method to create survey with questions and options
+            var survey = await _surveyService.CreateFullSurveyAsync(model.Survey, model.QuestionDtos);
+
+            return RedirectToAction(nameof(Details), new { id = survey.SurveyId });
+
+
+            return View(model);
         }
 
         // GET: Surveys/Edit/5
@@ -71,7 +74,7 @@ namespace mvc.app.Controllers
                 return NotFound();
             }
 
-            var survey = await _surveyService.GetSurveyAsync(id);
+            var survey = await _surveyService.GetSurveyByIdAsync(id);
             if (survey == null)
             {
                 return NotFound();
@@ -79,38 +82,133 @@ namespace mvc.app.Controllers
             return View(survey);
         }
 
-        // POST: Surveys/Edit/5
+        // POST: Surveys/UpdateQuestion/{id}
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(Guid id, [Bind("SurveyId,Title,Description,Type,IsActive,CreatedAt")] Survey survey)
+        public async Task<IActionResult> UpdateQuestion(Guid id, [Bind("QuestionId,QuestionText,OrderIndex")] SurveyQuestion question)
         {
-            if (id != survey.SurveyId)
+            if (id != question.QuestionId)
+            {
+                return BadRequest();
+            }
+
+            // Get the existing question to preserve the SurveyId
+            var existingQuestion = await _surveyService.GetQuestionWithOptionsAsync(id);
+            if (existingQuestion == null)
             {
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
+            // Update only the allowed fields
+            existingQuestion.QuestionText = question.QuestionText;
+            existingQuestion.OrderIndex = question.OrderIndex;
+
+            await _surveyService.UpdateQuestionAsync(existingQuestion);
+            return Ok();
+        }
+
+        // POST: Surveys/DeleteQuestion/{id}
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteQuestion(Guid id)
+        {
+            var result = await _surveyService.DeleteQuestionAsync(id);
+            if (!result)
             {
-                try
-                {
-                    // You may need to implement an UpdateSurveyAsync in ISurveyService/Repository
-                    // await _surveyService.UpdateSurveyAsync(survey);
-                }
-                catch (Exception)
-                {
-                    var existing = await _surveyService.GetSurveyAsync(survey.SurveyId);
-                    if (existing == null)
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
+                return NotFound();
             }
-            return View(survey);
+            return Ok();
+        }
+
+        // POST: Surveys/UpdateOption/{id}
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UpdateOption(Guid id, [Bind("OptionId,OptionText,Score,OrderIndex")] QuestionOption option)
+        {
+            if (id != option.OptionId)
+            {
+                return BadRequest();
+            }
+
+            // Get the existing option to preserve the QuestionId
+            var existingOption = await _surveyService.GetOptionByIdAsync(id);
+            if (existingOption == null)
+            {
+                return NotFound();
+            }
+
+            // Update only the allowed fields
+            existingOption.OptionText = option.OptionText;
+            existingOption.Score = option.Score;
+            existingOption.OrderIndex = option.OrderIndex;
+
+            await _surveyService.UpdateOptionAsync(existingOption);
+            return Ok();
+        }
+
+        // POST: Surveys/DeleteOption/{id}
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteOption(Guid id)
+        {
+            var result = await _surveyService.DeleteOptionAsync(id);
+            if (!result)
+            {
+                return NotFound();
+            }
+            return Ok();
+        }
+
+        // POST: Surveys/AddQuestion
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AddQuestion([Bind("SurveyId,QuestionText,OrderIndex")] SurveyQuestion question)
+        {
+            if (question.SurveyId == Guid.Empty)
+            {
+                return BadRequest();
+            }
+
+            question.QuestionId = Guid.NewGuid();
+            var createdQuestion = await _surveyService.AddQuestionToSurveyAsync(question.SurveyId, question);
+            return Json(createdQuestion);
+        }
+
+        // POST: Surveys/AddOption
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AddOption([Bind("QuestionId,OptionText,Score,OrderIndex")] QuestionOption option)
+        {
+            if (option.QuestionId == Guid.Empty)
+            {
+                return BadRequest();
+            }
+
+            option.OptionId = Guid.NewGuid();
+            var createdOption = await _surveyService.AddOptionToQuestionAsync(option.QuestionId, option);
+            return Json(createdOption);
+        }
+
+        // GET: Surveys/GetOptionByIdAsync/{id}
+        public async Task<IActionResult> GetOptionByIdAsync(Guid id)
+        {
+            var option = await _surveyService.GetOptionByIdAsync(id);
+            if (option == null)
+            {
+                return NotFound();
+            }
+            return Json(option);
+        }
+
+        // GET: Surveys/GetQuestionWithOptionsAsync/{id}
+        public async Task<IActionResult> GetQuestionWithOptionsAsync(Guid id)
+        {
+            var question = await _surveyService.GetQuestionWithOptionsAsync(id);
+            if (question == null)
+            {
+                return NotFound();
+            }
+            return Json(question);
         }
 
         // GET: Surveys/Delete/5
@@ -121,7 +219,7 @@ namespace mvc.app.Controllers
                 return NotFound();
             }
 
-            var survey = await _surveyService.GetSurveyAsync(id);
+            var survey = await _surveyService.GetSurveyByIdAsync(id);
             if (survey == null)
             {
                 return NotFound();
@@ -134,8 +232,13 @@ namespace mvc.app.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(Guid id)
         {
-            // You may need to implement a DeleteSurveyAsync in ISurveyService/Repository
-            // await _surveyService.DeleteSurveyAsync(id);
+            var result = await _surveyService.DeleteSurveyAsync(id);
+
+            if(result == null)
+            {
+                return NotFound();
+            }
+
             return RedirectToAction(nameof(Index));
         }
     }
