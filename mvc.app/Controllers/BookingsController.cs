@@ -34,19 +34,7 @@ namespace mvc.app.Controllers
         }
         public async Task<IActionResult> ConsultanView()
         {
-            var bookings = await _bookingService.GetAllBookingsAsync();
-
-            // Join bookings with users to create UserBookingRequest view models
-            var userBookingRequests = (from booking in bookings
-                                       join user in _context.Users on booking.CustomerId equals user.Id
-                                       select new mvc.dataaccess.ViewModels.UserBookingRequest
-                                       {
-                                           customerId = user.Id,
-                                           UserName = user.FullName, // Adjust property names as needed
-                                           Email = user.Email,
-                                           PhoneNumber = user.PhoneNumber,
-                                           BookingDate = booking.BookingDate
-                                       }).ToList();
+            var userBookingRequests=_bookingService.GetBookingsByCustomerIdAsync();
 
             return View(userBookingRequests);
         }
