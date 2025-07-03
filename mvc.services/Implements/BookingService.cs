@@ -31,6 +31,11 @@ namespace mvc.services.Implements
             return await _bookingRepo.GetAllBookingsAsync();
         }
 
+        public async Task<Booking?> GetBookingByCustomerIdAsync(Guid id)
+        {
+            return await _bookingRepo.GetBookingByCustomerIdAsync(id);
+        }
+
         public async Task<Booking?> GetBookingByIdAsync(int id)
         {
             return await _bookingRepo.GetBookingByIdAsync(id);

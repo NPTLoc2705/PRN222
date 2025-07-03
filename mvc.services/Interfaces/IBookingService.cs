@@ -13,6 +13,7 @@ namespace mvc.services.Interfaces
         Task<List<Booking>> GetAllBookingsAsync();
         Task<Booking?> GetBookingByIdAsync(int id);
         Task AddBookingAsync(Booking booking);
+        Task<Booking?> GetBookingByCustomerIdAsync(Guid id);
         Task UpdateBookingAsync(Booking booking);
         Task <List<UserBookingRequest>> GetBookingsByCustomerIdAsync();
         Task DeleteBookingAsync(int id);

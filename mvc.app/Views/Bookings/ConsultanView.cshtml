@@ -239,9 +239,11 @@
                                     </div>
                                     <!-- Add more consultant details as needed -->
                                 </div>
-                                <a asp-action="Book" asp-route-consultantId="@consultant.customerId" class="btn btn-book">
-                                    Book Consultation
-                                </a>
+                                <form asp-action="BookConsultant" asp-controller="Bookings" method="post">
+                                    <input type="hidden" name="customerId" value="@consultant.customerId" />
+                                    <button type="submit">Book Consultant</button>
+                                </form>
+
                             </div>
                         </div>
                     </div>

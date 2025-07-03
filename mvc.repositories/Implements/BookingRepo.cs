@@ -48,7 +48,10 @@ namespace mvc.repositories.Implements
             return await _context.Bookings.ToListAsync();
         }
 
-        
+        public async Task<Booking?> GetBookingByCustomerIdAsync(Guid id)
+        {
+            return await _context.Bookings.FirstOrDefaultAsync(c => c.CustomerId.Equals(id));
+        }
 
         public async Task<Booking?> GetBookingByIdAsync(int id)
         {
@@ -57,15 +60,18 @@ namespace mvc.repositories.Implements
 
         public async Task<List<UserBookingRequest>> GetBookingsByCustomer()
         {
-            var bookings = await _context.Bookings.ToListAsync();
+            // Filter bookings where Status == 1 (assuming 1 means the desired status)
+            var bookings = await _context.Bookings
+                .Where(b => (int)b.Status == 1)
+                .ToListAsync();
 
-            // Join bookings with users to create UserBookingRequest view models
+            // Join bookings with users to create UserBookingRequest view models  
             var userBookingRequests = (from booking in bookings
                                        join user in _context.Users on booking.CustomerId equals user.Id
                                        select new UserBookingRequest
                                        {
                                            customerId = user.Id,
-                                           UserName = user.FullName, // Adjust property names as needed
+                                           UserName = user.FullName,
                                            Email = user.Email,
                                            PhoneNumber = user.PhoneNumber,
                                            BookingDate = booking.BookingDate
@@ -74,7 +80,6 @@ namespace mvc.repositories.Implements
             return userBookingRequests;
         }
 
-       
         public async Task UpdateBookingAsync(Booking booking)
         {
             _context.Update(booking);
