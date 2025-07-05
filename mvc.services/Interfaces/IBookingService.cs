@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using mvc.dataaccess.Entities;
+using mvc.dataaccess.ViewModels;
 
 namespace mvc.services.Interfaces
 {
@@ -12,7 +13,9 @@ namespace mvc.services.Interfaces
         Task<List<Booking>> GetAllBookingsAsync();
         Task<Booking?> GetBookingByIdAsync(int id);
         Task AddBookingAsync(Booking booking);
+        Task<Booking?> GetBookingByCustomerIdAsync(Guid id);
         Task UpdateBookingAsync(Booking booking);
+        Task <List<UserBookingRequest>> GetBookingsByCustomerIdAsync();
         Task DeleteBookingAsync(int id);
     }
 }

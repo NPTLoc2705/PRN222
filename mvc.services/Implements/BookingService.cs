@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using mvc.dataaccess.Entities;
+using mvc.dataaccess.ViewModels;
 using mvc.repositories.Interfaces;
 using mvc.services.Interfaces;
 
@@ -30,9 +31,21 @@ namespace mvc.services.Implements
             return await _bookingRepo.GetAllBookingsAsync();
         }
 
+        public async Task<Booking?> GetBookingByCustomerIdAsync(Guid id)
+        {
+            return await _bookingRepo.GetBookingByCustomerIdAsync(id);
+        }
+
         public async Task<Booking?> GetBookingByIdAsync(int id)
         {
             return await _bookingRepo.GetBookingByIdAsync(id);
+        }
+
+        
+
+        public Task<List<UserBookingRequest>> GetBookingsByCustomerIdAsync()
+        {
+            return _bookingRepo.GetBookingsByCustomer();
         }
 
         public async Task UpdateBookingAsync(Booking booking)

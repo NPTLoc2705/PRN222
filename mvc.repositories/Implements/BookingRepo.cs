@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using mvc.dataaccess.Entities;
+using mvc.dataaccess.ViewModels;
 using mvc.repositories.Interfaces;
 
 namespace mvc.repositories.Implements
@@ -47,9 +48,36 @@ namespace mvc.repositories.Implements
             return await _context.Bookings.ToListAsync();
         }
 
+        public async Task<Booking?> GetBookingByCustomerIdAsync(Guid id)
+        {
+            return await _context.Bookings.FirstOrDefaultAsync(c => c.CustomerId.Equals(id));
+        }
+
         public async Task<Booking?> GetBookingByIdAsync(int id)
         {
             return await _context.Bookings.FirstOrDefaultAsync(b => b.Id == id);
+        }
+
+        public async Task<List<UserBookingRequest>> GetBookingsByCustomer()
+        {
+            // Filter bookings where Status == 1 (assuming 1 means the desired status)
+            var bookings = await _context.Bookings
+                .Where(b => (int)b.Status == 1)
+                .ToListAsync();
+
+            // Join bookings with users to create UserBookingRequest view models  
+            var userBookingRequests = (from booking in bookings
+                                       join user in _context.Users on booking.CustomerId equals user.Id
+                                       select new UserBookingRequest
+                                       {
+                                           customerId = user.Id,
+                                           UserName = user.FullName,
+                                           Email = user.Email,
+                                           PhoneNumber = user.PhoneNumber,
+                                           BookingDate = booking.BookingDate
+                                       }).ToList();
+
+            return userBookingRequests;
         }
 
         public async Task UpdateBookingAsync(Booking booking)

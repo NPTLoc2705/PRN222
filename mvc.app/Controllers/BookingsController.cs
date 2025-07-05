@@ -34,23 +34,12 @@ namespace mvc.app.Controllers
         }
         public async Task<IActionResult> ConsultanView()
         {
-            var bookings = await _bookingService.GetAllBookingsAsync();
-
-            // Join bookings with users to create UserBookingRequest view models
-            var userBookingRequests = (from booking in bookings
-                                       join user in _context.Users on booking.CustomerId equals user.Id
-                                       select new mvc.dataaccess.ViewModels.UserBookingRequest
-                                       {
-                                           customerId = user.Id,
-                                           UserName = user.FullName, // Adjust property names as needed
-                                           Email = user.Email,
-                                           PhoneNumber = user.PhoneNumber,
-                                           BookingDate = booking.BookingDate
-                                       }).ToList();
+            var userBookingRequests=await _bookingService.GetBookingsByCustomerIdAsync();
 
             return View(userBookingRequests);
         }
 
+        
         // GET: Bookings
 
         public async Task<IActionResult> Index()
@@ -121,7 +110,74 @@ namespace mvc.app.Controllers
             }
             return View(booking);
         }
-        // GET: Bookings/Edit/5
+        /*  // GET: Bookings/Edit/5
+          public async Task<IActionResult> Book(Guid id)
+          {
+              if (id == null )
+              {
+                  return NotFound();
+              }
+              var consultanId = HttpContext.Session.GetString("UserId");
+              var role = HttpContext.Session.GetString("Role");
+              if (consultanId == null || role == "Consultan")
+              {
+                  // Handle missing session (e.g., redirect to login)
+                  return RedirectToAction("Login", "Auth");
+              }
+              var booking = await _bookingService.GetBookingByCustomerIdAsync(id);
+              if (booking == null)
+              {
+                  return NotFound();
+              }
+
+              // Set the ConsultantId for confirmation
+              booking.ConsultantId = Guid.Parse(consultanId);
+
+              return View(booking); // Create a Book.cshtml view or reuse Edit.cshtml
+          }*/
+        /*[HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Book(Guid id, [Bind("Id,")] Booking booking)
+        {
+            if (id != booking.CustomerId)
+            {
+                return NotFound();
+            }
+
+            var existingBooking = await _bookingService.GetBookingByCustomerIdAsync(id);
+            if (existingBooking == null)
+            {
+                return NotFound();
+            }
+
+            existingBooking.ConsultantId = booking.ConsultantId;
+            await _bookingService.UpdateBookingAsync(existingBooking);
+
+            return RedirectToAction(nameof(Index));
+        }*/
+        
+        public async Task<IActionResult> BookConsultant(Guid customerId)
+        {
+            var consultantIdStr = HttpContext.Session.GetString("UserId");
+            var role = HttpContext.Session.GetString("Role");
+            if (consultantIdStr == null /*|| role != "Consultan"*/)
+            {
+                return Json(new { success = false, message = "Unauthorized" });
+            }
+
+            var booking = await _bookingService.GetBookingByCustomerIdAsync(customerId);
+            if (booking == null)
+            {
+                return Json(new { success = false, message = "Booking not found" });
+            }
+            booking.Status = BookStatus.Ongoing; // Update the status to Ongoing
+            booking.ConsultantId = Guid.Parse(consultantIdStr);
+            await _bookingService.UpdateBookingAsync(booking);
+
+            return View("ConsultanView");
+        }
+
+
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
