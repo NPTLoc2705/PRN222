@@ -211,7 +211,11 @@
 
                     @if (ViewData["IsLoggedIn"] != null && (bool)ViewData["IsLoggedIn"])
                     {
-                        <li><span class="user-welcome">@ViewData["UserMessage"]</span></li>
+                        <li>
+                            <a href="/User/UserProfile" class="user-welcome">
+                                @ViewData["UserMessage"]
+                            </a>
+                        </li>
                         <li><a asp-controller="Auth" asp-action="Logout">Logout</a></li>
                     }
                     else
