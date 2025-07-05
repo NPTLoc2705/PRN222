@@ -1,4 +1,6 @@
-﻿using mvc.dataaccess.Entities;
+﻿using Microsoft.EntityFrameworkCore;
+using mvc.dataaccess.Entities;
+using mvc.dataaccess.ViewModels.User;
 using mvc.repositories.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -68,6 +70,118 @@ namespace mvc.repositories.Implements
                 throw new Exception("An error occurred while retrieving the user by ID.", ex);
             }
 
+        }
+        public Task<List<User>> GetAllUsers()
+        {
+            try
+            {
+                return _context.Users.ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("An error occurred while retrieving all users.", ex);
+            }
+        }
+        public User GetUserProfile(Guid userId)
+        {
+            try
+            {
+                return _context.Users.FirstOrDefault(u => u.Id == userId);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("An error occurred while retrieving user profile.", ex);
+            }
+        }
+
+        public bool DeleteUser(Guid userId)
+        {
+            try
+            {
+                var user = _context.Users.FirstOrDefault(u => u.Id == userId);
+                if (user == null)
+                {
+                    return false;
+
+                }
+                _context.Users.Remove(user);
+                _context.SaveChanges();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("An error occurred while deleting the user.", ex);
+            }
+        }
+        public bool banUser(Guid userId)
+        {
+            try
+            {
+                var user = _context.Users.FirstOrDefault(u => u.Id == userId);
+                if (user == null)
+                {
+                    return false;
+                }
+                user.IsActive = false;
+                _context.SaveChanges();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("An error occurred while banning the user.", ex);
+
+            }
+        }
+
+        public bool unBanUser(Guid userId)
+        {
+            try
+            {
+                var user = _context.Users.FirstOrDefault(u => u.Id == userId);
+                if (user == null)
+                {
+                    return false;
+                }
+                user.IsActive = true;
+                _context.SaveChanges();
+                return true;
+
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("An error occurred while unbanning the user.", ex);
+            }
+
+
+
+        }
+
+        public void UpdateUserProfile(UpdateUserViewModel user)
+        {
+            try
+            {
+                var userR = _context.Users.FirstOrDefault(u => u.Id == user.Id);
+                if (userR == null)
+                {
+                    throw new Exception("User not found.");
+                }
+
+                userR.FullName = user.FullName;
+                userR.PhoneNumber = user.PhoneNumber;
+                userR.Address = user.Address;
+
+                if (!string.IsNullOrWhiteSpace(user.Password))
+                {
+                    userR.Password = user.Password;
+                }
+
+                _context.Users.Update(userR);
+                _context.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("An error occurred while updating the user profile.", ex);
+            }
         }
     }
 }
