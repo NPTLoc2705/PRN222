@@ -1,4 +1,5 @@
 ﻿@model mvc.dataaccess.Entities.Courses.Course
+@inject mvc.services.Interfaces.IProgressService progressService
 
 @{
     ViewData["Title"] = "Delete";
@@ -55,10 +56,31 @@
             @Html.DisplayFor(model => model.IsActive)
         </dd>
     </dl>
-    
-    <form asp-action="Delete">
-        <input type="hidden" asp-for="CourseId" />
-        <input type="submit" value="Delete" class="btn btn-danger" /> |
-        <a asp-action="Index">Back to List</a>
-    </form>
+    @if (ViewBag.CanDelete == false)
+{
+    <div class="alert alert-warning">
+        <h5>Warning!</h5>
+        <p>This course cannot be deleted because it has:</p>
+        <ul>
+            @if (Model.Lessons?.Any() == true)
+            {
+                <li>@Model.Lessons.Count lesson(s)</li>
+            }
+            @if (await progressService.HasCourseProgress(Model.CourseId))
+            {
+                <li>User progress records</li>
+            }
+        </ul>
+        <p>Please delete these items first.</p>
+    </div>
+}
+else
+{
+        <form asp-controller="Courses" asp-action="DeleteConfirmed" asp-route-id="@Model.CourseId" method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="CourseId" />
+            <button type="submit" class="btn btn-danger">Delete</button>
+        </form>
+}
 </div>
+

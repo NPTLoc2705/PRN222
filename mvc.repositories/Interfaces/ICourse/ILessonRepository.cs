@@ -11,10 +11,11 @@ namespace mvc.repositories.Interfaces.ICourse
     public interface ILessonRepository
     {
         Task<LessonDTO> GetLessonByIdAsync(Guid lessonId);
-        Task<IEnumerable<LessonDTO>> GetLessonsByModuleIdAsync(Guid moduleId);
+        Task<IEnumerable<Lesson>> GetLessonsByCourseIdAsync(Guid courseId); 
         Task<LessonDTO> CreateLessonAsync(LessonDTO lessonDto);
         Task<LessonDTO> UpdateLessonAsync(LessonDTO lessonDto);
         Task<bool> DeleteLessonAsync(Guid lessonId);
-        Task<bool> ReorderLessonsAsync(LessonDTO reorderDto);
+        Task<bool> ReorderLessonsAsync(Guid courseId, List<Guid> orderedLessonIds);
+        Task DeleteLessonsByCourseIdAsync(Guid courseId);
     }
 }
