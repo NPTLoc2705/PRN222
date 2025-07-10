@@ -65,15 +65,17 @@ namespace mvc.repositories.Implements
                 .Where(b => (int)b.Status == 1)
                 .ToListAsync();
 
-            // Create UserBookingRequest view models directly from bookings
-            var userBookingRequests = bookings.Select(booking => new UserBookingRequest
-            {
-                customerId = booking.CustomerId,
-                UserName = string.Empty, // UserName is not fetched
-                Email = string.Empty,    // Email is not fetched
-                PhoneNumber = string.Empty, // PhoneNumber is not fetched
-                BookingDate = booking.BookingDate
-            }).ToList();
+            // Join bookings with users to create UserBookingRequest view models  
+            var userBookingRequests = (from booking in bookings
+                                       join user in _context.Users on booking.CustomerId equals user.Id
+                                       select new UserBookingRequest
+                                       {
+                                           customerId = user.Id,
+                                           UserName = user.FullName,
+                                           Email = user.Email,
+                                           PhoneNumber = user.PhoneNumber,
+                                           BookingDate = booking.BookingDate
+                                       }).ToList();
 
             return userBookingRequests;
         }

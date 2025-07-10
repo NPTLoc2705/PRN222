@@ -11,8 +11,6 @@ namespace mvc.dataaccess.ViewModels
     public class CoursesDTO
     {
         public bool Error { get; set; }
-
-        [Display(Name = "Message")]
         public string? Message { get; set; }
 
         // Course data
@@ -29,32 +27,28 @@ namespace mvc.dataaccess.ViewModels
         [Required(ErrorMessage = "Duration is required")]
         [Range(1, int.MaxValue, ErrorMessage = "Duration must be greater than 0")]
         [Display(Name = "Duration (minutes)")]
-        public int Duration { get; set; } // in minutes
+        public int Duration { get; set; }
 
         [Required(ErrorMessage = "Difficulty level is required")]
         [Display(Name = "Difficulty Level")]
         public string DifficultyLevel { get; set; }
 
         public byte[]? ImageBytes { get; set; }
-
         public string? ImageContentType { get; set; }
 
         public DateTime CreatedAt { get; set; }
-
         public DateTime UpdatedAt { get; set; }
 
         [Display(Name = "Is Active")]
         public bool IsActive { get; set; } = true;
 
-        // Optional navigation property representations (e.g., names or IDs)
-        public List<Guid>? ModuleIds { get; set; }
+        // Navigation properties
+       
+        public List<LessonDTO>? Lessons { get; set; }  // Changed from LessonIds to full LessonDTO objects
+        [MinLength(1, ErrorMessage = "Please select at least one category")]
 
-        public List<Guid>? UserProgressIds { get; set; }
+        public List<Guid> SelectedCategoryIds { get; set; } = new List<Guid>();
+        public List<CategoryDTO> AvailableCategories { get; set; } = new List<CategoryDTO>();
 
-        public List<Guid>? CategoryMappingIds { get; set; }
-
-        public List<Guid>? PrerequisiteCourseIds { get; set; }
-
-        public List<Guid>? RequiredForCourseIds { get; set; }
     }
 }

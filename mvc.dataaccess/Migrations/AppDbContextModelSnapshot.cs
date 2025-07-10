@@ -47,7 +47,7 @@ namespace mvc.dataaccess.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Bookings", (string)null);
+                    b.ToTable("Bookings");
                 });
 
             modelBuilder.Entity("mvc.dataaccess.Entities.Blog", b =>
@@ -75,7 +75,7 @@ namespace mvc.dataaccess.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Blogs", (string)null);
+                    b.ToTable("Blogs");
                 });
 
             modelBuilder.Entity("mvc.dataaccess.Entities.Courses.Course", b =>
@@ -133,13 +133,10 @@ namespace mvc.dataaccess.Migrations
                         .HasColumnType("uniqueidentifier")
                         .HasDefaultValueSql("NEWID()");
 
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.HasKey("CategoryId");
 
@@ -158,22 +155,7 @@ namespace mvc.dataaccess.Migrations
 
                     b.HasIndex("CategoryId");
 
-                    b.ToTable("CourseCategoryMappings");
-                });
-
-            modelBuilder.Entity("mvc.dataaccess.Entities.Courses.CoursePrerequisite", b =>
-                {
-                    b.Property<Guid>("CourseId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("PrerequisiteCourseId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("CourseId", "PrerequisiteCourseId");
-
-                    b.HasIndex("PrerequisiteCourseId");
-
-                    b.ToTable("CoursePrerequisites");
+                    b.ToTable("CourseCategoryMappings", (string)null);
                 });
 
             modelBuilder.Entity("mvc.dataaccess.Entities.Courses.Lesson", b =>
@@ -185,11 +167,16 @@ namespace mvc.dataaccess.Migrations
 
                     b.Property<string>("ContentType")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("ContentUrl")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<Guid>("CourseId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
@@ -198,54 +185,23 @@ namespace mvc.dataaccess.Migrations
                         .HasColumnType("int");
 
                     b.Property<bool>("IsFreePreview")
-                        .HasColumnType("bit");
-
-                    b.Property<Guid>("ModuleId")
-                        .HasColumnType("uniqueidentifier");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
 
                     b.Property<int>("OrderNumber")
                         .HasColumnType("int");
 
                     b.Property<string>("Title")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.HasKey("LessonId");
 
-                    b.HasIndex("ModuleId");
-
-                    b.ToTable("Lessons", (string)null);
-                });
-
-            modelBuilder.Entity("mvc.dataaccess.Entities.Courses.Module", b =>
-                {
-                    b.Property<Guid>("ModuleId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier")
-                        .HasDefaultValueSql("NEWID()");
-
-                    b.Property<Guid>("CourseId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("OrderNumber")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("ModuleId");
-
                     b.HasIndex("CourseId");
 
-                    b.ToTable("Modules", (string)null);
+                    b.ToTable("Lessons", (string)null);
                 });
 
             modelBuilder.Entity("mvc.dataaccess.Entities.Courses.UserCourseProgress", b =>
@@ -262,7 +218,9 @@ namespace mvc.dataaccess.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<bool>("IsCompleted")
-                        .HasColumnType("bit");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
 
                     b.Property<DateTime>("LastAccessed")
                         .HasColumnType("datetime2");
@@ -271,7 +229,9 @@ namespace mvc.dataaccess.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<decimal>("ProgressPercentage")
-                        .HasColumnType("decimal(18,2)");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("decimal(5,2)")
+                        .HasDefaultValue(0.00m);
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("uniqueidentifier");
@@ -282,9 +242,9 @@ namespace mvc.dataaccess.Migrations
 
                     b.HasIndex("LessonId");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("UserId", "CourseId");
 
-                    b.ToTable("UserCourseProgresses");
+                    b.ToTable("UserCourseProgresses", (string)null);
                 });
 
             modelBuilder.Entity("mvc.dataaccess.Entities.Post", b =>
@@ -317,7 +277,7 @@ namespace mvc.dataaccess.Migrations
 
                     b.HasIndex("StaffId");
 
-                    b.ToTable("Posts", (string)null);
+                    b.ToTable("Posts");
                 });
 
             modelBuilder.Entity("mvc.dataaccess.Entities.User", b =>
@@ -329,29 +289,38 @@ namespace mvc.dataaccess.Migrations
 
                     b.Property<string>("Address")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<string>("Email")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
 
                     b.Property<string>("FullName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
 
                     b.Property<string>("Password")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
 
                     b.Property<string>("PhoneNumber")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
-                    b.Property<int>("Role")
-                        .HasColumnType("int");
+                    b.Property<string>("Role")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.HasKey("Id");
 
@@ -388,40 +357,10 @@ namespace mvc.dataaccess.Migrations
                     b.Navigation("Course");
                 });
 
-            modelBuilder.Entity("mvc.dataaccess.Entities.Courses.CoursePrerequisite", b =>
-                {
-                    b.HasOne("mvc.dataaccess.Entities.Courses.Course", "Course")
-                        .WithMany("Prerequisites")
-                        .HasForeignKey("CourseId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("mvc.dataaccess.Entities.Courses.Course", "PrerequisiteCourse")
-                        .WithMany("RequiredForCourses")
-                        .HasForeignKey("PrerequisiteCourseId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Course");
-
-                    b.Navigation("PrerequisiteCourse");
-                });
-
             modelBuilder.Entity("mvc.dataaccess.Entities.Courses.Lesson", b =>
                 {
-                    b.HasOne("mvc.dataaccess.Entities.Courses.Module", "Module")
-                        .WithMany("Lessons")
-                        .HasForeignKey("ModuleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Module");
-                });
-
-            modelBuilder.Entity("mvc.dataaccess.Entities.Courses.Module", b =>
-                {
                     b.HasOne("mvc.dataaccess.Entities.Courses.Course", "Course")
-                        .WithMany("Modules")
+                        .WithMany("Lessons")
                         .HasForeignKey("CourseId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -470,11 +409,7 @@ namespace mvc.dataaccess.Migrations
                 {
                     b.Navigation("CategoryMappings");
 
-                    b.Navigation("Modules");
-
-                    b.Navigation("Prerequisites");
-
-                    b.Navigation("RequiredForCourses");
+                    b.Navigation("Lessons");
 
                     b.Navigation("UserProgresses");
                 });
@@ -487,11 +422,6 @@ namespace mvc.dataaccess.Migrations
             modelBuilder.Entity("mvc.dataaccess.Entities.Courses.Lesson", b =>
                 {
                     b.Navigation("UserProgresses");
-                });
-
-            modelBuilder.Entity("mvc.dataaccess.Entities.Courses.Module", b =>
-                {
-                    b.Navigation("Lessons");
                 });
 
             modelBuilder.Entity("mvc.dataaccess.Entities.User", b =>

@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using mvc.dataaccess.Entities;
 using mvc.dataaccess.Entities.Courses;
 using mvc.dataaccess.ViewModels;
@@ -23,8 +24,7 @@ namespace mvc.repositories.Implements.CourseRepo
         public async Task<LessonDTO> GetLessonByIdAsync(Guid lessonId)
         {
             var lesson = await _context.Lessons
-                .Include(l => l.Module)
-                .ThenInclude(m => m.Course)
+                .Include(l => l.Course)
                 .FirstOrDefaultAsync(l => l.LessonId == lessonId);
 
             if (lesson == null) return null;
@@ -32,7 +32,7 @@ namespace mvc.repositories.Implements.CourseRepo
             return new LessonDTO
             {
                 LessonId = lesson.LessonId,
-                ModuleId = lesson.ModuleId,
+                CourseId = lesson.CourseId, // Changed from ModuleId to CourseId
                 Title = lesson.Title,
                 ContentType = lesson.ContentType,
                 ContentUrl = lesson.ContentUrl,
@@ -40,51 +40,37 @@ namespace mvc.repositories.Implements.CourseRepo
                 OrderNumber = lesson.OrderNumber,
                 IsFreePreview = lesson.IsFreePreview,
                 CreatedAt = lesson.CreatedAt,
-                ModuleTitle = lesson.Module?.Title,
-                ModuleDescription = lesson.Module?.Description,
-                CourseTitle = lesson.Module?.Course?.Title,
-                CourseId = lesson.Module?.CourseId ?? Guid.Empty
+                CourseTitle = lesson.Course?.Title // Changed from ModuleTitle to CourseTitle
             };
         }
 
-        public async Task<IEnumerable<LessonDTO>> GetLessonsByModuleIdAsync(Guid moduleId)
+        public async Task<IEnumerable<Lesson>> GetLessonsByCourseIdAsync(Guid courseId)
         {
             return await _context.Lessons
-                .Where(l => l.ModuleId == moduleId)
+                .Where(l => l.CourseId == courseId)
                 .OrderBy(l => l.OrderNumber)
-                .Select(l => new LessonDTO
-                {
-                    LessonId = l.LessonId,
-                    ModuleId = l.ModuleId,
-                    Title = l.Title,
-                    ContentType = l.ContentType,
-                    ContentUrl = l.ContentUrl,
-                    Duration = l.Duration,
-                    OrderNumber = l.OrderNumber,
-                    IsFreePreview = l.IsFreePreview,
-                    CreatedAt = l.CreatedAt
-                })
                 .ToListAsync();
         }
 
+
         public async Task<LessonDTO> CreateLessonAsync(LessonDTO lessonDto)
         {
-            // Validate module exists
-            var moduleExists = await _context.Modules.AnyAsync(m => m.ModuleId == lessonDto.ModuleId);
-            if (!moduleExists)
+            // Validate course exists
+            var courseExists = await _context.Courses.AnyAsync(c => c.CourseId == lessonDto.CourseId);
+            if (!courseExists)
             {
-                return new LessonDTO { Error = true, Message = "Module not found" };
+                return new LessonDTO { Error = true, Message = "Course not found" };
             }
 
             // Get the next order number
             var maxOrder = await _context.Lessons
-                .Where(l => l.ModuleId == lessonDto.ModuleId)
+                .Where(l => l.CourseId == lessonDto.CourseId)
                 .MaxAsync(l => (int?)l.OrderNumber) ?? 0;
 
             var lesson = new Lesson
             {
                 LessonId = Guid.NewGuid(),
-                ModuleId = lessonDto.ModuleId,
+                CourseId = lessonDto.CourseId, // Changed from ModuleId to CourseId
                 Title = lessonDto.Title,
                 ContentType = lessonDto.ContentType,
                 ContentUrl = lessonDto.ContentUrl,
@@ -100,7 +86,7 @@ namespace mvc.repositories.Implements.CourseRepo
             return new LessonDTO
             {
                 LessonId = lesson.LessonId,
-                ModuleId = lesson.ModuleId,
+                CourseId = lesson.CourseId, // Changed from ModuleId to CourseId
                 Title = lesson.Title,
                 ContentType = lesson.ContentType,
                 ContentUrl = lesson.ContentUrl,
@@ -143,20 +129,20 @@ namespace mvc.repositories.Implements.CourseRepo
             return true;
         }
 
-        public async Task<bool> ReorderLessonsAsync(LessonDTO reorderDto)
+        public async Task<bool> ReorderLessonsAsync(Guid courseId, List<Guid> orderedLessonIds)
         {
             var lessons = await _context.Lessons
-                .Where(l => l.ModuleId == reorderDto.ModuleId)
+                .Where(l => l.CourseId == courseId)
                 .ToListAsync();
 
-            if (lessons.Count != reorderDto.OrderedLessonIds.Count)
+            if (lessons.Count != orderedLessonIds.Count)
             {
                 return false;
             }
 
-            for (int i = 0; i < reorderDto.OrderedLessonIds.Count; i++)
+            for (int i = 0; i < orderedLessonIds.Count; i++)
             {
-                var lesson = lessons.FirstOrDefault(l => l.LessonId == reorderDto.OrderedLessonIds[i]);
+                var lesson = lessons.FirstOrDefault(l => l.LessonId == orderedLessonIds[i]);
                 if (lesson != null)
                 {
                     lesson.OrderNumber = i + 1;
@@ -165,6 +151,31 @@ namespace mvc.repositories.Implements.CourseRepo
 
             await _context.SaveChangesAsync();
             return true;
+        }
+        public async Task<bool> ProcessLessonContentFileAsync(Guid lessonId, IFormFile contentFile)
+        {
+            var lesson = await _context.Lessons.FindAsync(lessonId);
+            if (lesson == null) return false;
+
+            // Process file upload logic here
+            // Example: save to storage and update ContentUrl
+            // lesson.ContentUrl = processedFileUrl;
+
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task DeleteLessonsByCourseIdAsync(Guid courseId)
+        {
+            var lessons = await _context.Lessons
+                .Where(l => l.CourseId == courseId)
+                .ToListAsync();
+
+            if (lessons.Any())
+            {
+                _context.Lessons.RemoveRange(lessons);
+                await _context.SaveChangesAsync();
+            }
         }
     }
 }

@@ -1,77 +1,294 @@
 ﻿@model mvc.dataaccess.ViewModels.LessonDTO
 @{
-    ViewData["Title"] = "Lesson Details";
-    var courseId = ViewBag.CourseId;
-    var module = ViewBag.Module;
+    ViewData["Title"] = Model.Title;
+    var userId = Context.Session.GetString("UserId");
+    var isLoggedIn = !string.IsNullOrEmpty(userId);
+    bool isCompleted = ViewBag.IsLessonCompleted;
+    var isAdmin = Context.Session.GetString("UserRole") == "Admin" ||
+                 Context.Session.GetString("UserRole") == "Instructor";
 }
 
-<h1>Lesson Details</h1>
+<style>
+    :root {
+        --primary-color: #28a745;
+        --primary-light: #5cb85c;
+        --primary-dark: #218838;
+        --secondary-color: #6c757d;
+        --light-color: #f8f9fa;
+        --dark-color: #343a40;
+        --success-color: #28a745;
+        --info-color: #17a2b8;
+        --warning-color: #ffc107;
+        --danger-color: #dc3545;
+    }
 
-<div>
-    <h4>@Model.Title</h4>
-    <hr />
-    <dl class="row">
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Title)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Title)
-        </dd>
-        <dt class="col-sm-2">
-            Content Type
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.ContentType)
-        </dd>
-        @if (!string.IsNullOrEmpty(Model.ContentUrl))
-        {
-            <dt class="col-sm-2">
-                Content Link
-            </dt>
-            <dd class="col-sm-10">
-                <a href="@Model.ContentUrl" target="_blank">View Content</a>
-            </dd>
+    body {
+        background-color: #f5f9f5;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .container {
+        max-width: 1200px;
+        padding-top: 2rem;
+        padding-bottom: 2rem;
+    }
+
+    h1 {
+        color: var(--dark-color);
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid var(--primary-light);
+    }
+
+    .card {
+        border: none;
+        border-radius: 10px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        margin-bottom: 1.5rem;
+        background-color: white;
+    }
+
+    .card-header {
+        background-color: var(--primary-color);
+        color: white;
+        border-radius: 10px 10px 0 0 !important;
+        padding: 1rem 1.5rem;
+        font-weight: 500;
+    }
+
+    .card-body {
+        padding: 1.5rem;
+    }
+
+    .alert {
+        border-radius: 8px;
+        padding: 1rem 1.5rem;
+    }
+
+    .alert-warning {
+        background-color: #fff8e1;
+        border-color: #ffecb3;
+        color: #ff8f00;
+    }
+
+    .alert-success {
+        background-color: #e8f5e9;
+        border-color: #c8e6c9;
+        color: #2e7d32;
+    }
+
+    .alert-danger {
+        background-color: #ffebee;
+        border-color: #ffcdd2;
+        color: #c62828;
+    }
+
+    .alert-info {
+        background-color: #e8f5e9;
+        border-color: #c8e6c9;
+        color: #2e7d32;
+    }
+
+    .btn {
+        border-radius: 6px;
+        font-weight: 500;
+        padding: 0.5rem 1.25rem;
+    }
+
+    .btn-secondary {
+        background-color: var(--secondary-color);
+        border-color: var(--secondary-color);
+    }
+
+    .btn-success {
+        background-color: var(--success-color);
+        border-color: var(--success-color);
+    }
+
+    .btn-warning {
+        background-color: var(--warning-color);
+        border-color: var(--warning-color);
+        color: var(--dark-color);
+    }
+
+    .progress {
+        height: 12px;
+        border-radius: 6px;
+        background-color: #e9ecef;
+        margin: 1rem 0;
+    }
+
+    .progress-bar {
+        background-color: var(--primary-color);
+        border-radius: 6px;
+    }
+
+    .badge {
+        font-weight: 500;
+        padding: 0.5rem 0.75rem;
+        border-radius: 50px;
+        font-size: 0.85rem;
+    }
+
+        .badge.bg-success {
+            background-color: var(--success-color) !important;
         }
-        <dt class="col-sm-2">
-            Duration
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Duration) minutes
-        </dd>
-        <dt class="col-sm-2">
-            Free Preview
-        </dt>
-        <dd class="col-sm-10">
-            @(Model.IsFreePreview ? "Yes" : "No")
-        </dd>
-        <dt class="col-sm-2">
-            Module
-        </dt>
-        <dd class="col-sm-10">
-            @Model.ModuleTitle
-        </dd>
-        <dt class="col-sm-2">
-            Course
-        </dt>
-        <dd class="col-sm-10">
-            @Model.CourseTitle
-        </dd>
-        <dt class="col-sm-2">
-            Created
-        </dt>
-        <dd class="col-sm-10">
-            @Model.CreatedAt.ToString("d")
-        </dd>
-    </dl>
-</div>
-<div>
-    <a asp-action="Edit"
-       asp-route-courseId="@courseId"
-       asp-route-moduleId="@module.ModuleId"
-       asp-route-lessonId="@Model.LessonId"
-       class="btn btn-primary">Edit</a>
-    <a asp-action="Index"
-       asp-route-courseId="@courseId"
-       asp-route-moduleId="@module.ModuleId"
-       class="btn btn-secondary">Back to List</a>
+
+    .embed-responsive {
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        margin-bottom: 1.5rem;
+    }
+
+    iframe {
+        border-radius: 10px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        border: none;
+    }
+</style>
+
+<div class="container">
+    <h1><i class="fas fa-book-open mr-2"></i> @Model.Title</h1>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">
+            <i class="fas fa-check-circle mr-2"></i> @TempData["SuccessMessage"]
+        </div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">
+            <i class="fas fa-exclamation-circle mr-2"></i> @TempData["ErrorMessage"]
+        </div>
+    }
+    @if (TempData["InfoMessage"] != null)
+    {
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle mr-2"></i> @TempData["InfoMessage"]
+        </div>
+    }
+
+    @if (!isLoggedIn)
+    {
+        <div class="alert alert-warning">
+            <i class="fas fa-exclamation-circle mr-2"></i>
+            <strong>Please <a asp-controller="Auth" asp-action="Login" class="alert-link">login</a> to access this lesson</strong>
+        </div>
+    }
+    else
+    {
+        <div class="row">
+            <div class="col-lg-8">
+                @if (!string.IsNullOrEmpty(Model.ContentUrl))
+                {
+                    if (Model.ContentType == "Video")
+                    {
+                        <div class="embed-responsive embed-responsive-16by9">
+                            <video controls class="embed-responsive-item">
+                                <source src="@Model.ContentUrl" type="video/mp4">
+                                Your browser does not support the video tag.
+                            </video>
+                        </div>
+                    }
+                    else if (Model.ContentType == "PDF")
+                    {
+                        <iframe src="@Model.ContentUrl" style="width:100%; height:500px;"></iframe>
+                    }
+                    else
+                    {
+                        <div class="card">
+                            <div class="card-body text-center">
+                                <a href="@Model.ContentUrl" target="_blank" class="btn btn-primary">
+                                    <i class="fas fa-download mr-2"></i> Download Lesson Content
+                                </a>
+                            </div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle mr-2"></i> No content available for this lesson.
+                    </div>
+                }
+            </div>
+
+            <div class="col-lg-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-info-circle mr-2"></i> Lesson Info</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <h6><i class="fas fa-clock mr-2 text-muted"></i> Duration</h6>
+                            <p>@Model.Duration minutes</p>
+                        </div>
+
+                        @if (ViewBag.IsUserEnrolled ?? false)
+                        {
+                            <div class="mb-4">
+                                <h6><i class="fas fa-chart-line mr-2 text-muted"></i> Course Progress</h6>
+                                <div class="progress">
+                                    <div class="progress-bar"
+                                         role="progressbar"
+                                         style="width: @(ViewBag.CourseProgressPercentage ?? 0)%;"
+                                         aria-valuenow="@(ViewBag.CourseProgressPercentage ?? 0)"
+                                         aria-valuemin="0"
+                                         aria-valuemax="100">
+                                    </div>
+                                </div>
+                                <small class="text-muted">
+                                    @{
+                                        var completedCount = ViewBag.CompletedLessonsCount ?? 0;
+                                        var totalLessons = ViewBag.TotalLessonsCount ?? 1;
+                                    }
+                                    @completedCount of @totalLessons lessons completed (@(ViewBag.CourseProgressPercentage ?? 0)%)
+                                </small>
+                            </div>
+
+                            <div class="d-flex flex-column">
+                                <form method="post"
+                                      action="@Url.Action(isCompleted ? "MarkLessonIncomplete" : "MarkLessonComplete",
+                      "Progresses",
+                      new { courseId = Model.CourseId, lessonId = Model.LessonId })"
+                                      id="progressForm">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn @(isCompleted ? "btn-warning" : "btn-success") mb-3">
+                                        @if (isCompleted)
+                                        {
+                                            <i class="fas fa-times mr-2"></i> @:Mark Incomplete
+                                        }
+                                        else
+                                        {
+                                            <i class="fas fa-check mr-2"></i> @:Mark Complete
+                                        }
+                                    </button>
+                                </form>
+
+                                @if (isCompleted)
+                                {
+                                    <div class="text-center">
+                                        <span class="badge bg-success">
+                                            <i class="fas fa-check-circle mr-1"></i> Completed on @(ViewBag.CompletedDate?.ToString("MMM dd, yyyy") ?? "")
+                                        </span>
+                                    </div>
+                                }
+                            </div>
+                        }
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+    <div class="mt-4">
+        <a href="@Url.Action("Details", "Courses", new { id = Model.CourseId })"
+           class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left mr-2"></i> Back to Course
+        </a>
+    </div>
 </div>

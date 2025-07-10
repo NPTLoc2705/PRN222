@@ -1,70 +1,490 @@
 ﻿@model IEnumerable<mvc.dataaccess.Entities.Courses.Course>
+@inject mvc.services.Interfaces.IProgressService progressService
 
 @{
-    ViewData["Title"] = "Index";
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    ViewData["Title"] = "Courses";
+    var userId = Context.Session.GetString("UserId");
+    var isLoggedIn = !string.IsNullOrEmpty(userId);
+    var username = Context.Session.GetString("Username");
 }
 
-<h1>Index</h1>
+<style>
+    :root {
+        --primary-color: #4CAF50;
+        --primary-hover: #3e8e41;
+        --secondary-color: #6c757d;
+        --light-bg: #f8f9fa;
+        --card-shadow: 0 10px 20px rgba(0,0,0,0.08);
+        --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    }
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Title)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Description)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Duration)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.DifficultyLevel)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.IsActive)
-            </th>
-            <th>
-                Image
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Title)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Description)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Duration)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.DifficultyLevel)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.IsActive)
-                </td>
-                <td>
-                    @if (item.ImageBytes != null && item.ImageBytes.Length > 0)
-                    {
-                        <img src="@Url.Action("GetCourseImage", "Courses", new { id = item.CourseId })"
-                             alt="Course Image" style="max-height: 50px;" />
-                    }
-                </td>
-                <td>
-                    <a asp-action="Edit" asp-route-id="@item.CourseId">Edit</a> |
-                    <a asp-action="Details" asp-route-id="@item.CourseId">Details</a> |
-                    <a asp-action="Delete" asp-route-id="@item.CourseId">Delete</a>
-                </td>
-            </tr>
+    body {
+        background-color: #f5f7fa;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    /* Header Styles */
+    .welcome-card {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        box-shadow: var(--card-shadow);
+        border-left: 4px solid var(--primary-color);
+    }
+
+    .home-btn {
+        background: var(--primary-color);
+        color: white;
+        border-radius: 8px;
+        padding: 0.5rem 1.25rem;
+        transition: var(--transition);
+        border: none;
+    }
+
+        .home-btn:hover {
+            background: var(--primary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            color: white;
         }
-    </tbody>
-</table>
+
+    /* Main Header */
+    .main-header {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        box-shadow: var(--card-shadow);
+    }
+
+    .create-btn {
+        background: var(--primary-color);
+        border: none;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 500;
+        transition: var(--transition);
+    }
+
+        .create-btn:hover {
+            background: var(--primary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+    /* Search Section */
+    .search-section {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        box-shadow: var(--card-shadow);
+    }
+
+    .search-title {
+        color: var(--primary-color);
+        font-weight: 600;
+        margin-bottom: 1rem;
+    }
+
+    .search-input {
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        padding: 0.75rem 1rem 0.75rem 3rem;
+        transition: var(--transition);
+    }
+
+        .search-input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2);
+        }
+
+    .search-icon {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--secondary-color);
+    }
+
+    .filter-select {
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        padding: 0.75rem 1rem;
+        transition: var(--transition);
+    }
+
+        .filter-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2);
+        }
+
+    /* Courses Table */
+    .courses-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: var(--card-shadow);
+        overflow: hidden;
+    }
+
+    .courses-header {
+        padding: 1.25rem 1.5rem;
+        border-bottom: 1px solid #f0f0f0;
+        background: white;
+    }
+
+    .courses-count {
+        background: var(--primary-color);
+        color: white;
+        padding: 0.25rem 0.75rem;
+        border-radius: 50px;
+        font-size: 0.875rem;
+    }
+
+    .course-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+
+        .course-table th {
+            background: #f8f9fa;
+            color: var(--secondary-color);
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.5px;
+            padding: 1rem 1.5rem;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .course-table td {
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid #f5f5f5;
+            vertical-align: middle;
+        }
+
+        .course-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .course-table tr:hover td {
+            background: rgba(76, 175, 80, 0.03);
+        }
+
+    .course-img {
+        width: 60px;
+        height: 60px;
+        border-radius: 8px;
+        object-fit: cover;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    .course-title {
+        font-weight: 600;
+        color: #333;
+        transition: color 0.2s;
+    }
+
+        .course-title:hover {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+    .badge {
+        font-weight: 500;
+        padding: 0.4em 0.8em;
+        border-radius: 6px;
+        font-size: 0.75rem;
+    }
+
+    .badge-beginner {
+        background: rgba(40, 167, 69, 0.1);
+        color: #28a745;
+    }
+
+    .badge-intermediate {
+        background: rgba(255, 193, 7, 0.1);
+        color: #ffc107;
+    }
+
+    .badge-advanced {
+        background: rgba(220, 53, 69, 0.1);
+        color: #dc3545;
+    }
+
+    .badge-active {
+        background: rgba(40, 167, 69, 0.1);
+        color: #28a745;
+    }
+
+    .badge-inactive {
+        background: rgba(108, 117, 125, 0.1);
+        color: #6c757d;
+    }
+
+    .action-btn {
+        width: 36px;
+        height: 36px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+        transition: var(--transition);
+    }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+        }
+
+    /* Empty State */
+    .empty-state {
+        padding: 3rem;
+        text-align: center;
+    }
+
+    .empty-icon {
+        font-size: 4rem;
+        color: #e9ecef;
+        margin-bottom: 1.5rem;
+    }
+
+    .empty-title {
+        color: #495057;
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+    }
+
+    .empty-text {
+        color: #adb5bd;
+        margin-bottom: 1.5rem;
+    }
+
+    /* Responsive Adjustments */
+    @@media (max-width: 768px) {
+        .course-table td,
+        .course-table th {
+            padding: 0.75rem;
+        }
+
+        .course-img {
+            width: 40px;
+            height: 40px;
+        }
+    }
+</style>
+
+<div class="container-fluid px-lg-4 py-4">
+    <!-- Welcome Card -->
+    @if (isLoggedIn)
+    {
+        <div class="welcome-card d-flex justify-content-between align-items-center">
+            <div>
+                <h5 class="mb-1">Welcome back, <span class="text-primary">@username</span>!</h5>
+                <p class="text-muted mb-0 small">Ready to expand your knowledge today?</p>
+            </div>
+            <div class="d-flex gap-2">
+                <a asp-controller="Home" asp-action="Index" class="btn home-btn">
+                    <i class="fas fa-home me-1"></i> Dashboard
+                </a>
+                <a asp-controller="Auth" asp-action="Logout" class="btn btn-outline-secondary">
+                    <i class="fas fa-sign-out-alt me-1"></i> Logout
+                </a>
+            </div>
+        </div>
+    }
+
+    <!-- Main Header -->
+    <div class="main-header d-flex justify-content-between align-items-center">
+        <div>
+            <h2 class="h4 mb-1 text-dark"><i class="fas fa-graduation-cap me-2 text-primary"></i>Course Catalog</h2>
+            <p class="text-muted mb-0 small">Browse and manage all learning materials</p>
+        </div>
+        <a asp-action="Create" class="btn create-btn">
+            <i class="fas fa-plus me-2"></i>New Course
+        </a>
+    </div>
+
+    <!-- Search Section -->
+    <div class="search-section">
+        <h5 class="search-title"><i class="fas fa-search me-2"></i>Find Courses</h5>
+        <form asp-action="Index" method="get" class="row g-3">
+            <div class="col-md-6 position-relative">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" class="form-control search-input" name="searchTerm"
+                       placeholder="Search by title, description..." value="@ViewBag.SearchTerm">
+            </div>
+            <div class="col-md-4">
+                <select class="form-select filter-select" name="categoryName">
+                    <option value="">All Categories</option>
+                    @foreach (var category in ViewBag.Categories)
+                    {
+                        <option value="@category.Text" selected="@(ViewBag.CategoryName == category.Text ? "selected" : null)">
+                            @category.Text
+                        </option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-2 d-flex align-items-end gap-2">
+                <button type="submit" class="btn btn-primary flex-grow-1">
+                    <i class="fas fa-search me-1"></i> Search
+                </button>
+                <a asp-action="Index" class="btn btn-outline-secondary">
+                    <i class="fas fa-sync-alt"></i>
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Courses Table -->
+    <div class="courses-card">
+        <div class="courses-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0 fw-bold">Available Courses</h5>
+            <span class="courses-count">@Model.Count() courses</span>
+        </div>
+
+        <div class="table-responsive">
+            @if (Model.Any())
+            {
+                <table class="course-table">
+                    <thead>
+                        <tr>
+                            <th class="ps-4">Image</th>
+                            <th>Title</th>
+                            <th>Categories</th>
+                            <th>Description</th>
+                            <th>Duration</th>
+                            <th>Difficulty</th>
+                            <th>Status</th>
+                            <th class="pe-4">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td class="ps-4">
+                                    @if (item.ImageBytes != null && item.ImageBytes.Length > 0)
+                                    {
+                                        <img src="@Url.Action("GetCourseImage", "Courses", new { id = item.CourseId })"
+                                             alt="Course Image"
+                                             class="course-img" />
+                                    }
+                                    else
+                                    {
+                                        <div class="course-img bg-light d-flex align-items-center justify-content-center">
+                                            <i class="fas fa-book text-muted"></i>
+                                        </div>
+                                    }
+                                </td>
+                                <td>
+                                    <div class="course-title">@item.Title</div>
+                                </td>
+                                <td>
+                                    @if (item.CategoryMappings?.Any() ?? false)
+                                    {
+                                        <div class="d-flex flex-wrap gap-1">
+                                            @foreach (var category in item.CategoryMappings.Select(cm => cm.Category))
+                                            {
+                                                <span class="badge bg-primary bg-opacity-10 text-primary">@category.Name</span>
+                                            }
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">-</span>
+                                    }
+                                </td>
+                                <td>
+                                    <div class="text-truncate" style="max-width: 200px;" title="@item.Description">
+                                        @item.Description
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="text-nowrap">
+                                        <i class="far fa-clock text-muted me-1"></i> @item.Duration min
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="badge @(item.DifficultyLevel == "Beginner" ? "badge-beginner" :
+                                                  item.DifficultyLevel == "Intermediate" ? "badge-intermediate" : "badge-advanced")">
+                                        @item.DifficultyLevel
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="badge @(item.IsActive ? "badge-active" : "badge-inactive")">
+                                        @(item.IsActive ? "Active" : "Inactive")
+                                    </span>
+                                </td>
+                                <td class="pe-4">
+                                    <div class="d-flex gap-2">
+                                        <a asp-action="Details" asp-route-id="@item.CourseId"
+                                           class="btn btn-sm btn-outline-info" title="View Details">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a asp-action="Edit" asp-route-id="@item.CourseId"
+                                                class="btn btn-sm btn-outline-warning" title="Edit">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <a asp-action="Delete" asp-route-id="@item.CourseId"
+                                           class="btn btn-sm btn-outline-danger" title="Delete">
+                                            <i class="fas fa-trash"></i>
+                                        </a>
+                                        @if (isLoggedIn && Guid.TryParse(userId, out var userIdGuid))
+                                        {
+                                            var isEnrolled = await progressService.IsUserEnrolled(userIdGuid, item.CourseId);
+
+                                            if (isEnrolled)
+                                            {
+                                                <span class="action-btn btn btn-success" title="Already Enrolled">
+                                                    <i class="fas fa-check"></i>
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                <form asp-action="Enroll" method="post" class="d-inline">
+                                                    <input type="hidden" name="courseId" value="@item.CourseId" />
+                                                    @Html.AntiForgeryToken()
+                                                    <button type="submit" class="action-btn btn btn-primary" title="Enroll">
+                                                        <i class="fas fa-plus"></i>
+                                                    </button>
+                                                </form>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <button class="action-btn btn btn-primary" title="Login to Enroll"
+                                                    onclick="window.location.href='@Url.Action("Login", "Auth")'">
+                                                <i class="fas fa-plus"></i>
+                                            </button>
+                                        }
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <div class="empty-state">
+                    <div class="empty-icon">
+                        <i class="fas fa-book-open"></i>
+                    </div>
+                    <h5 class="empty-title">No courses found</h5>
+                    <p class="empty-text">We couldn't find any courses matching your criteria</p>
+                    <div class="d-flex justify-content-center gap-3">
+                        <a asp-action="Index" class="btn btn-outline-secondary">
+                            <i class="fas fa-sync-alt me-2"></i>Reset Search
+                        </a>
+                        <a asp-action="Create" class="btn btn-primary">
+                            <i class="fas fa-plus me-2"></i>Create Course
+                        </a>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
