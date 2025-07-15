@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using mvc.dataaccess.Entities;
+using mvc.dataaccess.ViewModels;
 using mvc.services.Interfaces;
 
 namespace mvc.app.Controllers
@@ -16,70 +16,60 @@ namespace mvc.app.Controllers
         private readonly IBookingService _bookingService;
         private readonly IAuthService _userService;
 
-        public BookingsController(AppDbContext context,IBookingService bookingService, IAuthService service)
+        public BookingsController(AppDbContext context, IBookingService bookingService, IAuthService userService)
         {
             _context = context;
             _bookingService = bookingService;
-            _userService = service;
+            _userService = userService;
         }
+
         public async Task<IActionResult> Booking()
         {
             var customerIdObj = HttpContext.Session.GetString("UserId");
             if (customerIdObj == null)
             {
-                // Handle missing session (e.g., redirect to login)
                 return RedirectToAction("Login", "Auth");
             }
             return View();
         }
+
         public async Task<IActionResult> ConsultanView()
         {
-            var userBookingRequests=await _bookingService.GetBookingsByCustomerIdAsync();
-
+            var userBookingRequests = await _bookingService.GetBookingsByCustomerIdAsync();
             return View(userBookingRequests);
         }
-
-        
-        // GET: Bookings
 
         public async Task<IActionResult> Index()
         {
             var customerIdObj = HttpContext.Session.GetString("UserId");
             var role = HttpContext.Session.GetString("Role");
-            if (customerIdObj == null|| role == "Admin")
+            if (customerIdObj == null || role == "Admin")
             {
-                // Handle missing session (e.g., redirect to login)
                 return RedirectToAction("Login", "Auth");
             }
-                var list = await _bookingService.GetAllBookingsAsync();
+            var list = await _bookingService.GetAllBookingsWithNamesAsync();
             return View(list);
         }
 
-        // GET: Bookings/Details/5
         public async Task<IActionResult> Details(int id)
         {
             var book = await _bookingService.GetBookingByIdAsync(id);
             return View(book);
         }
 
-        // GET: Bookings/Create
         public IActionResult Create()
         {
             return View();
         }
-        public async Task<IActionResult> UserBooking()
-        {   
+
+        public IActionResult UserBooking()
+        {
             return View();
         }
 
-
-
-        // POST: Bookings/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,BookingDate,CustomerId,ConsultantId,StartDate,Status")] Booking booking)
+        public async Task<IActionResult> Create([Bind("Id,BookingDate,CustomerId,ConsultantId,StartDate,Status,Phone")] Booking booking)
         {
             if (ModelState.IsValid)
             {
@@ -89,78 +79,57 @@ namespace mvc.app.Controllers
             }
             return View(booking);
         }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> UserBooking([Bind("Id,ConsultantId,StartDate")] Booking booking)
+        public async Task<IActionResult> UserBooking([Bind("StartDate,Phone")] Booking booking)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                // Retrieve CustomerId from session
-                var customerIdObj = HttpContext.Session.GetString("UserId");
-                if (customerIdObj == null)
-                {
-                    // Handle missing session (e.g., redirect to login)
-                    return RedirectToAction("Login", "Auth");
-                }
-                booking.CustomerId = Guid.Parse(customerIdObj);
-                booking.BookingDate = DateTime.Now; // Set the booking date to now
-                booking.Status = BookStatus.Pending; // Set the initial status to Pending
+                var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage);
+                System.Diagnostics.Debug.WriteLine("ModelState Errors: " + string.Join(", ", errors));
+                return View(booking);
+            }
+
+            var customerIdObj = HttpContext.Session.GetString("UserId");
+            if (customerIdObj == null || !Guid.TryParse(customerIdObj, out var customerId))
+            {
+                System.Diagnostics.Debug.WriteLine("Session UserId is null or invalid.");
+                return RedirectToAction("Login", "Auth");
+            }
+
+            var consultant = await _bookingService.GetConsultantWithFewestBookingsAsync();
+            if (consultant == null)
+            {
+                ModelState.AddModelError("", "No available consultants found.");
+                return View(booking);
+            }
+
+            booking.CustomerId = customerId;
+            booking.BookingDate = DateTime.Now;
+            booking.Status = BookStatus.Pending;
+            booking.ConsultantId = consultant.Id;
+
+            try
+            {
                 await _bookingService.AddBookingAsync(booking);
-                return RedirectToAction(nameof(Index));
+                System.Diagnostics.Debug.WriteLine($"Booking created for CustomerId: {customerId}, ConsultantId: {consultant.Id}");
             }
-            return View(booking);
-        }
-        /*  // GET: Bookings/Edit/5
-          public async Task<IActionResult> Book(Guid id)
-          {
-              if (id == null )
-              {
-                  return NotFound();
-              }
-              var consultanId = HttpContext.Session.GetString("UserId");
-              var role = HttpContext.Session.GetString("Role");
-              if (consultanId == null || role == "Consultan")
-              {
-                  // Handle missing session (e.g., redirect to login)
-                  return RedirectToAction("Login", "Auth");
-              }
-              var booking = await _bookingService.GetBookingByCustomerIdAsync(id);
-              if (booking == null)
-              {
-                  return NotFound();
-              }
-
-              // Set the ConsultantId for confirmation
-              booking.ConsultantId = Guid.Parse(consultanId);
-
-              return View(booking); // Create a Book.cshtml view or reuse Edit.cshtml
-          }*/
-        /*[HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Book(Guid id, [Bind("Id,")] Booking booking)
-        {
-            if (id != booking.CustomerId)
+            catch (Exception ex)
             {
-                return NotFound();
+                System.Diagnostics.Debug.WriteLine($"Error saving booking: {ex.Message}");
+                ModelState.AddModelError("", "An error occurred while saving the booking.");
+                return View(booking);
             }
-
-            var existingBooking = await _bookingService.GetBookingByCustomerIdAsync(id);
-            if (existingBooking == null)
-            {
-                return NotFound();
-            }
-
-            existingBooking.ConsultantId = booking.ConsultantId;
-            await _bookingService.UpdateBookingAsync(existingBooking);
 
             return RedirectToAction(nameof(Index));
-        }*/
-        
+        }
+
         public async Task<IActionResult> BookConsultant(Guid customerId)
         {
             var consultantIdStr = HttpContext.Session.GetString("UserId");
             var role = HttpContext.Session.GetString("Role");
-            if (consultantIdStr == null /*|| role != "Consultan"*/)
+            if (consultantIdStr == null)
             {
                 return Json(new { success = false, message = "Unauthorized" });
             }
@@ -170,13 +139,12 @@ namespace mvc.app.Controllers
             {
                 return Json(new { success = false, message = "Booking not found" });
             }
-            booking.Status = BookStatus.Ongoing; // Update the status to Ongoing
+            booking.Status = BookStatus.Ongoing;
             booking.ConsultantId = Guid.Parse(consultantIdStr);
             await _bookingService.UpdateBookingAsync(booking);
 
             return View("ConsultanView");
         }
-
 
         public async Task<IActionResult> Edit(int? id)
         {
@@ -193,12 +161,9 @@ namespace mvc.app.Controllers
             return View(booking);
         }
 
-        // POST: Bookings/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,BookingDate,CustomerId,ConsultantId,StartDate,Status")] Booking booking)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,BookingDate,CustomerId,ConsultantId,StartDate,Status,Phone")] Booking booking)
         {
             if (id != booking.Id)
             {
@@ -210,7 +175,6 @@ namespace mvc.app.Controllers
                 try
                 {
                     await _bookingService.UpdateBookingAsync(booking);
-                    
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -228,7 +192,6 @@ namespace mvc.app.Controllers
             return View(booking);
         }
 
-        // GET: Bookings/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -245,22 +208,53 @@ namespace mvc.app.Controllers
             return View(booking);
         }
 
-        // POST: Bookings/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            
-              await _bookingService.DeleteBookingAsync(id);
-            
-
-
+            await _bookingService.DeleteBookingAsync(id);
             return RedirectToAction(nameof(Index));
         }
 
         private bool BookingExists(int id)
         {
             return _context.Bookings.Any(e => e.Id == id);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UpdateBookingStatus(Guid customerId, [Bind("Status")] Booking booking)
+        {
+            var consultantIdStr = HttpContext.Session.GetString("UserId");
+            var role = HttpContext.Session.GetString("Role");
+            if (consultantIdStr == null)
+            {
+                return Json(new { success = false, message = "Unauthorized" });
+            }
+
+            var existingBooking = await _bookingService.GetBookingByCustomerIdAsync(customerId);
+            if (existingBooking == null)
+            {
+                return Json(new { success = false, message = "Booking not found" });
+            }
+
+            var validTransitions = new Dictionary<BookStatus, List<BookStatus>>
+            {
+                { BookStatus.Pending, new List<BookStatus> { BookStatus.Ongoing } },
+                { BookStatus.Ongoing, new List<BookStatus> { BookStatus.Complete } }
+            };
+
+            if (!validTransitions.ContainsKey(existingBooking.Status) ||
+                !validTransitions[existingBooking.Status].Contains(booking.Status))
+            {
+                return Json(new { success = false, message = "Invalid status transition" });
+            }
+
+            existingBooking.Status = booking.Status;
+            existingBooking.ConsultantId = Guid.Parse(consultantIdStr);
+            await _bookingService.UpdateBookingAsync(existingBooking);
+
+            return Json(new { success = true, message = "Status updated successfully" });
         }
     }
 }

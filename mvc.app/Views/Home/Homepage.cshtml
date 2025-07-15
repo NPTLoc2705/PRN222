@@ -1,214 +1,127 @@
-﻿@* @page *@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Drug-Free World - Education and Prevention</title>
+﻿@{
+    ViewData["Title"] = "Home";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Styles {
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: Arial, Helvetica, sans-serif;
-        }
-
         body {
-            line-height: 1.6;
-            color: #333;
+            font-family: 'Segoe UI', sans-serif;
         }
 
-        /* Header */
-        header {
-            background: #fff;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            position: fixed;
-            width: 100%;
-            top: 0;
-            z-index: 1000;
-        }
-
-        .header-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px 20px;
-        }
-
-        .logo img {
-            height: 50px;
-        }
-
-        nav ul {
-            list-style: none;
-            display: flex;
-            gap: 20px;
-            align-items: center;
-        }
-
-            nav ul li a {
-                text-decoration: none;
-                color: #333;
-                font-weight: bold;
-                font-size: 16px;
-                transition: color 0.3s;
-            }
-
-                nav ul li a:hover {
-                    color: #00a79d;
-                }
-
-        .user-welcome {
-            color: #00a79d;
-            font-weight: bold;
-            font-size: 16px;
-            padding: 8px 12px;
-            background: #f0f9f8;
-            border-radius: 5px;
-        }
-
-        /* Hero Section */
         .hero {
-            position: relative;
             height: 100vh;
+            background: linear-gradient(to right, rgba(0, 167, 157, 0.7), rgba(0, 167, 157, 0.3)), url('/images/hero-bg.jpg') center/cover no-repeat;
             display: flex;
-            align-items: center;
+            flex-direction: column;
             justify-content: center;
+            align-items: center;
             text-align: center;
-            color: #fff;
-            overflow: hidden;
+            padding: 0 20px;
+            color: white;
         }
 
-            .hero video {
-                position: absolute;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                object-fit: cover;
-                z-index: -1;
-            }
-
-        .hero-content {
-            background: rgba(0, 0, 0, 0.5);
-            padding: 20px;
-            border-radius: 10px;
-        }
-
-            .hero-content h1 {
-                font-size: 48px;
+            .hero h1 {
+                font-size: 56px;
+                font-weight: bold;
                 margin-bottom: 20px;
-                text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
             }
 
-            .hero-content p {
-                font-size: 24px;
-                margin-bottom: 30px;
+            .hero p {
+                font-size: 20px;
+                margin-bottom: 40px;
+                max-width: 700px;
             }
 
-        .cta-button {
-            background: #00a79d;
-            color: #fff;
+        .btn-primary {
+            background-color: #00a79d;
+            color: white;
             padding: 15px 30px;
-            text-decoration: none;
             font-size: 18px;
-            border-radius: 5px;
+            border-radius: 8px;
+            text-decoration: none;
             transition: background 0.3s;
         }
 
-            .cta-button:hover {
-                background: #008c83;
+            .btn-primary:hover {
+                background-color: #008c83;
             }
 
-        /* Info Section */
-        .info-section {
-            max-width: 1200px;
-            margin: 50px auto;
-            padding: 0 20px;
+        .section {
+            padding: 80px 20px;
             text-align: center;
         }
 
-            .info-section h2 {
+            .section h2 {
                 font-size: 36px;
                 margin-bottom: 20px;
                 color: #00a79d;
             }
 
-            .info-section p {
+            .section p {
                 font-size: 18px;
-                margin-bottom: 30px;
+                margin-bottom: 40px;
+                color: #444;
+                max-width: 800px;
+                margin-left: auto;
+                margin-right: auto;
             }
 
-        .info-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
+        .features {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            justify-content: center;
         }
 
-        .info-card {
-            background: #f9f9f9;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s;
+        .card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            padding: 30px;
+            width: 300px;
+            text-align: left;
         }
 
-            .info-card:hover {
-                transform: translateY(-5px);
-            }
-
-            .info-card img {
+            .card img {
                 width: 100%;
-                height: 150px;
+                height: 160px;
                 object-fit: cover;
-                border-radius: 5px;
+                border-radius: 8px;
                 margin-bottom: 15px;
             }
 
-            .info-card h3 {
-                font-size: 24px;
+            .card h3 {
+                font-size: 22px;
                 margin-bottom: 10px;
-            }
-
-        /* Footer */
-        footer {
-            background: #333;
-            color: #fff;
-            padding: 20px;
-            text-align: center;
-        }
-
-            footer a {
                 color: #00a79d;
-                text-decoration: none;
             }
 
-                footer a:hover {
-                    text-decoration: underline;
-                }
+            .card p {
+                font-size: 16px;
+                color: #555;
+            }
 
-     
+
     </style>
-</head>
-<body>
-    <header>
-        <div class="header-container">
-            <div class="logo">
-                <img src="https://via.placeholder.com/150x50?text=DrugFreeWorld" alt="Drug Free World Logo">
-            </div>
-            <nav>
-                <ul>
-                    <li><a href="#">Home</a></li>
-                    <li><a href="#">About</a></li>
-                    <li><a href="#">Education</a></li>
-                    <li><a href="/Blogs">Blog</a></li>
-                    <li><a href="#">Get Involved</a></li>
-                    <li><a href="#">Contact</a></li>
-                    <li><a href="/Courses">Course</a></li>
-                    <li><a href="/Bookings">Booking</a></li>
+}
 
+<!-- Hero Section -->
+<section class="hero">
+    <h1>Toward a Drug-Free Future</h1>
+    <p>We are dedicated to empowering individuals and communities through education, awareness, and support for a life free from drug abuse.</p>
+    <a href="#services" class="btn-primary">Discover More</a>
+</section>
+
+<!-- What We Do Section -->
+<section class="section" id="services">
+    <h2>What We Do</h2>
+    <p>Our platform offers free access to educational materials, online courses, and professional consulting to support drug prevention efforts for all ages.</p>
+    <div class="features">
+        <div class="card">
+            <img src="https://via.placeholder.com/400x200?text=Consult+Now" alt="Consult a Professional">
+            <h3>Talk to a Consultant</h3>
+            <p>Book private sessions with trained consultants to discuss prevention, recovery, and questions related to substance use.</p>
                     @if (ViewData["IsLoggedIn"] != null && (bool)ViewData["IsLoggedIn"])
                     {
                         <li>
@@ -226,56 +139,15 @@
                 </ul>
             </nav>
         </div>
-    </header>
-
-    <section class="hero">
-        <video autoplay muted loop>
-            <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">
-            Your browser does not support the video tag.
-        </video>
-        <div class="hero-content">
-            <h1>Empowering a Drug-Free World</h1>
-            <p>Education and Prevention for a Healthier Future</p>
-            <a href="#" class="cta-button">Learn More</a>
+        <div class="card">
+            <img src="https://via.placeholder.com/400x200?text=Start+Course" alt="Learn Online">
+            <h3>Take an Online Course</h3>
+            <p>Learn the facts about drugs and addiction through engaging and accessible online courses designed for students, families, and educators.</p>
         </div>
-    </section>
-
-    <section class="info-section">
-        <h2>Our Mission</h2>
-        <p>We provide effective educational materials and programs to help people make informed decisions about drugs.</p>
-        <div class="info-grid">
-            <div class="info-card">
-                <img src="https://via.placeholder.com/250x150?text=Education" alt="Education">
-                <h3>Free Educational Materials</h3>
-                <p>Access booklets, videos, and resources to learn the truth about drugs.</p>
-            </div>
-            <div class="info-card">
-                <img src="https://via.placeholder.com/250x150?text=Prevention" alt="Prevention">
-                <h3>Prevention Programs</h3>
-                <p>Join our initiatives to educate youth and communities about drug prevention.</p>
-            </div>
-            <div class="info-card">
-                <img src="https://via.placeholder.com/250x150?text=Get+Involved" alt="Get Involved">
-                <h3>Get Involved</h3>
-                <p>Volunteer or donate to support a drug-free world.</p>
-            </div>
+        <div class="card">
+            <img src="https://via.placeholder.com/400x200?text=Get+Involved" alt="Join Us">
+            <h3>Join the Movement</h3>
+            <p>Get involved in our mission by volunteering, donating, or sharing resources within your community.</p>
         </div>
-    </section>
-
-    <footer>
-        <p>&copy; 2025 Drug-Free World. All rights reserved. | <a href="#">Privacy Policy</a> | <a href="#">Contact Us</a></p>
-    </footer>
-
-    <script>
-        // Basic JavaScript for smooth scrolling
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                document.querySelector(this.getAttribute('href')).scrollIntoView({
-                    behavior: 'smooth'
-                });
-            });
-        });
-    </script>
-</body>
-</html>
+    </div>
+</section>

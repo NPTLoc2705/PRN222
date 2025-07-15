@@ -10,7 +10,6 @@ namespace mvc.dataaccess.Entities
     public enum SystemRole
     {
         Member,
-        Staff,
         Consultant,
         Manager,
         Admin,
