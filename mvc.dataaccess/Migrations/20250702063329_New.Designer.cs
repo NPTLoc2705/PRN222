@@ -12,8 +12,8 @@ using mvc.dataaccess.Entities;
 namespace mvc.dataaccess.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250618083717_updateBooking")]
-    partial class updateBooking
+    [Migration("20250702063329_New")]
+    partial class New
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -55,15 +55,16 @@ namespace mvc.dataaccess.Migrations
 
             modelBuilder.Entity("mvc.dataaccess.Entities.Blog", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<byte[]>("ImageData")
                         .IsRequired()
                         .HasColumnType("varbinary(max)");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("blog_content")
                         .IsRequired()

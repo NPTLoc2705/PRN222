@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using mvc.dataaccess.Entities;
 using mvc.services.Interfaces;
-using mvc.dataaccess.ViewModels;
+using mvc.dataaccess.Entities;
+using mvc.dataaccess.ViewModels.Auth;
 
 namespace mvc.app.Controllers
 {
@@ -61,8 +61,12 @@ namespace mvc.app.Controllers
             HttpContext.Session.SetString("Username", user.FullName);
             HttpContext.Session.SetString("UserRole", user.Role.ToString());
 
-            // Redirect to Home controller Index action
-            return RedirectToAction("Index", "Home");
+            return user.Role switch
+            {
+                SystemRole.Admin => RedirectToAction("Index", "Admin"),
+                SystemRole.Consultant => RedirectToAction("ConsultanView", "Bookings"),
+                _ => RedirectToAction("Index", "Home"),
+            };
         }
 
         public IActionResult Logout()

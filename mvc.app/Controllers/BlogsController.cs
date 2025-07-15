@@ -9,7 +9,7 @@ using mvc.services.Interfaces;
 
 namespace mvc.app.Controllers
 {
-    public class BlogsController : Controller
+    public class BlogsController : BaseController
     {
         private readonly IBlogService _blogService;
 
@@ -58,7 +58,8 @@ namespace mvc.app.Controllers
             {
                 // Get User ID from session
                 var userIdString = HttpContext.Session.GetString("UserId");
-
+                var userRole = HttpContext.Session.GetString("UserRole");
+                Console.WriteLine(userRole);
                 if (!string.IsNullOrEmpty(userIdString))
                 {
                     blog.UserId = Guid.Parse(userIdString);

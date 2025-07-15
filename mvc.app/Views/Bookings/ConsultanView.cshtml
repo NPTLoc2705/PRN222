@@ -1,261 +1,638 @@
 ﻿@using mvc.dataaccess.ViewModels
 @model List<UserBookingRequest>
 @{
-    ViewData["Title"] = "Book a Consultant";
+    ViewData["Title"] = "Consultant Dashboard";
 }
 
 <style>
-    .consultant-booking-page {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        background: #f8fafc;
         min-height: 100vh;
-        padding: 2rem 0;
+        color: #333;
     }
 
-    .page-header {
-        text-align: center;
-        margin-bottom: 3rem;
-        color: white;
+    .dashboard-wrapper {
+        display: flex;
+        min-height: 100vh;
     }
 
-        .page-header h2 {
-            font-size: 2.5rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-        }
-
-    .page-subtitle {
-        font-size: 1.1rem;
-        opacity: 0.9;
-        margin-bottom: 0;
-    }
-
-    .consultant-card {
-        background: rgba(255, 255, 255, 0.95);
-        border: none;
-        border-radius: 20px;
-        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
-        transition: all 0.3s ease;
-        overflow: hidden;
-        backdrop-filter: blur(10px);
-        height: 100%;
-    }
-
-        .consultant-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
-        }
-
-    .card-body {
+    .sidebar {
+        width: 280px;
+        background: white;
+        border-right: 1px solid #e2e8f0;
         padding: 2rem;
-        text-align: center;
-        position: relative;
+        position: fixed;
+        height: 100%;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
     }
 
-    .consultant-avatar {
-        width: 80px;
-        height: 80px;
-        border-radius: 50%;
-        background: linear-gradient(135deg, #667eea, #764ba2);
-        margin: 0 auto 1.5rem;
+    .sidebar-header {
         display: flex;
         align-items: center;
-        justify-content: center;
-        font-size: 2rem;
-        font-weight: bold;
-        color: white;
-        text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        margin-bottom: 3rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 2px solid #f1f5f9;
     }
 
-    .card-title {
-        font-size: 1.4rem;
-        font-weight: 600;
-        color: #2d3748;
-        margin-bottom: 1rem;
+        .sidebar-header h3 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #1e293b;
+        }
+
+    .sidebar-nav {
+        list-style: none;
+        padding: 0;
     }
 
-    .card-text {
-        color: #718096;
-        font-size: 0.95rem;
-        line-height: 1.6;
-        margin-bottom: 1.5rem;
+        .sidebar-nav li {
+            margin-bottom: 1.5rem;
+        }
+
+        .sidebar-nav a {
+            color: #64748b;
+            text-decoration: none;
+            font-size: 1.1rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            border-radius: 16px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+            .sidebar-nav a::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 0;
+                height: 100%;
+                background: #2563eb;
+                transition: width 0.3s ease;
+                border-radius: 16px;
+            }
+
+            .sidebar-nav a:hover {
+                color: white;
+                transform: translateX(8px);
+            }
+
+                .sidebar-nav a:hover::before {
+                    width: 100%;
+                }
+
+            .sidebar-nav a.active {
+                background: #2563eb;
+                color: white;
+                box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+            }
+
+        .sidebar-nav i {
+            margin-right: 1rem;
+            font-size: 1.2rem;
+            z-index: 1;
+            position: relative;
+        }
+
+        .sidebar-nav span {
+            z-index: 1;
+            position: relative;
+        }
+
+    .main-content {
+        margin-left: 280px;
+        flex-grow: 1;
+        padding: 2rem;
+        background: transparent;
     }
 
-    .email-info {
-        background: #f7fafc;
-        padding: 0.75rem;
-        border-radius: 10px;
-        border-left: 4px solid #667eea;
-        margin-bottom: 1rem;
+    .dashboard-container {
+        max-width: 1400px;
+        margin: 0 auto;
     }
 
-    .btn-book {
-        background: linear-gradient(135deg, #667eea, #764ba2);
-        border: none;
-        border-radius: 25px;
-        padding: 0.75rem 2rem;
-        font-weight: 600;
-        color: white;
-        transition: all 0.3s ease;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        position: relative;
+    .dashboard-header {
+        margin-bottom: 3rem;
+        text-align: center;
+    }
+
+        .dashboard-header h2 {
+            font-size: 3rem;
+            font-weight: 800;
+            color: #1e293b;
+            margin-bottom: 1rem;
+        }
+
+    .dashboard-subtitle {
+        font-size: 1.3rem;
+        color: #64748b;
+        font-weight: 300;
+    }
+
+    .bookings-container {
+        background: white;
+        border-radius: 12px;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        margin-top: 2rem;
         overflow: hidden;
     }
 
-        .btn-book:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
-            color: white;
+    .bookings-header {
+        background: #f8fafc;
+        padding: 1.5rem 2rem;
+        border-bottom: 1px solid #e2e8f0;
+        display: grid;
+        grid-template-columns: 80px 1fr 150px 120px 100px 120px;
+        gap: 1rem;
+        align-items: center;
+        font-weight: 600;
+        color: #475569;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .booking-item {
+        padding: 1.5rem 2rem;
+        border-bottom: 1px solid #f1f5f9;
+        display: grid;
+        grid-template-columns: 80px 1fr 150px 120px 100px 120px;
+        gap: 1rem;
+        align-items: center;
+        transition: all 0.3s ease;
+        position: relative;
+    }
+
+        .booking-item:last-child {
+            border-bottom: none;
         }
 
-        .btn-book::before {
+        .booking-item:hover {
+            background: #f8fafc;
+            transform: translateX(4px);
+        }
+
+        .booking-item::before {
             content: '';
             position: absolute;
+            left: 0;
             top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-            transition: left 0.5s;
+            bottom: 0;
+            width: 0;
+            background: #2563eb;
+            transition: width 0.3s ease;
         }
 
-        .btn-book:hover::before {
-            left: 100%;
+        .booking-item:hover::before {
+            width: 4px;
         }
 
-    .consultant-grid {
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 0 1rem;
-    }
-
-    .no-consultants {
-        text-align: center;
-        color: white;
-        font-size: 1.2rem;
-        padding: 3rem;
-        background: rgba(255, 255, 255, 0.1);
-        border-radius: 15px;
-        backdrop-filter: blur(10px);
-    }
-
-    .card-body {
-        padding: 1.5rem;
-    }
-
-    .consultant-avatar {
-        width: 60px;
-        height: 60px;
-        font-size: 1.5rem;
-    }
-
-    }
-
-    /* Animation for cards appearing */
-    .consultant-card {
-        animation: fadeInUp 0.6s ease forwards;
-        opacity: 0;
-        transform: translateY(30px);
-    }
-
-        .consultant-card:nth-child(1) {
-            animation-delay: 0.1s;
-        }
-
-        .consultant-card:nth-child(2) {
-            animation-delay: 0.2s;
-        }
-
-        .consultant-card:nth-child(3) {
-            animation-delay: 0.3s;
-        }
-
-        .consultant-card:nth-child(4) {
-            animation-delay: 0.4s;
-        }
-
-        .consultant-card:nth-child(5) {
-            animation-delay: 0.5s;
-        }
-
-        .consultant-card:nth-child(6) {
-            animation-delay: 0.6s;
-        }
-
-    .consultant-card {
-        border-radius: 14px;
-        box-shadow: 0 6px 18px rgba(0,0,0,0.08);
-    }
-
-    .card-body {
-        padding: 1rem;
+    .customer-info {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
     }
 
     .consultant-avatar {
         width: 40px;
         height: 40px;
+        background: #2563eb;
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
         font-size: 1rem;
-        margin-bottom: 1rem;
+        flex-shrink: 0;
     }
-    
+
+    .customer-details {
+        min-width: 0;
+    }
+
+    .customer-name {
+        font-weight: 600;
+        color: #1e293b;
+        font-size: 1rem;
+        margin-bottom: 0.25rem;
+    }
+
+    .customer-email {
+        color: #64748b;
+        font-size: 0.875rem;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .booking-date {
+        color: #475569;
+        font-size: 0.9rem;
+        font-weight: 500;
+    }
+
+    .booking-phone {
+        color: #475569;
+        font-size: 0.9rem;
+    }
+
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        margin-left: 0.5rem;
+    }
+
+    .status-pending {
+        background: #fef3c7;
+        color: #d97706;
+    }
+
+    .status-confirmed {
+        background: #dcfce7;
+        color: #16a34a;
+    }
+
+    .status-canceled {
+        background: #fee2e2;
+        color: #dc2626;
+    }
+
+    .status-ongoing {
+        background: #dbeafe;
+        color: #2563eb;
+    }
+
+    .status-complete {
+        background: #f3e8ff;
+        color: #7c3aed;
+    }
+
+    .btn-action {
+        background: #2563eb;
+        border: none;
+        border-radius: 8px;
+        padding: 0.5rem 1rem;
+        font-weight: 500;
+        color: white;
+        font-size: 0.875rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        white-space: nowrap;
+    }
+
+        .btn-action:hover {
+            background: #1d4ed8;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
+
+    .no-bookings {
+        text-align: center;
+        color: #64748b;
+        font-size: 1.3rem;
+        padding: 4rem 2rem;
+        background: white;
+        border-radius: 24px;
+        border: 1px solid #e2e8f0;
+        margin-top: 2rem;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+    }
+
+        .no-bookings h4 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            font-weight: 700;
+            color: #1e293b;
+        }
+
+    .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+    }
+
+    .modal-content {
+        background: white;
+        padding: 2.5rem;
+        border-radius: 24px;
+        width: 500px;
+        max-height: 80vh;
+        overflow-y: auto;
+        box-shadow: 0 30px 60px rgba(0, 0, 0, 0.3);
+        position: relative;
+    }
+
+    .close {
+        position: absolute;
+        top: 1rem;
+        right: 1.5rem;
+        font-size: 2rem;
+        cursor: pointer;
+        color: #64748b;
+        transition: color 0.3s ease;
+    }
+
+        .close:hover {
+            color: #dc2626;
+        }
+
+    .modal h3 {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 2rem;
+        text-align: center;
+    }
+
+    .modal-info {
+        background: #f8fafc;
+        border-radius: 16px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+        .modal-info p {
+            margin-bottom: 1rem;
+            color: #64748b;
+        }
+
+        .modal-info strong {
+            color: #1e293b;
+        }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 0.5rem;
+        }
+
+    .form-control {
+        width: 100%;
+        padding: 1rem;
+        border: 2px solid #e5e7eb;
+        border-radius: 12px;
+        font-size: 1rem;
+        transition: border-color 0.3s ease;
+    }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+    .consultant-card, .no-bookings {
+        animation: fadeInUp 0.6s ease forwards;
+    }
+
+    @@keyframes fadeInUp {
+        from
+
+    {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    }
+
+    @@media (max-width: 768px) {
+        .sidebar
+
+    {
+        width: 100%;
+        height: auto;
+        position: static;
+        border-right: none;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .main-content {
+        margin-left: 0;
+    }
+
+    .dashboard-header h2 {
+        font-size: 2.5rem;
+    }
+
+    .bookings-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .modal-content {
+        width: 90%;
+        margin: 1rem;
+    }
+
+    }
 </style>
 
-
-
-<!-- (Styles remain unchanged) -->
-
-<div class="consultant-booking-page">
-    <div class="consultant-grid">
-        <div class="page-header">
-            <h2>@ViewData["Title"]</h2>
-            <p class="page-subtitle">Choose from our expert consultants to get the guidance you need</p>
+<div class="dashboard-wrapper">
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h3>Consultant Portal</h3>
         </div>
+        <ul class="sidebar-nav">
+            <li><a href="#" class="active"><i class="fas fa-calendar-check"></i><span>Bookings</span></a></li>
+            <li><a href="#"><i class="fas fa-user"></i><span>Profile</span></a></li>
+            <li><a href="#"><i class="fas fa-sign-out-alt"></i><span>Logout</span></a></li>
+        </ul>
+    </div>
 
-        @if (Model != null && Model.Any())
-        {
-            <div class="row">
-                @foreach (var consultant in Model)
-                {
-                    <div class="col-lg-4 col-md-6 mb-4">
-                        <div class="card consultant-card">
-                            <div class="card-body">
-                                <div class="consultant-avatar">
-                                    @consultant.UserName?.Substring(0, 1).ToUpper()
-                                </div>
-                                <h5 class="card-title">@consultant.UserName</h5>
-                                <div class="card-text">
-                                    <div class="email-info">
-                                        <strong>📧 Email:</strong> @consultant.Email
-                                    </div>
-                                    <div class="email-info">
-                                        <strong>📧 Email:</strong> @consultant.Email
-                                    </div>
-                                    <div class="email-info">
-                                        <strong>📅 Booking Date:</strong> @consultant.BookingDate.ToString("yyyy-MM-dd")
-                                    </div>
-                                    <div class="email-info">
-                                        <strong>📞 Phone:</strong> @consultant.PhoneNumber
-                                    </div>
-                                    <!-- Add more consultant details as needed -->
-                                </div>
-                                <form asp-action="BookConsultant" asp-controller="Bookings" method="post">
-                                    <input type="hidden" name="customerId" value="@consultant.customerId" />
-                                    <button type="submit">Book Consultant</button>
-                                </form>
+    <div class="main-content">
+        <div class="dashboard-container">
+            <div class="dashboard-header">
+                <h2>@ViewData["Title"]</h2>
+                <p class="dashboard-subtitle">View and manage all client bookings</p>
+            </div>
 
+            @if (Model != null && Model.Any())
+            {
+                <div class="bookings-container">
+                    <div class="bookings-header">
+                        <span>Avatar</span>
+                        <span>Customer Details</span>
+                        <span>Booking Date</span>
+                        <span>Phone Number</span>
+                        <span>Status</span>
+                        <span>Actions</span>
+                    </div>
+
+                    @foreach (var consultant in Model)
+                    {
+                        <div class="booking-item">
+                            <div class="consultant-avatar">
+                                @consultant.UserName?.Substring(0, 1).ToUpper()
+                            </div>
+
+                            <div class="customer-info">
+                                <div class="customer-details">
+                                    <div class="customer-name">@consultant.UserName</div>
+                                    <div class="customer-email">@consultant.Email</div>
+                                </div>
+                            </div>
+
+                            <div class="booking-date">
+                                @consultant.BookingDate.ToString("MMM dd, yyyy")
+                            </div>
+
+                            <div class="booking-phone">
+                                @consultant.PhoneNumber
+                            </div>
+
+                            <div class="booking-status">
+                                @switch ((int)consultant.Status)
+                                {
+                                    case 1:
+                                        <span class="status-badge status-pending">Pending</span>
+                                        break;
+                                    case 2:
+                                        <span class="status-badge status-confirmed">Confirmed</span>
+                                        break;
+                                    case 3:
+                                        <span class="status-badge status-canceled">Canceled</span>
+                                        break;
+                                    case 4:
+                                        <span class="status-badge status-ongoing">Ongoing</span>
+                                        break;
+                                    case 5:
+                                        <span class="status-badge status-complete">Complete</span>
+                                        break;
+                                    default:
+                                        <span class="status-badge">Unknown</span>
+                                        break;
+                                }
+                            </div>
+
+                            <div class="booking-actions">
+                                <button class="btn-action" onclick="openModal('@consultant.customerId', '@consultant.UserName', '@consultant.Email', '@consultant.PhoneNumber', '@consultant.BookingDate.ToString("yyyy-MM-dd")', '@((int)consultant.Status)')">
+                                    Update Status
+                                </button>
                             </div>
                         </div>
-                    </div>
-                }
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="no-bookings">
+                    <h4>No bookings available at the moment</h4>
+                    <p>Check back later or contact support for assistance.</p>
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div id="statusModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h3>Update Booking Status</h3>
+            <div class="modal-info">
+                <p><strong>Customer Name:</strong> <span id="modalUserName"></span></p>
+                <p><strong>Email:</strong> <span id="modalEmail"></span></p>
+                <p><strong>Phone:</strong> <span id="modalPhone"></span></p>
+                <p><strong>Booking Date:</strong> <span id="modalBookingDate"></span></p>
+                <p><strong>Current Status:</strong> <span id="modalCurrentStatus"></span></p>
             </div>
-        }
-        else
-        {
-            <div class="no-consultants">
-                <h4>No consultants available at the moment</h4>
-                <p>Please check back later or contact us for assistance.</p>
-            </div>
-        }
+            <form id="statusForm" asp-action="UpdateBookingStatus" asp-controller="Bookings" method="post">
+                <input type="hidden" name="customerId" id="modalCustomerId" />
+                <div class="form-group">
+                    <label for="status">New Status:</label>
+                    <select name="Status" id="status" class="form-control">
+                        <option value="4">Ongoing</option>
+                        <option value="5">Complete</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn-action">Save Status</button>
+            </form>
+        </div>
     </div>
 </div>
+
+<script src="https://kit.fontawesome.com/your-fontawesome-kit.js" crossorigin="anonymous"></script>
+<script>
+    function openModal(customerId, userName, email, phone, bookingDate, currentStatus) {
+        document.getElementById('modalCustomerId').value = customerId;
+        document.getElementById('modalUserName').textContent = userName;
+        document.getElementById('modalEmail').textContent = email;
+        document.getElementById('modalPhone').textContent = phone;
+        document.getElementById('modalBookingDate').textContent = bookingDate;
+        document.getElementById('modalCurrentStatus').textContent =
+            currentStatus == '1' ? 'Pending' :
+            currentStatus == '2' ? 'Confirmed' :
+            currentStatus == '3' ? 'Canceled' :
+            currentStatus == '4' ? 'Ongoing' :
+            currentStatus == '5' ? 'Complete' : 'Unknown';
+        document.getElementById('statusModal').style.display = 'flex';
+    }
+
+    function closeModal() {
+        document.getElementById('statusModal').style.display = 'none';
+    }
+
+    // Handle form submission with AJAX to avoid page reload
+    document.getElementById('statusForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        var formData = new FormData(this);
+
+        fetch(this.action, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'RequestVerificationToken': document.getElementsByName('__RequestVerificationToken')[0].value
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert(data.message);
+                closeModal();
+                location.reload(); // Refresh the page to reflect the updated status
+            } else {
+                alert(data.message);
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    });
+
+    // Close modal when clicking outside
+    window.addEventListener('click', function(e) {
+        var modal = document.getElementById('statusModal');
+        if (e.target == modal) {
+            modal.style.display = 'none';
+        }
+    });
+</script>
