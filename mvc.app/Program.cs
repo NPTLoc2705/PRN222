@@ -9,7 +9,6 @@ using mvc.dataaccess.Entities;
 using mvc.repositories.Interfaces.ICourse;
 using mvc.repositories.Implements.CourseRepo;
 using Scalar.AspNetCore;
-using mvc.services.Implementations;
 using mvc.services.Implements;
 using mvc.services.Infrastructure;
 using mvc.services.Interfaces;
@@ -26,16 +25,20 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<TokenProvider>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<ICourseRepository, CourseRepository>();
-builder.Services.AddScoped<IModuleRepository, ModuleRepository>();
+builder.Services.AddScoped<ILessonRepository, LessonRepository>();
+builder.Services.AddScoped<IProgressRepo, ProgressRepo>();
 builder.Services.AddScoped<IBookingRepo, BookingRepo>();
 builder.Services.AddScoped<IBlogRepo, BlogRepo>();
+builder.Services.AddScoped<ICategoryRepo, CategoryRepo>();
 //Injection Service
 builder.Services.AddScoped<IBookingService, BookingService>();
-builder.Services.AddScoped<IModuleService, ModuleService>();
+builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<ICourseService, CourseService>();
-builder.Services.AddScoped<ILessonRepository, LessonRepository>();
+builder.Services.AddScoped<ILessonService, LessonService>();
+builder.Services.AddScoped<IProgressService, ProgressService>();
 builder.Services.AddScoped<IBlogService, BlogService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddSession(options =>
 {
     options.IdleTimeout = TimeSpan.FromMinutes(20); // Set session timeout

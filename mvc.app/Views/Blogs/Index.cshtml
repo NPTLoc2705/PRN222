@@ -6,6 +6,73 @@
 }
 
 <style>
+    /* Admin Bar */
+    .admin-bar {
+        background-color: #2d3748;
+        color: white;
+        padding: 10px 0;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 1000;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .admin-bar-content {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .admin-label {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 600;
+    }
+
+        .admin-label i {
+            color: #ffd700;
+        }
+
+    .admin-nav {
+        display: flex;
+        gap: 15px;
+    }
+
+        .admin-nav a {
+            color: white;
+            text-decoration: none;
+            padding: 5px 15px;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+            .admin-nav a:hover {
+                background-color: rgba(255,255,255,0.1);
+            }
+
+        .admin-nav .btn-admin-dashboard {
+            background-color: #667eea;
+            font-weight: 600;
+        }
+
+            .admin-nav .btn-admin-dashboard:hover {
+                background-color: #764ba2;
+            }
+
+    /* Adjust body padding when admin bar is present */
+    body.has-admin-bar {
+        padding-top: 50px;
+    }
+
     /* Hero Section */
     .blog-hero {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -239,6 +306,20 @@
 
     /* Responsive */
     @@media (max-width: 768px) {
+        .admin-bar-content {
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .admin-nav {
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        body.has-admin-bar {
+            padding-top: 80px;
+        }
+
         .blog-hero h1 {
             font-size: 2rem;
         }
@@ -269,6 +350,39 @@
         }
     }
 </style>
+@{
+    var userRole = Context.Session.GetString("UserRole");
+}
+
+@if (!string.IsNullOrEmpty(userRole) && userRole == "Admin")
+{
+    <div class="admin-bar">
+        <div class="admin-bar-content">
+            <div class="admin-label">
+                <i class="bi bi-shield-check"></i>
+                <span>Admin Mode</span>
+            </div>
+            <nav class="admin-nav">
+                <a href="@Url.Action("AdminBlog", "Blogs")" class="btn-admin-dashboard">
+                    <i class="bi bi-speedometer2"></i>
+                    Admin Dashboard
+                </a>
+                <a href="@Url.Action("AdminBlog", "Blogs")">
+                    <i class="bi bi-journal-text"></i>
+                    Manage Blogs
+                </a>
+                <a href="@Url.Action("Create", "Blogs")">
+                    <i class="bi bi-plus-circle"></i>
+                    New Post
+                </a>
+            </nav>
+        </div>
+    </div>
+
+    <script>
+        document.body.classList.add('has-admin-bar');
+    </script>
+}
 
 <div class="blog-hero">
     <div class="blog-container">
@@ -278,15 +392,6 @@
 </div>
 
 <div class="blog-container">
-    @if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
-    {
-        <div class="admin-actions">
-            <a href="@Url.Action("AdminBlog", "Blogs")" class="btn-create">
-                <i class="fas fa-cog"></i>Manage Blogs
-            </a>
-        </div>
-    }
-
     @if (Model != null && Model.Any())
     {
         <div class="article-grid">
@@ -303,7 +408,7 @@
                         else
                         {
                             <div class="no-image">
-                                <i class="fas fa-image"></i>
+                                <i class="bi bi-image"></i>
                             </div>
                         }
                     </div>
@@ -311,11 +416,11 @@
                     <div class="article-content">
                         <div class="article-meta">
                             <span>
-                                <i class="fas fa-calendar-alt"></i>
+                                <i class="bi bi-calendar3"></i>
                                 @DateTime.Now.ToString("MMM dd, yyyy")
                             </span>
                             <span>
-                                <i class="fas fa-clock"></i>
+                                <i class="bi bi-clock"></i>
                                 5 min read
                             </span>
                         </div>
@@ -327,14 +432,14 @@
                         <div class="article-actions">
                             <a asp-action="Details" asp-route-id="@item.Id" class="article-link">
                                 Read More
-                                <i class="fas fa-arrow-right"></i>
+                                <i class="bi bi-arrow-right"></i>
                             </a>
 
                             @{
                                 var hasImage = item.blog_content != null && item.blog_content.Contains("<img");
                             }
                             <span class="content-type-badge @(hasImage ? "badge-image" : "badge-text")">
-                                <i class="fas fa-@(hasImage ? "image" : "file-alt")"></i>
+                                <i class="bi bi-@(hasImage ? "image" : "file-text")"></i>
                                 @(hasImage ? "Image" : "Text")
                             </span>
                         </div>
@@ -346,13 +451,13 @@
     else
     {
         <div class="empty-state">
-            <i class="fas fa-newspaper"></i>
+            <i class="bi bi-newspaper"></i>
             <h2>No Articles Yet</h2>
             <p>Check back soon for new content!</p>
             @if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
             {
                 <a href="@Url.Action("Create", "Blogs")" class="btn-create">
-                    <i class="fas fa-plus-circle"></i>Create First Article
+                    <i class="bi bi-plus-circle"></i>Create First Article
                 </a>
             }
         </div>

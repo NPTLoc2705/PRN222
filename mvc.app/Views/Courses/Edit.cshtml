@@ -13,6 +13,12 @@
         <form asp-action="Edit" enctype="multipart/form-data">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="CourseId" />
+            <!-- Hidden fields to preserve image data -->
+            <input type="hidden" asp-for="ImageBytes" />
+            <input type="hidden" asp-for="ImageContentType" />
+            <input type="hidden" asp-for="CreatedAt" />
+            <input type="hidden" asp-for="UpdatedAt" />
+
             <div class="form-group">
                 <label asp-for="Title" class="control-label"></label>
                 <input asp-for="Title" class="form-control" />
@@ -36,6 +42,25 @@
                     <option value="Advanced">Advanced</option>
                 </select>
                 <span asp-validation-for="DifficultyLevel" class="text-danger"></span>
+            </div>
+            <div class="form-group mb-3">
+                <label>Categories</label>
+                <div class="d-flex flex-wrap gap-2">
+                    @foreach (var category in Model.AvailableCategories)
+                    {
+                        <div class="form-check">
+                            <input class="form-check-input"
+                                   type="checkbox"
+                                   name="SelectedCategoryIds"
+                                   value="@category.CategoryId"
+                                   id="category-@category.CategoryId"
+                            @(Model.SelectedCategoryIds.Contains(category.CategoryId) ? "checked" : "") />
+                            <label class="form-check-label" for="category-@category.CategoryId">
+                                @category.Name
+                            </label>
+                        </div>
+                    }
+                </div>
             </div>
             <div class="form-group form-check">
                 <label class="form-check-label">

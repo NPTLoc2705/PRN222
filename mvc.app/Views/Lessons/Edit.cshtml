@@ -14,7 +14,6 @@
         <form asp-action="Edit" asp-route-courseId="@courseId" asp-route-moduleId="@module.ModuleId" asp-route-lessonId="@Model.LessonId" enctype="multipart/form-data">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="LessonId" />
-            <input type="hidden" asp-for="ModuleId" />
             <input type="hidden" asp-for="CreatedAt" />
 
             <div class="form-group">

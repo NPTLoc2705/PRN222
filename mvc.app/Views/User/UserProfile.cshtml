@@ -1,0 +1,343 @@
+﻿@model mvc.dataaccess.Entities.User
+@{
+    ViewData["Title"] = "User Profile";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var currentUserId = Context.Session.GetString("UserId");
+    var currentRole = Context.Session.GetString("UserRole");
+    bool isOwnProfile = Model.Id.ToString() == currentUserId;
+}
+
+<style>
+    .profile-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 2rem;
+    }
+
+    .profile-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 3rem;
+        border-radius: 16px;
+        margin-bottom: 2rem;
+        text-align: center;
+    }
+
+    .profile-avatar {
+        width: 120px;
+        height: 120px;
+        background: white;
+        border-radius: 50%;
+        margin: 0 auto 1.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 3rem;
+        color: #667eea;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    .profile-name {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+
+    .profile-role {
+        display: inline-block;
+        background: rgba(255,255,255,0.2);
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        margin-bottom: 1rem;
+    }
+
+    .profile-status {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        border-radius: 12px;
+        font-size: 0.85rem;
+        font-weight: 500;
+    }
+
+    .status-active {
+        background: #d4edda;
+        color: #155724;
+    }
+
+    .status-banned {
+        background: #f8d7da;
+        color: #721c24;
+    }
+
+    .profile-info {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        margin-bottom: 2rem;
+    }
+
+    .info-row {
+        display: flex;
+        padding: 1rem 0;
+        border-bottom: 1px solid #e9ecef;
+    }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+    .info-label {
+        font-weight: 600;
+        color: #495057;
+        width: 150px;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .info-value {
+        flex: 1;
+        color: #212529;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        margin-top: 2rem;
+    }
+
+    .btn {
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 500;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+
+    .btn-primary {
+        background: #667eea;
+        color: white;
+    }
+
+        .btn-primary:hover {
+            background: #5a67d8;
+            transform: translateY(-2px);
+        }
+
+    .btn-warning {
+        background: #ffc107;
+        color: #212529;
+    }
+
+        .btn-warning:hover {
+            background: #e0a800;
+        }
+
+    .btn-success {
+        background: #28a745;
+        color: white;
+    }
+
+        .btn-success:hover {
+            background: #218838;
+        }
+
+    .btn-danger {
+        background: #dc3545;
+        color: white;
+    }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+    .btn-secondary {
+        background: #6c757d;
+        color: white;
+    }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+    @@media (max-width: 768px) {
+        .profile-container {
+            padding: 1rem;
+        }
+
+        .profile-header {
+            padding: 2rem;
+        }
+
+        .info-row {
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .info-label {
+            width: auto;
+        }
+
+        .action-buttons {
+            flex-direction: column;
+        }
+
+        .btn {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+</style>
+
+<div class="profile-container">
+    <div class="profile-header">
+        <div class="profile-avatar">
+            <i class="bi bi-person-fill"></i>
+        </div>
+        <h1 class="profile-name">@Model.FullName</h1>
+        <div class="profile-role">@Model.Role</div>
+        <div>
+            @if (Model.IsActive)
+            {
+                <span class="profile-status status-active">Active</span>
+            }
+            else
+            {
+                <span class="profile-status status-banned">Banned</span>
+            }
+        </div>
+    </div>
+
+    <div class="profile-info">
+        <h3 class="mb-4">Profile Information</h3>
+
+        <div class="info-row">
+            <div class="info-label">
+                <i class="bi bi-envelope"></i> Email
+            </div>
+            <div class="info-value">@Model.Email</div>
+        </div>
+
+        <div class="info-row">
+            <div class="info-label">
+                <i class="bi bi-telephone"></i> Phone
+            </div>
+            <div class="info-value">@(string.IsNullOrEmpty(Model.PhoneNumber) ? "Not provided" : Model.PhoneNumber)</div>
+        </div>
+
+        <div class="info-row">
+            <div class="info-label">
+                <i class="bi bi-geo-alt"></i> Address
+            </div>
+            <div class="info-value">@(string.IsNullOrEmpty(Model.Address) ? "Not provided" : Model.Address)</div>
+        </div>
+
+        
+
+        <div class="info-row">
+            <div class="info-label">
+                <i class="bi bi-shield-check"></i> Role
+            </div>
+            <div class="info-value">
+                <span class="badge bg-info">@Model.Role</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="action-buttons">
+        @if (isOwnProfile)
+        {
+            <!-- Own profile actions -->
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editProfileModal">
+                <i class="bi bi-pencil"></i> Edit Profile
+            </button>
+        }
+        else if (currentRole == "Admin")
+        {
+            <!-- Admin actions for other users -->
+            @if (Model.IsActive)
+            {
+                <form asp-controller="User" asp-action="Ban" asp-route-id="@Model.Id" method="post" class="d-inline"
+                      onsubmit="return confirm('Are you sure you want to ban this user?');">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-warning">
+                        <i class="bi bi-lock"></i> Ban User
+                    </button>
+                </form>
+            }
+            else
+            {
+                <form asp-controller="User" asp-action="UnBan" asp-route-id="@Model.Id" method="post" class="d-inline">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-success">
+                        <i class="bi bi-unlock"></i> Unban User
+                    </button>
+                </form>
+            }
+
+            <form asp-controller="User" asp-action="Delete" asp-route-id="@Model.Id" method="post" class="d-inline"
+                  onsubmit="return confirm('Are you sure you want to delete this user? This action cannot be undone.');">
+                @Html.AntiForgeryToken()
+                <button type="submit" class="btn btn-danger">
+                    <i class="bi bi-trash"></i> Delete User
+                </button>
+            </form>
+        }
+
+        <a asp-controller="User" asp-action="Index" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Back to List
+        </a>
+    </div>
+</div>
+
+
+<!-- Edit Profile Modal -->
+<div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form asp-controller="User" asp-action="UpdateProfile" method="post">
+                @Html.AntiForgeryToken()
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editProfileModalLabel">Edit Profile</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="Id" value="@Model.Id" />
+
+                    <div class="mb-3">
+                        <label for="FullName" class="form-label">Full Name</label>
+                        <input type="text" class="form-control" name="FullName" value="@Model.FullName" required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="PhoneNumber" class="form-label">Phone</label>
+                        <input type="text" class="form-control" name="PhoneNumber" value="@Model.PhoneNumber" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="Address" class="form-label">Address</label>
+                        <input type="text" class="form-control" name="Address" value="@Model.Address" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="Password" class="form-label">New Password</label>
+                        <input type="password" class="form-control" name="Password" />
+                        <small class="form-text text-muted">Leave blank if not changing password</small>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-success">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

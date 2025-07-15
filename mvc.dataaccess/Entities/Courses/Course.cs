@@ -20,11 +20,16 @@
             public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
             public bool IsActive { get; set; } = true;
 
-            // Navigation properties
-            public ICollection<Module> Modules { get; set; }
-            public ICollection<UserCourseProgress> UserProgresses { get; set; }
+        // Navigation properties
+        public ICollection<Lesson> Lessons { get; set; }
+        public ICollection<UserCourseProgress> UserProgresses { get; set; }
             public ICollection<CourseCategoryMapping> CategoryMappings { get; set; }
-            public ICollection<CoursePrerequisite> Prerequisites { get; set; }
-            public ICollection<CoursePrerequisite> RequiredForCourses { get; set; }
+        public Course()
+        {
+            CategoryMappings = new List<CourseCategoryMapping>();
+            Lessons = new List<Lesson>();
+            UserProgresses = new List<UserCourseProgress>();
+        }
+          
         }
     }

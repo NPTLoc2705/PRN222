@@ -165,5 +165,13 @@ namespace mvc.app.Controllers
 
             return RedirectToAction(nameof(Index));
         }
+
+        [HttpGet]
+
+        public IActionResult AdminBlog()
+        {
+            var blogs = _blogService.GetAll(); 
+            return View(blogs); 
+        }
     }
 }

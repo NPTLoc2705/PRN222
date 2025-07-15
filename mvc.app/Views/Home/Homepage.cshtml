@@ -122,6 +122,22 @@
             <img src="https://via.placeholder.com/400x200?text=Consult+Now" alt="Consult a Professional">
             <h3>Talk to a Consultant</h3>
             <p>Book private sessions with trained consultants to discuss prevention, recovery, and questions related to substance use.</p>
+                    @if (ViewData["IsLoggedIn"] != null && (bool)ViewData["IsLoggedIn"])
+                    {
+                        <li>
+                            <a href="/User/UserProfile" class="user-welcome">
+                                @ViewData["UserMessage"]
+                            </a>
+                        </li>
+                        <li><a asp-controller="Auth" asp-action="Logout">Logout</a></li>
+                    }
+                    else
+                    {
+                        <li><a href="/Auth/Login">Login</a></li>
+                        <li><a href="/Auth/Register">Register</a></li>
+                    }
+                </ul>
+            </nav>
         </div>
         <div class="card">
             <img src="https://via.placeholder.com/400x200?text=Start+Course" alt="Learn Online">
