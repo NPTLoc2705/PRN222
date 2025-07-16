@@ -6,7 +6,7 @@ using mvc.services.Interfaces;
 
 namespace mvc.app.Controllers
 {
-    public class UserController : Controller
+    public class UserController : BaseController
     {
         private readonly IUserService _userService;
 
