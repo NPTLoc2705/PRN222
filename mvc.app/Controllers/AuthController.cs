@@ -63,7 +63,7 @@ namespace mvc.app.Controllers
 
             return user.Role switch
             {
-                SystemRole.Admin => RedirectToAction("Index", "Admin"),
+                SystemRole.Admin => RedirectToAction("DashBoard", "Admin"),
                 SystemRole.Consultant => RedirectToAction("ConsultanView", "Bookings"),
                 _ => RedirectToAction("Index", "Home"),
             };
