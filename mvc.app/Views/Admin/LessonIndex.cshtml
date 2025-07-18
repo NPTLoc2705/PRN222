@@ -1,0 +1,150 @@
+﻿@model IEnumerable<mvc.dataaccess.ViewModels.LessonDTO>
+@{
+    ViewData["Title"] = "Manager - Course Lessons";
+    var courseId = ViewBag.CourseId;
+    var courseTitle = ViewBag.CourseTitle;
+    var isManager = Context.Session.GetString("UserRole") == "Admin";
+}
+
+<style>
+    .lesson-management-header {
+        background-color: #f1f5f9;
+        padding: 1.5rem;
+        border-radius: 8px;
+        margin-bottom: 2rem;
+    }
+
+    .drag-handle {
+        cursor: move;
+        color: #64748b;
+    }
+
+    .lesson-item {
+        transition: all 0.2s ease;
+    }
+
+        .lesson-item:hover {
+            background-color: #f8fafc;
+        }
+</style>
+
+@if (!isManager)
+{
+    <div class="alert alert-danger">
+        <i class="fas fa-exclamation-triangle mr-2"></i>
+        You don't have permission to access this area.
+    </div>
+}
+else
+{
+    <div class="container-fluid">
+        <div class="lesson-management-header">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h2><i class="fas fa-book-open mr-2"></i>@courseTitle</h2>
+                    <h4 class="text-muted">Lesson Management</h4>
+                </div>
+                <div>
+                    <a asp-controller="Admin" asp-action="Details" asp-route-id="@courseId"
+                       class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left mr-2"></i> Back to Course
+                    </a>
+                    <a asp-controller="Lessons" asp-action="Create" asp-route-courseId="@courseId" class="btn btn-primary">
+                        <i class="fas fa-plus mr-2"></i> Add Lesson
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-list-ol mr-2"></i>Lessons</h5>
+            </div>
+
+            <div class="card-body">
+                @if (Model.Any())
+                {
+                    <div class="list-group" id="sortable-lessons">
+                        @foreach (var lesson in Model.OrderBy(l => l.OrderNumber))
+                        {
+                            <div class="list-group-item lesson-item mb-2" data-id="@lesson.LessonId">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div class="d-flex align-items-center">
+                                        <span class="drag-handle me-3">
+                                            <i class="fas fa-grip-vertical fa-lg"></i>
+                                        </span>
+                                        <div>
+                                            <h6 class="mb-1">@lesson.Title</h6>
+                                            <small class="text-muted">
+                                                <i class="fas fa-tag mr-1"></i> @lesson.ContentType |
+                                                <i class="fas fa-clock mr-1"></i> @lesson.Duration min |
+                                                Order: @lesson.OrderNumber
+                                            </small>
+                                        </div>
+                                    </div>
+                                    <div class="btn-group">
+                                        <a asp-action="Details" asp-route-courseId="@courseId"
+                                           asp-route-lessonId="@lesson.LessonId" class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a asp-action="Edit" asp-route-courseId="@courseId"
+                                           asp-route-lessonId="@lesson.LessonId" class="btn btn-sm btn-outline-warning">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <a asp-action="Delete" asp-route-courseId="@courseId"
+                                           asp-route-lessonId="@lesson.LessonId" class="btn btn-sm btn-outline-danger">
+                                            <i class="fas fa-trash"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle mr-2"></i> No lessons found for this course.
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    @section Scripts {
+    <script src="https://code.jquery.com/ui/1.13.1/jquery-ui.min.js"></script>
+    <script>
+        $(function() {
+            $("#sortable-lessons").sortable({
+                handle: ".drag-handle",
+                update: function(event, ui) {
+                    var lessonOrder = [];
+                    $("#sortable-lessons .list-group-item").each(function(index) {
+                        lessonOrder.push({
+                            lessonId: $(this).data("id"),
+                            newOrder: index + 1
+                        });
+                    });
+
+                    $.ajax({
+                        url: '@Url.Action("ReorderLessons", "Lessons")',
+                        type: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify({
+                            courseId: '@courseId',
+                            lessonOrder: lessonOrder
+                        }),
+                        success: function(response) {
+                            if (response.success) {
+                                toastr.success('Lesson order updated successfully');
+                            } else {
+                                toastr.error('Error updating lesson order');
+                            }
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+    }
+}

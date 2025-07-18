@@ -38,8 +38,8 @@
         </dd>
     </dl>
 
-    <form asp-action="Delete" asp-route-courseId="@courseId" asp-route-moduleId="@module.ModuleId" asp-route-lessonId="@Model.LessonId">
+    <form asp-controller="Lessons" asp-action="DeleteConfirmed" asp-route-courseId="@courseId" asp-route-lessonId="@Model.LessonId">
         <input type="submit" value="Delete" class="btn btn-danger" />
-        <a asp-action="Index" asp-route-courseId="@courseId" asp-route-moduleId="@module.ModuleId" class="btn btn-secondary">Cancel</a>
+        <a asp-controller="Admin" asp-action="LessonIndex" asp-route-courseId="@courseId" class="btn btn-secondary">Cancel</a>
     </form>
 </div>

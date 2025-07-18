@@ -1,0 +1,46 @@
+﻿@model mvc.dataaccess.ViewModels.LessonDTO
+@{
+    ViewData["Title"] = "Lesson Details";
+    var courseId = ViewBag.CourseId;
+    var courseTitle = ViewBag.CourseTitle;
+}
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2>@courseTitle</h2>
+            <h4 class="text-muted">@Model.Title</h4>
+        </div>
+        <div>
+            <a asp-controller="Admin" asp-action="LessonIndex" asp-route-courseId="@courseId"
+               class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left mr-2"></i> Back to Lessons
+            </a>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <dl class="row">
+                <dt class="col-sm-3">Content Type</dt>
+                <dd class="col-sm-9">@Model.ContentType</dd>
+
+                <dt class="col-sm-3">Duration</dt>
+                <dd class="col-sm-9">@Model.Duration minutes</dd>
+
+                <dt class="col-sm-3">Order Number</dt>
+                <dd class="col-sm-9">@Model.OrderNumber</dd>
+
+                <dt class="col-sm-3">Content</dt>
+                <dd class="col-sm-9">@Html.Raw(Model.ContentFile)</dd>
+            </dl>
+        </div>
+        <div class="card-footer">
+            <a asp-controller="Admin" asp-action="EditLesson"
+               asp-route-courseId="@courseId" asp-route-lessonId="@Model.LessonId"
+               class="btn btn-primary">
+                <i class="fas fa-edit mr-2"></i> Edit
+            </a>
+        </div>
+    </div>
+</div>

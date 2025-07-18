@@ -35,6 +35,9 @@ namespace mvc.services.Implements
         public Task<IEnumerable<Course>> GetAllCoursesAsync()
         => _courseRepository.GetAllCoursesAsync();
 
+        public Task<IEnumerable<Course>> GetAllCoursesWithLessonsAsync()
+        => _courseRepository.GetAllCoursesWithLessonsAsync();
+
         public Task<Course> GetCourseByIdAsync(Guid courseId)
         => _courseRepository.GetCourseByIdAsync(courseId);
 
@@ -52,6 +55,9 @@ namespace mvc.services.Implements
 
         public Task<IEnumerable<Course>> GetCoursesByCategoryNameAsync(string categoryName)
         => _courseRepository.GetCoursesByCategoryNameAsync(categoryName);
+
+        public Task<Course> GetCourseWithLessonsAsync(Guid id)
+        => _courseRepository.GetCourseWithLessonsAsync(id);
 
         public Task<IEnumerable<Course>> SearchCoursesAsync(string searchTerm)
         => _courseRepository.SearchCoursesAsync(searchTerm);

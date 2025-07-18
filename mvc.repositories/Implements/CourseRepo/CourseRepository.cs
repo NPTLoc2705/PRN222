@@ -235,8 +235,9 @@ namespace mvc.repositories.Implements.CourseRepo
             var course = await _context.Courses.FindAsync(courseId);
             if (course == null)
                 return false;
+            course.IsActive = false; // Soft delete
 
-            _context.Courses.Remove(course);
+            _context.Courses.Update(course);
             await _context.SaveChangesAsync();
             return true;
         }
@@ -390,6 +391,26 @@ namespace mvc.repositories.Implements.CourseRepo
                     });
                 }
             }
+        }
+
+        public async Task<IEnumerable<Course>> GetAllCoursesWithLessonsAsync()
+        {
+            return await _context.Courses
+       .Include(c => c.Lessons)
+       .Include(c => c.CategoryMappings)
+       .ThenInclude(cm => cm.Category)
+       .AsNoTracking()
+       .ToListAsync();
+        }
+
+        public async Task<Course> GetCourseWithLessonsAsync(Guid id)
+        {
+            return await _context.Courses
+        .Include(c => c.Lessons)
+        .Include(c => c.CategoryMappings)
+        .ThenInclude(cm => cm.Category)
+        .AsNoTracking()
+        .FirstOrDefaultAsync(c => c.CourseId == id);
         }
     }
 }

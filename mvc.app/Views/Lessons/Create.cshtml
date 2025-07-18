@@ -9,7 +9,7 @@
 <hr />
 <div class="row">
     <div class="col-md-6">
-        <form asp-action="Create" asp-route-courseId="@courseId" enctype="multipart/form-data">
+        <form asp-controller="Lessons"  asp-action="Create" asp-route-courseId="@courseId" enctype="multipart/form-data">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
             <input type="hidden" asp-for="CourseId" value="@courseId" />
@@ -62,7 +62,7 @@
                 <button type="submit" class="btn btn-primary">
                     <i class="fas fa-save"></i> Create Lesson
                 </button>
-                <a asp-action="Index" asp-route-courseId="@courseId" class="btn btn-secondary">
+                <a asp-controller="Admin" asp-action="LessonIndex" asp-route-courseId="@courseId" class="btn btn-secondary">
                     <i class="fas fa-arrow-left"></i> Cancel
                 </a>
             </div>

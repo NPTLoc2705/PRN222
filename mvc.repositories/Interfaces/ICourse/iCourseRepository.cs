@@ -28,5 +28,9 @@ namespace mvc.repositories.Interfaces.ICourse
         //Search Category and Name courses 
         Task<IEnumerable<Course>> SearchCoursesAsync(string searchTerm);
         Task<IEnumerable<Course>> GetCoursesByCategoryNameAsync(string categoryName);
+
+        //List for manager view 
+        Task<IEnumerable<Course>> GetAllCoursesWithLessonsAsync();
+        Task<Course> GetCourseWithLessonsAsync(Guid id);
     }
 }
