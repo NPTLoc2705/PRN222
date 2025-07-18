@@ -3,13 +3,18 @@
     ViewData["Title"] = "Create Lesson";
     var courseId = ViewBag.CourseId;
 }
-
+<style>
+    .field-validation-error {
+        color: #dc3545;
+        font-size: 0.875em;
+    }
+    </style>
 <h1>Create Lesson</h1>
 
 <hr />
 <div class="row">
     <div class="col-md-6">
-        <form asp-action="Create" asp-route-courseId="@courseId" enctype="multipart/form-data">
+        <form asp-controller="Lessons"  asp-action="Create" asp-route-courseId="@courseId" enctype="multipart/form-data">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
             <input type="hidden" asp-for="CourseId" value="@courseId" />
@@ -34,16 +39,15 @@
 
             <div class="form-group mb-3">
                 <label asp-for="ContentFile" class="control-label">Upload Content</label>
-                <input type="file" asp-for="ContentFile" class="form-control" />
+                <input type="file" asp-for="ContentFile" class="form-control"
+                       data-val="true"
+                       data-val-filesize="The file must be less than 1GB"
+                       data-val-filesize-max="1073741824" accept="video/mp4,video/x-m4v,video/*" />
                 <span asp-validation-for="ContentFile" class="text-danger"></span>
-                <small class="form-text text-muted">Or enter a URL below</small>
+                <small class="form-text text-muted">Maximum file size: 1GB</small>
             </div>
 
-            <div class="form-group mb-3">
-                <label asp-for="ContentUrl" class="control-label">Content URL</label>
-                <input asp-for="ContentUrl" class="form-control" />
-                <span asp-validation-for="ContentUrl" class="text-danger"></span>
-            </div>
+           
 
             <div class="form-group mb-3">
                 <label asp-for="Duration" class="control-label">Duration (minutes)</label>
@@ -62,7 +66,7 @@
                 <button type="submit" class="btn btn-primary">
                     <i class="fas fa-save"></i> Create Lesson
                 </button>
-                <a asp-action="Index" asp-route-courseId="@courseId" class="btn btn-secondary">
+                <a asp-controller="Admin" asp-action="LessonIndex" asp-route-courseId="@courseId" class="btn btn-secondary">
                     <i class="fas fa-arrow-left"></i> Cancel
                 </a>
             </div>
@@ -74,4 +78,18 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+    <script>
+        $.validator.addMethod('filesize', function (value, element, param) {
+            if (element.files.length < 1) {
+                // No files selected
+                return true;
+            }
+            return element.files[0].size <= param;
+        });
+
+        $.validator.unobtrusive.adapters.add('filesize', ['max'], function (options) {
+            options.rules['filesize'] = options.params.max;
+            options.messages['filesize'] = options.message;
+        });
+    </script>
 }

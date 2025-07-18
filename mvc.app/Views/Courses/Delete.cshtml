@@ -1,5 +1,4 @@
 ﻿@model mvc.dataaccess.Entities.Courses.Course
-@inject mvc.services.Interfaces.IProgressService progressService
 
 @{
     ViewData["Title"] = "Delete";
@@ -7,80 +6,59 @@
 
 <h1>Delete</h1>
 
-<h3>Are you sure you want to delete this?</h3>
+<h3>Are you sure you want to deactivate this course?</h3>
 <div>
     <h4>Course</h4>
     <hr />
     <dl class="row">
-        <dt class = "col-sm-2">
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.Title)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10">
             @Html.DisplayFor(model => model.Title)
         </dd>
-        <dt class = "col-sm-2">
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.Description)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10">
             @Html.DisplayFor(model => model.Description)
         </dd>
-        <dt class = "col-sm-2">
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.Duration)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10">
             @Html.DisplayFor(model => model.Duration)
         </dd>
-        <dt class = "col-sm-2">
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.DifficultyLevel)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10">
             @Html.DisplayFor(model => model.DifficultyLevel)
         </dd>
-        
-        <dt class = "col-sm-2">
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.CreatedAt)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10">
             @Html.DisplayFor(model => model.CreatedAt)
         </dd>
-        <dt class = "col-sm-2">
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.UpdatedAt)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10">
             @Html.DisplayFor(model => model.UpdatedAt)
         </dd>
-        <dt class = "col-sm-2">
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.IsActive)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10">
             @Html.DisplayFor(model => model.IsActive)
         </dd>
     </dl>
-    @if (ViewBag.CanDelete == false)
-{
-    <div class="alert alert-warning">
-        <h5>Warning!</h5>
-        <p>This course cannot be deleted because it has:</p>
-        <ul>
-            @if (Model.Lessons?.Any() == true)
-            {
-                <li>@Model.Lessons.Count lesson(s)</li>
-            }
-            @if (await progressService.HasCourseProgress(Model.CourseId))
-            {
-                <li>User progress records</li>
-            }
-        </ul>
-        <p>Please delete these items first.</p>
-    </div>
-}
-else
-{
-        <form asp-controller="Courses" asp-action="DeleteConfirmed" asp-route-id="@Model.CourseId" method="post">
-            @Html.AntiForgeryToken()
-            <input type="hidden" asp-for="CourseId" />
-            <button type="submit" class="btn btn-danger">Delete</button>
-        </form>
-}
-</div>
 
+    <form asp-controller="Courses" asp-action="DeleteConfirmed" asp-route-id="@Model.CourseId" method="post">
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="CourseId" />
+        <button type="submit" class="btn btn-danger">Deactivate</button>
+        <a asp-controller="Admin" asp-action="Index" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>

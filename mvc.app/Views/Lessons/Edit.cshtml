@@ -11,7 +11,7 @@
 <hr />
 <div class="row">
     <div class="col-md-6">
-        <form asp-action="Edit" asp-route-courseId="@courseId" asp-route-moduleId="@module.ModuleId" asp-route-lessonId="@Model.LessonId" enctype="multipart/form-data">
+        <form asp-controller="Lessons" asp-action="Edit" asp-route-courseId="@courseId" asp-route-lessonId="@Model.LessonId" enctype="multipart/form-data">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="LessonId" />
             <input type="hidden" asp-for="CreatedAt" />
@@ -35,17 +35,12 @@
 
             <div class="form-group">
                 <label asp-for="ContentFile" class="control-label">Update Content File</label>
-                <input type="file" asp-for="ContentFile" class="form-control" />
+                <input type="file" asp-for="ContentFile" class="form-control" data-val="true"
+                       data-val-filesize="The file must be less than 1GB"
+                       data-val-filesize-max="1073741824" accept="video/mp4,video/x-m4v,video/*" />
                 <span asp-validation-for="ContentFile" class="text-danger"></span>
                 <small class="form-text text-muted">Current: @(string.IsNullOrEmpty(Model.ContentUrl) ? "None" : Model.ContentUrl)</small>
             </div>
-
-            <div class="form-group">
-                <label asp-for="ContentUrl" class="control-label">Content URL</label>
-                <input asp-for="ContentUrl" class="form-control" />
-                <span asp-validation-for="ContentUrl" class="text-danger"></span>
-            </div>
-
             <div class="form-group">
                 <label asp-for="Duration" class="control-label">Duration (minutes)</label>
                 <input asp-for="Duration" class="form-control" />
@@ -66,7 +61,7 @@
 
             <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary" />
-                <a asp-action="Index" asp-route-courseId="@courseId" asp-route-moduleId="@module.ModuleId" class="btn btn-secondary">Cancel</a>
+                <a asp-controller="Admin" asp-action="LessonIndex" asp-route-courseId="@courseId" class="btn btn-secondary">Cancel</a>
             </div>
         </form>
     </div>
@@ -76,4 +71,18 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+    <script>
+        $.validator.addMethod('filesize', function (value, element, param) {
+            if (element.files.length < 1) {
+                // No files selected
+                return true;
+            }
+            return element.files[0].size <= param;
+        });
+
+        $.validator.unobtrusive.adapters.add('filesize', ['max'], function (options) {
+            options.rules['filesize'] = options.params.max;
+            options.messages['filesize'] = options.message;
+        });
+    </script>
 }

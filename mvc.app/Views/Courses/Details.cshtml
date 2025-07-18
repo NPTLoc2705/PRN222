@@ -8,8 +8,7 @@
     bool isEnrolled = ViewBag.IsEnrolled ?? false;
     decimal progressPercentage = ViewBag.ProgressPercentage ?? 0;
     var completedLessonIds = ViewBag.CompletedLessonIds as List<Guid> ?? new List<Guid>();
-    var isAdmin = Context.Session.GetString("UserRole") == "Member" ||
-                 Context.Session.GetString("UserRole") == "Instructor";
+    var isAdmin = Context.Session.GetString("UserRole") == "Member";
 }
 
 <style>
@@ -318,13 +317,7 @@
         <div class="card">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <h5 class="mb-0"><i class="fas fa-book-open mr-2"></i>Course Lessons</h5>
-                @if (isAdmin && (!Model.Lessons?.Any() ?? true))
-                {
-                    <a asp-controller="Lessons" asp-action="Create" asp-route-courseId="@Model.CourseId"
-                       class="btn btn-primary btn-sm">
-                        <i class="fas fa-plus mr-1"></i> Add First Lesson
-                    </a>
-                }
+               
             </div>
 
             @if (Model.Lessons?.Any() ?? false)
@@ -366,13 +359,7 @@
                         <i class="fas fa-book-open fa-3x text-muted mb-3"></i>
                         <h5>No lessons available</h5>
                         <p class="text-muted">This course doesn't have any lessons yet.</p>
-                        @if (isAdmin)
-                        {
-                            <a asp-controller="Lessons" asp-action="Create" asp-route-courseId="@Model.CourseId"
-                               class="btn btn-primary mt-2">
-                                <i class="fas fa-plus mr-1"></i> Add First Lesson
-                            </a>
-                        }
+                       
                     </div>
                 </div>
             }
