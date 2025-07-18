@@ -1,146 +1,215 @@
 ﻿@model mvc.dataaccess.Entities.Courses.Course
 @{
-    ViewData["Title"] = "Manager - Course Details";
+    ViewData["Title"] = "Course Management | " + Model.Title;
     var isManager = Context.Session.GetString("UserRole") == "Admin";
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 }
 
 <style>
-    .manager-course-header {
-        background-color: #f1f5f9;
+    .management-container {
+        padding: 2rem;
+        background-color: #f8fafc;
+        min-height: 100vh;
+    }
+
+    .course-header {
+        background: white;
+        border-radius: 0.5rem;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         padding: 1.5rem;
-        border-radius: 8px;
-        margin-bottom: 2rem;
+        margin-bottom: 1.5rem;
     }
 
-    .lesson-list-item {
-        border-left: 4px solid #3b82f6;
-        transition: all 0.2s ease;
+    .course-metadata {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+        margin-top: 1.5rem;
     }
 
-        .lesson-list-item:hover {
-            transform: translateX(5px);
+    .metadata-item {
+        background-color: #f1f5f9;
+        padding: 1rem;
+        border-radius: 0.5rem;
+    }
+
+    .metadata-label {
+        font-size: 0.875rem;
+        color: #64748b;
+        margin-bottom: 0.5rem;
+    }
+
+    .metadata-value {
+        font-weight: 500;
+        color: #1e293b;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 0.75rem;
+        margin-top: 1.5rem;
+        flex-wrap: wrap;
+    }
+
+    .lessons-card {
+        background: white;
+        border-radius: 0.5rem;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        overflow: hidden;
+    }
+
+    .lesson-item {
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid #e2e8f0;
+        transition: background-color 0.2s ease;
+    }
+
+        .lesson-item:hover {
             background-color: #f8fafc;
         }
+
+    .lesson-actions {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .status-badge {
+        font-size: 0.75rem;
+        padding: 0.35rem 0.75rem;
+    }
+
+    .empty-state {
+        padding: 2rem;
+        text-align: center;
+        color: #64748b;
+    }
 </style>
 
-@if (!isManager)
-{
-    <div class="alert alert-danger">
-        <i class="fas fa-exclamation-triangle mr-2"></i>
-        You don't have permission to access this area.
-    </div>
-}
-else
-{
-    <div class="container-fluid">
+<div class="management-container">
+    @if (!isManager)
+    {
+        <div class="alert alert-danger">
+            <i class="fas fa-exclamation-triangle mr-2"></i>
+            You don't have permission to access this area.
+        </div>
+    }
+    else
+    {
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2><i class="fas fa-book mr-2"></i>@Model.Title</h2>
+            <div>
+                <h2 class="mb-1">@Model.Title</h2>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a asp-action="Index">Courses</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Details</li>
+                    </ol>
+                </nav>
+            </div>
             <a asp-action="Index" class="btn btn-outline-secondary">
-                <i class="fas fa-arrow-left mr-2"></i> Back to Dashboard
+                <i class="fas fa-arrow-left mr-2"></i> Back to List
             </a>
         </div>
 
-        <div class="manager-course-header">
-            <div class="row">
-                <div class="col-md-8">
-                    <h4>Course Information</h4>
+        <div class="course-header">
+            <div class="d-flex justify-content-between align-items-start">
+                <div style="max-width: 70%;">
+                    <h4 class="mb-3">Course Overview</h4>
                     <p class="text-muted">@Model.Description</p>
+                </div>
+                <div class="text-end">
+                    <span class="status-badge badge @(Model.IsActive ? "bg-success" : "bg-secondary")">
+                        @(Model.IsActive ? "Published" : "Draft")
+                    </span>
+                </div>
+            </div>
 
-                    <div class="row mt-3">
-                        <div class="col-md-4">
-                            <div class="mb-3">
-                                <h6 class="text-muted">Status</h6>
-                                <p>
-                                    @if (Model.IsActive)
-                                    {
-                                        <span class="badge bg-success">Active</span>
-                                    }
-                                    else
-                                    {
-                                        <span class="badge bg-secondary">Inactive</span>
-                                    }
-                                </p>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="mb-3">
-                                <h6 class="text-muted">Difficulty</h6>
-                                <p>@Model.DifficultyLevel</p>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="mb-3">
-                                <h6 class="text-muted">Duration</h6>
-                                <p>@Model.Duration minutes</p>
-                            </div>
-                        </div>
-                    </div>
+            <div class="course-metadata">
+                <div class="metadata-item">
+                    <div class="metadata-label">Difficulty Level</div>
+                    <div class="metadata-value">@Model.DifficultyLevel</div>
                 </div>
-                <div class="col-md-4 text-end">
-                    <div class="btn-group-vertical">
-                        <a asp-action="Edit" asp-controller="Courses" asp-route-id="@Model.CourseId" class="btn btn-primary mb-2">
-                            <i class="fas fa-edit mr-2"></i>Edit Course
-                        </a>
-                        <a asp-controller="Lessons" asp-action="Create" asp-route-courseId="@Model.CourseId"
-                           class="btn btn-success mb-2">
-                            <i class="fas fa-plus mr-2"></i>Add Lesson
-                        </a>
-                        <a asp-action="Delete" asp-controller="Courses" asp-route-id="@Model.CourseId" class="btn btn-danger">
-                            <i class="fas fa-trash mr-2"></i>Delete Course
-                        </a>
-                    </div>
+                <div class="metadata-item">
+                    <div class="metadata-label">Total Duration</div>
+                    <div class="metadata-value">@Model.Duration minutes</div>
                 </div>
+                <div class="metadata-item">
+                    <div class="metadata-label">Lessons</div>
+                    <div class="metadata-value">@(Model.Lessons?.Count ?? 0)</div>
+                </div>
+                <div class="metadata-item">
+                    <div class="metadata-label">Created</div>
+                    <div class="metadata-value">@Model.CreatedAt.ToString("MMMM dd, yyyy")</div>
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <a asp-controller="Courses" asp-action="Edit" asp-route-id="@Model.CourseId" class="btn btn-primary">
+                    <i class="fas fa-edit mr-2"></i> Edit Course
+                </a>
+                <a asp-controller="Lessons" asp-action="Create" asp-route-courseId="@Model.CourseId" class="btn btn-success">
+                    <i class="fas fa-plus mr-2"></i> Add Lesson
+                </a>
+                <a asp-controller="Courses" asp-action="Delete" asp-route-id="@Model.CourseId" class="btn btn-danger">
+                    <i class="fas fa-trash mr-2"></i> Delete Course
+                </a>
             </div>
         </div>
 
-        <div class="card">
-            <div class="card-header">
-                <h5 class="mb-0"><i class="fas fa-book-open mr-2"></i>Lessons</h5>
+        <div class="lessons-card">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-list-ul mr-2"></i> Course Lessons
+                    <span class="badge bg-primary ms-2">@(Model.Lessons?.Count ?? 0)</span>
+                </h5>
             </div>
-            <div class="card-body">
-                @if (Model.Lessons?.Any() == true)
-                {
-                    <div class="list-group">
-                        @foreach (var lesson in Model.Lessons.OrderBy(l => l.OrderNumber))
-                        {
-                            <div class="list-group-item lesson-list-item mb-2">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <h6 class="mb-1">@lesson.Title</h6>
-                                        <small class="text-muted">
-                                            <i class="fas fa-clock mr-1"></i> @lesson.Duration min |
-                                            <i class="fas fa-tag mr-1"></i> @lesson.ContentType
-                                        </small>
-                                    </div>
-                                    <div class="btn-group">
-                                        <a asp-controller="Lessons" asp-action="Details"
-                                           asp-route-courseId="@Model.CourseId" asp-route-lessonId="@lesson.LessonId"
-                                           class="btn btn-sm btn-outline-primary">
-                                            <i class="fas fa-eye"></i>
-                                        </a>
-                                        <a asp-controller="Lessons" asp-action="Edit"
-                                           asp-route-courseId="@Model.CourseId" asp-route-lessonId="@lesson.LessonId"
-                                           class="btn btn-sm btn-outline-warning">
-                                            <i class="fas fa-edit"></i>
-                                        </a>
-                                        <a asp-controller="Lessons" asp-action="Delete"
-                                           asp-route-courseId="@Model.CourseId" asp-route-lessonId="@lesson.LessonId"
-                                           class="btn btn-sm btn-outline-danger">
-                                            <i class="fas fa-trash"></i>
-                                        </a>
+
+            @if (Model.Lessons?.Any() == true)
+            {
+                <div class="list-group list-group-flush">
+                    @foreach (var lesson in Model.Lessons.OrderBy(l => l.OrderNumber))
+                    {
+                        <div class="lesson-item">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-1">@lesson.Title</h6>
+                                    <div class="d-flex gap-3 text-muted small">
+                                        <span><i class="fas fa-clock mr-1"></i> @lesson.Duration min</span>
+                                        <span><i class="fas fa-tag mr-1"></i> @lesson.ContentType</span>
+                                        @if (lesson.IsFreePreview)
+                                        {
+                                            <span class="text-success"><i class="fas fa-unlock mr-1"></i> Free Preview</span>
+                                        }
                                     </div>
                                 </div>
+                                <div class="lesson-actions">
+                                    <a asp-controller="Lessons" asp-action="Edit"
+                                       asp-route-courseId="@Model.CourseId" asp-route-lessonId="@lesson.LessonId"
+                                       class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a asp-controller="Lessons" asp-action="Delete"
+                                       asp-route-courseId="@Model.CourseId" asp-route-lessonId="@lesson.LessonId"
+                                       class="btn btn-sm btn-outline-danger">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                </div>
                             </div>
-                        }
-                    </div>
-                }
-                else
-                {
-                    <div class="alert alert-info">
-                        <i class="fas fa-info-circle mr-2"></i> No lessons found for this course.
-                    </div>
-                }
-            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="empty-state">
+                    <i class="fas fa-book-open fa-2x mb-3"></i>
+                    <h5>No Lessons Found</h5>
+                    <p class="mb-0">This course doesn't have any lessons yet.</p>
+                    <a asp-controller="Lessons" asp-action="Create" asp-route-courseId="@Model.CourseId"
+                       class="btn btn-primary mt-3">
+                        <i class="fas fa-plus mr-2"></i> Add First Lesson
+                    </a>
+                </div>
+            }
         </div>
-    </div>
-}
+    }
+</div>

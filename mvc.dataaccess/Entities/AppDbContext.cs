@@ -100,7 +100,6 @@ namespace mvc.dataaccess.Entities
                 entity.Property(e => e.CourseId)
                     .HasDefaultValueSql("NEWID()");
 
-                entity.HasQueryFilter(c => c.IsActive);
             });
 
             // Configure Lesson entity

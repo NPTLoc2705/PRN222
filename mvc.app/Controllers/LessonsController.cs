@@ -97,6 +97,8 @@ public class LessonsController : Controller
     }
     [HttpPost("create")]
 [ValidateAntiForgeryToken]
+    [RequestSizeLimit(1073741824)] // 1GB
+    [RequestFormLimits(MultipartBodyLengthLimit = 1073741824)]
     public async Task<IActionResult> Create(Guid courseId, LessonDTO lessonDto)
     {
         if (!IsAdmin()) return RedirectToAction("AccessDenied", "Home");
@@ -111,7 +113,13 @@ public class LessonsController : Controller
         {
             return BadRequest("Course ID mismatch");
         }
-
+        if (lessonDto.ContentFile != null && lessonDto.ContentFile.Length > 1073741824)
+        {
+            ModelState.AddModelError("ContentFile", "File size must be less than 1GB");
+            ViewBag.CourseId = courseId;
+            ViewBag.CourseTitle = (await _courseService.GetCourseByIdAsync(courseId))?.Title;
+            return View(lessonDto);
+        }
         if (ModelState.IsValid)
         {
             try
@@ -132,7 +140,7 @@ public class LessonsController : Controller
                 else
                 {
                     TempData["SuccessMessage"] = "Lesson created successfully!";
-                    return RedirectToAction("LessonIndex", "Admin", new { courseId });
+                    return RedirectToAction("Details", "Admin", new { id = courseId });
                 }
             }
             catch (Exception ex)
@@ -160,7 +168,7 @@ public class LessonsController : Controller
         var uniqueFileName = Guid.NewGuid().ToString() + "_" + file.FileName;
         var filePath = Path.Combine(uploadsFolder, uniqueFileName);
 
-        using (var fileStream = new FileStream(filePath, FileMode.Create))
+        using (var fileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.None, bufferSize: 81920, useAsync: true))
         {
             await file.CopyToAsync(fileStream);
         }
@@ -192,6 +200,8 @@ public class LessonsController : Controller
 
     [HttpPost("edit/{lessonId}")]
     [ValidateAntiForgeryToken]
+    [RequestSizeLimit(1073741824)] // 1GB
+    [RequestFormLimits(MultipartBodyLengthLimit = 1073741824)]
     public async Task<IActionResult> Edit(Guid courseId, Guid lessonId, LessonDTO lessonDto)
     {
         if (!IsAdmin()) return RedirectToAction("AccessDenied", "Home");
@@ -221,7 +231,7 @@ public class LessonsController : Controller
                 else
                 {
                     TempData["SuccessMessage"] = "Lesson updated successfully!";
-                    return RedirectToAction("LessonIndex", "Admin", new { courseId });
+                    return RedirectToAction("Details", "Admin", new { id = courseId });
                 }
             }
             catch (Exception ex)
@@ -275,13 +285,13 @@ public class LessonsController : Controller
             }
 
             TempData["SuccessMessage"] = "Lesson deleted successfully!";
-            return RedirectToAction("LessonIndex", "Admin", new { courseId });
+            return RedirectToAction("Details", "Admin", new { id = courseId });
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error deleting lesson");
             TempData["ErrorMessage"] = "An error occurred while deleting the lesson.";
-            return RedirectToAction(nameof(Index), new { courseId });
+            return RedirectToAction("Details", "Admin", new { id = courseId });
         }
     }
 }

@@ -70,7 +70,7 @@ namespace mvc.repositories.Implements.CourseRepo
             var lesson = new Lesson
             {
                 LessonId = Guid.NewGuid(),
-                CourseId = lessonDto.CourseId, // Changed from ModuleId to CourseId
+                CourseId = lessonDto.CourseId, 
                 Title = lessonDto.Title,
                 ContentType = lessonDto.ContentType,
                 ContentUrl = lessonDto.ContentUrl,
@@ -86,7 +86,7 @@ namespace mvc.repositories.Implements.CourseRepo
             return new LessonDTO
             {
                 LessonId = lesson.LessonId,
-                CourseId = lesson.CourseId, // Changed from ModuleId to CourseId
+                CourseId = lesson.CourseId, 
                 Title = lesson.Title,
                 ContentType = lesson.ContentType,
                 ContentUrl = lesson.ContentUrl,
@@ -120,12 +120,19 @@ namespace mvc.repositories.Implements.CourseRepo
 
         public async Task<bool> DeleteLessonAsync(Guid lessonId)
         {
-            var lesson = await _context.Lessons.FindAsync(lessonId);
+            var lesson = await _context.Lessons
+        .Include(l => l.UserProgresses) // Include related progress records
+        .FirstOrDefaultAsync(l => l.LessonId == lessonId);
+
             if (lesson == null) return false;
 
-            _context.Lessons.Remove(lesson);
-            await _context.SaveChangesAsync();
+            // Remove all related progress records
+            _context.UserCourseProgresses.RemoveRange(lesson.UserProgresses);
 
+            // Then remove the lesson
+            _context.Lessons.Remove(lesson);
+
+            await _context.SaveChangesAsync();
             return true;
         }
 

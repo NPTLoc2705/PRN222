@@ -186,7 +186,7 @@
                         <tbody>
                             @foreach (var course in Model.OrderByDescending(c => c.CreatedAt))
                             {
-                                <tr>
+                                <tr class="@(!course.IsActive ? "table-secondary" : "")">
                                     <td>
                                         @if (course.ImageBytes != null)
                                         {
@@ -211,7 +211,7 @@
                                     </td>
                                     <td>
                                         <span class="status-badge badge @(course.IsActive ? "bg-success" : "bg-secondary")">
-                                            @(course.IsActive ? "Published" : "Draft")
+                                            @(course.IsActive ? "Published" : "Inactive")
                                         </span>
                                     </td>
                                     <td>@course.DifficultyLevel</td>

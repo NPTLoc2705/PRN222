@@ -31,6 +31,7 @@ namespace mvc.repositories.Implements.CourseRepo
                 .Include(c => c.CategoryMappings)
                     .ThenInclude(cm => cm.Category)
                 .Include(c => c.Lessons)
+                .Where(c => c.IsActive) // Only get active courses
                 .AsNoTracking()
                 .ToListAsync();
         }

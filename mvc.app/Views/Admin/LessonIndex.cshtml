@@ -1,6 +1,8 @@
 ﻿@model IEnumerable<mvc.dataaccess.ViewModels.LessonDTO>
 @{
     ViewData["Title"] = "Manager - Course Lessons";
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
     var courseId = ViewBag.CourseId;
     var courseTitle = ViewBag.CourseTitle;
     var isManager = Context.Session.GetString("UserRole") == "Admin";
