@@ -51,6 +51,11 @@ namespace mvc.services.Implements
             return await _surveyRepository.DeleteAsync(surveyId);
         }
 
+        public async Task<SurveyResponse> GetSurveyResponseAsync(Guid responseId)
+        {
+            return await _surveyRepository.GetSurveyResponseAsync(responseId);
+        }
+
         #endregion
 
         #region Question Management

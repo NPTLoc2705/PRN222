@@ -17,6 +17,7 @@ namespace mvc.services.Interfaces
         Task<Survey> CreateSurveyAsync(Survey survey);
         Task<Survey> UpdateSurveyAsync(Survey survey);
         Task<bool> DeleteSurveyAsync(Guid surveyId);
+        Task<SurveyResponse> GetSurveyResponseAsync(Guid responseId);
 
         // Question Management
         Task<SurveyQuestion> GetQuestionWithOptionsAsync(Guid questionId);

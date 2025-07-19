@@ -29,5 +29,7 @@ namespace mvc.repositories.Interfaces
         Task<bool> DeleteOptionAsync(Guid optionId);
         Task<SurveyQuestion> GetQuestionWithOptionsAsync(Guid questionId);
         Task<QuestionOption> GetOptionByIdAsync(Guid optionId);
+
+        Task<SurveyResponse> GetSurveyResponseAsync(Guid responseId);
     }
 }

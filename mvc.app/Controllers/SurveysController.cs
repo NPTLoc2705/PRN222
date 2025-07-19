@@ -241,5 +241,94 @@ namespace mvc.app.Controllers
 
             return RedirectToAction(nameof(Index));
         }
+
+        #region Take Surveys
+
+        // GET: Surveys/TakeSurvey/{id}
+        public async Task<IActionResult> TakeSurvey(Guid id)
+        {
+            if (id == Guid.Empty)
+            {
+                return NotFound();
+            }
+
+            var survey = await _surveyService.GetSurveyWithQuestionsAndOptionsAsync(id);
+            if (survey == null)
+            {
+                return NotFound();
+            }
+
+            var memberId = HttpContext.Session.GetString("UserId");
+            if (string.IsNullOrEmpty(memberId) || !Guid.TryParse(memberId, out var parsedMemberId))
+            {
+                return Unauthorized();
+            }
+
+            var response = await _surveyService.StartSurveyAsync(id, parsedMemberId); // Replace Guid.NewGuid() with the actual member ID
+
+            var model = new SurveyDTO.TakeSurveyViewModel
+            {
+                Survey = survey,
+                ResponseId = response.ResponseId
+            };
+
+            return View(model);
+        }
+
+        // POST: Surveys/SubmitSurvey
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SubmitSurvey(SurveyDTO.SubmitAnswerModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+
+            // Retrieve MemberId from session
+            var memberIdString = HttpContext.Session.GetString("MemberId");
+            if (string.IsNullOrEmpty(memberIdString) || !Guid.TryParse(memberIdString, out var memberId))
+            {
+                return Unauthorized(); // Session expired or user not logged in
+            }
+
+            foreach (var answer in model.UserAnswers)
+            {
+                await _surveyService.SaveAnswerAsync(model.ResponseId, answer.Key, answer.Value);
+            }
+
+            var completedResponse = await _surveyService.CompleteSurveyAsync(model.ResponseId);
+
+            return RedirectToAction("SurveyResult", new { responseId = completedResponse.ResponseId });
+        }
+
+        // GET: Surveys/SurveyResult/{responseId}
+        public async Task<IActionResult> SurveyResult(Guid responseId)
+        {
+            var response = await _surveyService.GetSurveyResponseAsync(responseId);
+            if (response == null)
+            {
+                return NotFound();
+            }
+
+            var model = new SurveyDTO.SurveyResultViewModel
+            {
+                Response = response,
+                RiskLevelText = response.RiskLevel.ToString(),
+                RiskLevelColor = response.RiskLevel switch
+                {
+                    RiskLevel.Low => "green",
+                    RiskLevel.Moderate => "orange",
+                    RiskLevel.High => "red",
+                    RiskLevel.Severe => "darkred",
+                    _ => "gray"
+                },
+                //Actions = response.RecommendedActions
+            };
+
+            return View(model);
+        }
+
+        #endregion
     }
 }

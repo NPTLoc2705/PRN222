@@ -43,6 +43,9 @@ namespace mvc.dataaccess.ViewModels
 
             [Required]
             public Guid OptionId { get; set; }
+
+            [Required]
+            public Dictionary<Guid, Guid> UserAnswers { get; set; } = new Dictionary<Guid, Guid>();
         }
     }
 }

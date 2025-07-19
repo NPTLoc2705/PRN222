@@ -6,18 +6,11 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace mvc.dataaccess.Migrations
 {
     /// <inheritdoc />
-<<<<<<<< HEAD:mvc.dataaccess/Migrations/20250625052453_Init.cs
-    public partial class Init : Migration
-========
-    public partial class InialPRN : Migration
->>>>>>>> origin/main:mvc.dataaccess/Migrations/20250715050433_InialPRN.cs
+    public partial class Surveys : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-<<<<<<<< HEAD:mvc.dataaccess/Migrations/20250625052453_Init.cs
-           
-========
             migrationBuilder.CreateTable(
                 name: "Blogs",
                 columns: table => new
@@ -32,7 +25,6 @@ namespace mvc.dataaccess.Migrations
                 {
                     table.PrimaryKey("PK_Blogs", x => x.Id);
                 });
->>>>>>>> origin/main:mvc.dataaccess/Migrations/20250715050433_InialPRN.cs
 
             migrationBuilder.CreateTable(
                 name: "Bookings",
@@ -84,9 +76,22 @@ namespace mvc.dataaccess.Migrations
                     table.PrimaryKey("PK_Courses", x => x.CourseId);
                 });
 
-<<<<<<<< HEAD:mvc.dataaccess/Migrations/20250625052453_Init.cs
-           
-========
+            migrationBuilder.CreateTable(
+                name: "Surveys",
+                columns: table => new
+                {
+                    SurveyId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Title = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: false),
+                    Type = table.Column<int>(type: "int", nullable: false),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Surveys", x => x.SurveyId);
+                });
+
             migrationBuilder.CreateTable(
                 name: "Users",
                 columns: table => new
@@ -104,7 +109,6 @@ namespace mvc.dataaccess.Migrations
                 {
                     table.PrimaryKey("PK_Users", x => x.Id);
                 });
->>>>>>>> origin/main:mvc.dataaccess/Migrations/20250715050433_InialPRN.cs
 
             migrationBuilder.CreateTable(
                 name: "CourseCategoryMappings",
@@ -155,7 +159,79 @@ namespace mvc.dataaccess.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
-           
+            migrationBuilder.CreateTable(
+                name: "SurveyQuestions",
+                columns: table => new
+                {
+                    QuestionId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    SurveyId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    QuestionText = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
+                    OrderIndex = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SurveyQuestions", x => x.QuestionId);
+                    table.ForeignKey(
+                        name: "FK_SurveyQuestions_Surveys_SurveyId",
+                        column: x => x.SurveyId,
+                        principalTable: "Surveys",
+                        principalColumn: "SurveyId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Posts",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Content = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    StaffId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    IsPublished = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Posts", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Posts_Users_StaffId",
+                        column: x => x.StaffId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "SurveyResponses",
+                columns: table => new
+                {
+                    ResponseId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    SurveyId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    MemberId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    TotalScore = table.Column<int>(type: "int", nullable: false),
+                    RiskLevel = table.Column<int>(type: "int", nullable: false),
+                    IsCompleted = table.Column<bool>(type: "bit", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CompletedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SurveyResponses", x => x.ResponseId);
+                    table.ForeignKey(
+                        name: "FK_SurveyResponses_Surveys_SurveyId",
+                        column: x => x.SurveyId,
+                        principalTable: "Surveys",
+                        principalColumn: "SurveyId",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_SurveyResponses_Users_MemberId",
+                        column: x => x.MemberId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
             migrationBuilder.CreateTable(
                 name: "UserCourseProgresses",
                 columns: table => new
@@ -192,6 +268,84 @@ namespace mvc.dataaccess.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "QuestionOptions",
+                columns: table => new
+                {
+                    OptionId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    QuestionId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    OptionText = table.Column<string>(type: "nvarchar(300)", maxLength: 300, nullable: false),
+                    Score = table.Column<int>(type: "int", nullable: false),
+                    OrderIndex = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_QuestionOptions", x => x.OptionId);
+                    table.ForeignKey(
+                        name: "FK_QuestionOptions_SurveyQuestions_QuestionId",
+                        column: x => x.QuestionId,
+                        principalTable: "SurveyQuestions",
+                        principalColumn: "QuestionId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "RecommendedActions",
+                columns: table => new
+                {
+                    ActionId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ResponseId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Title = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: false),
+                    Type = table.Column<int>(type: "int", nullable: false),
+                    RequiredRiskLevel = table.Column<int>(type: "int", nullable: false),
+                    IsCompleted = table.Column<bool>(type: "bit", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_RecommendedActions", x => x.ActionId);
+                    table.ForeignKey(
+                        name: "FK_RecommendedActions_SurveyResponses_ResponseId",
+                        column: x => x.ResponseId,
+                        principalTable: "SurveyResponses",
+                        principalColumn: "ResponseId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "UserAnswers",
+                columns: table => new
+                {
+                    AnswerId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ResponseId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    QuestionId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    OptionId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Score = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserAnswers", x => x.AnswerId);
+                    table.ForeignKey(
+                        name: "FK_UserAnswers_QuestionOptions_OptionId",
+                        column: x => x.OptionId,
+                        principalTable: "QuestionOptions",
+                        principalColumn: "OptionId",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_UserAnswers_SurveyQuestions_QuestionId",
+                        column: x => x.QuestionId,
+                        principalTable: "SurveyQuestions",
+                        principalColumn: "QuestionId",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_UserAnswers_SurveyResponses_ResponseId",
+                        column: x => x.ResponseId,
+                        principalTable: "SurveyResponses",
+                        principalColumn: "ResponseId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_CourseCategoryMappings_CategoryId",
                 table: "CourseCategoryMappings",
@@ -202,7 +356,51 @@ namespace mvc.dataaccess.Migrations
                 table: "Lessons",
                 column: "CourseId");
 
-           
+            migrationBuilder.CreateIndex(
+                name: "IX_Posts_StaffId",
+                table: "Posts",
+                column: "StaffId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_QuestionOptions_QuestionId",
+                table: "QuestionOptions",
+                column: "QuestionId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_RecommendedActions_ResponseId",
+                table: "RecommendedActions",
+                column: "ResponseId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_SurveyQuestions_SurveyId",
+                table: "SurveyQuestions",
+                column: "SurveyId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_SurveyResponses_MemberId",
+                table: "SurveyResponses",
+                column: "MemberId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_SurveyResponses_SurveyId",
+                table: "SurveyResponses",
+                column: "SurveyId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserAnswers_OptionId",
+                table: "UserAnswers",
+                column: "OptionId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserAnswers_QuestionId",
+                table: "UserAnswers",
+                column: "QuestionId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserAnswers_ResponseId",
+                table: "UserAnswers",
+                column: "ResponseId");
+
             migrationBuilder.CreateIndex(
                 name: "IX_UserCourseProgresses_CourseId",
                 table: "UserCourseProgresses",
@@ -235,19 +433,37 @@ namespace mvc.dataaccess.Migrations
                 name: "Posts");
 
             migrationBuilder.DropTable(
+                name: "RecommendedActions");
+
+            migrationBuilder.DropTable(
+                name: "UserAnswers");
+
+            migrationBuilder.DropTable(
                 name: "UserCourseProgresses");
 
             migrationBuilder.DropTable(
                 name: "CourseCategories");
 
             migrationBuilder.DropTable(
+                name: "QuestionOptions");
+
+            migrationBuilder.DropTable(
+                name: "SurveyResponses");
+
+            migrationBuilder.DropTable(
                 name: "Lessons");
+
+            migrationBuilder.DropTable(
+                name: "SurveyQuestions");
 
             migrationBuilder.DropTable(
                 name: "Users");
 
             migrationBuilder.DropTable(
                 name: "Courses");
+
+            migrationBuilder.DropTable(
+                name: "Surveys");
         }
     }
 }

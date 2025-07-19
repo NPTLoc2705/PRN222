@@ -142,10 +142,18 @@ namespace mvc.repositories.Implements
 
         public async Task<SurveyResponse> StartSurveyAsync(Guid surveyId, Guid memberId)
         {
+            var userExists = await _context.Users.AnyAsync(u => u.Id == memberId);
+
+            if (!userExists)
+            {
+                throw new ArgumentException("User does not exist.");
+            }
+
             var response = new SurveyResponse
             {
                 SurveyId = surveyId,
-                MemberId = memberId
+                MemberId = memberId,
+                CreatedAt = DateTime.UtcNow,
             };
 
             _context.SurveyResponses.Add(response);
@@ -303,6 +311,15 @@ namespace mvc.repositories.Implements
             }
 
             _context.RecommendedActions.AddRange(actions);
+        }
+
+        public async Task<SurveyResponse> GetSurveyResponseAsync(Guid responseId)
+        {
+            return await _context.SurveyResponses
+                .Include(sr => sr.Answers)
+                .Include(sr => sr.Survey)
+                //.Include(sr => sr.RecommendedActions)
+                .FirstOrDefaultAsync(sr => sr.ResponseId == responseId);
         }
 
         #endregion

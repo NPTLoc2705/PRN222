@@ -6,18 +6,11 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace mvc.dataaccess.Migrations
 {
     /// <inheritdoc />
-<<<<<<<< HEAD:mvc.dataaccess/Migrations/20250625052453_Init.cs
-    public partial class Init : Migration
-========
     public partial class InialPRN : Migration
->>>>>>>> origin/main:mvc.dataaccess/Migrations/20250715050433_InialPRN.cs
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-<<<<<<<< HEAD:mvc.dataaccess/Migrations/20250625052453_Init.cs
-           
-========
             migrationBuilder.CreateTable(
                 name: "Blogs",
                 columns: table => new
@@ -32,7 +25,6 @@ namespace mvc.dataaccess.Migrations
                 {
                     table.PrimaryKey("PK_Blogs", x => x.Id);
                 });
->>>>>>>> origin/main:mvc.dataaccess/Migrations/20250715050433_InialPRN.cs
 
             migrationBuilder.CreateTable(
                 name: "Bookings",
@@ -84,9 +76,6 @@ namespace mvc.dataaccess.Migrations
                     table.PrimaryKey("PK_Courses", x => x.CourseId);
                 });
 
-<<<<<<<< HEAD:mvc.dataaccess/Migrations/20250625052453_Init.cs
-           
-========
             migrationBuilder.CreateTable(
                 name: "Users",
                 columns: table => new
@@ -104,7 +93,6 @@ namespace mvc.dataaccess.Migrations
                 {
                     table.PrimaryKey("PK_Users", x => x.Id);
                 });
->>>>>>>> origin/main:mvc.dataaccess/Migrations/20250715050433_InialPRN.cs
 
             migrationBuilder.CreateTable(
                 name: "CourseCategoryMappings",
@@ -155,7 +143,29 @@ namespace mvc.dataaccess.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
-           
+            migrationBuilder.CreateTable(
+                name: "Posts",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Content = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    StaffId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    IsPublished = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Posts", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Posts_Users_StaffId",
+                        column: x => x.StaffId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.CreateTable(
                 name: "UserCourseProgresses",
                 columns: table => new
@@ -202,7 +212,11 @@ namespace mvc.dataaccess.Migrations
                 table: "Lessons",
                 column: "CourseId");
 
-           
+            migrationBuilder.CreateIndex(
+                name: "IX_Posts_StaffId",
+                table: "Posts",
+                column: "StaffId");
+
             migrationBuilder.CreateIndex(
                 name: "IX_UserCourseProgresses_CourseId",
                 table: "UserCourseProgresses",
