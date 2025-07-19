@@ -6,11 +6,26 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace mvc.dataaccess.Migrations
 {
     /// <inheritdoc />
-    public partial class blogyy : Migration
+    public partial class rolestring : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.CreateTable(
+                name: "Blogs",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    blog_content = table.Column<string>(type: "nvarchar(MAX)", nullable: false),
+                    ImageData = table.Column<byte[]>(type: "varbinary(max)", nullable: false),
+                    title = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Blogs", x => x.Id);
+                });
+
             migrationBuilder.CreateTable(
                 name: "Bookings",
                 columns: table => new
@@ -18,10 +33,11 @@ namespace mvc.dataaccess.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     BookingDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CustomerId = table.Column<int>(type: "int", nullable: false),
-                    ConsultantId = table.Column<int>(type: "int", nullable: false),
+                    CustomerId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ConsultantId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     StartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Status = table.Column<int>(type: "int", nullable: false)
+                    Status = table.Column<int>(type: "int", nullable: false),
+                    Phone = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -33,8 +49,7 @@ namespace mvc.dataaccess.Migrations
                 columns: table => new
                 {
                     CategoryId = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "NEWID()"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -66,13 +81,13 @@ namespace mvc.dataaccess.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "NEWID()"),
-                    FullName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Role = table.Column<int>(type: "int", nullable: false),
-                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Address = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Password = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false)
+                    FullName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Role = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
+                    PhoneNumber = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
+                    Address = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
+                    Password = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false, defaultValue: true)
                 },
                 constraints: table =>
                 {
@@ -104,69 +119,27 @@ namespace mvc.dataaccess.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "CoursePrerequisites",
+                name: "Lessons",
                 columns: table => new
                 {
+                    LessonId = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "NEWID()"),
                     CourseId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    PrerequisiteCourseId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_CoursePrerequisites", x => new { x.CourseId, x.PrerequisiteCourseId });
-                    table.ForeignKey(
-                        name: "FK_CoursePrerequisites_Courses_CourseId",
-                        column: x => x.CourseId,
-                        principalTable: "Courses",
-                        principalColumn: "CourseId",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_CoursePrerequisites_Courses_PrerequisiteCourseId",
-                        column: x => x.PrerequisiteCourseId,
-                        principalTable: "Courses",
-                        principalColumn: "CourseId",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Modules",
-                columns: table => new
-                {
-                    ModuleId = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "NEWID()"),
-                    CourseId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Title = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    ContentType = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    ContentUrl = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
+                    Duration = table.Column<int>(type: "int", nullable: false),
                     OrderNumber = table.Column<int>(type: "int", nullable: false),
+                    IsFreePreview = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Modules", x => x.ModuleId);
+                    table.PrimaryKey("PK_Lessons", x => x.LessonId);
                     table.ForeignKey(
-                        name: "FK_Modules_Courses_CourseId",
+                        name: "FK_Lessons_Courses_CourseId",
                         column: x => x.CourseId,
                         principalTable: "Courses",
                         principalColumn: "CourseId",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Blogs",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    blog_content = table.Column<string>(type: "nvarchar(MAX)", nullable: false),
-                    ImageData = table.Column<byte[]>(type: "varbinary(max)", nullable: false),
-                    title = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Blogs", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Blogs_Users_UserId",
-                        column: x => x.UserId,
-                        principalTable: "Users",
-                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -194,31 +167,6 @@ namespace mvc.dataaccess.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Lessons",
-                columns: table => new
-                {
-                    LessonId = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "NEWID()"),
-                    ModuleId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ContentType = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ContentUrl = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Duration = table.Column<int>(type: "int", nullable: false),
-                    OrderNumber = table.Column<int>(type: "int", nullable: false),
-                    IsFreePreview = table.Column<bool>(type: "bit", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Lessons", x => x.LessonId);
-                    table.ForeignKey(
-                        name: "FK_Lessons_Modules_ModuleId",
-                        column: x => x.ModuleId,
-                        principalTable: "Modules",
-                        principalColumn: "ModuleId",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "UserCourseProgresses",
                 columns: table => new
                 {
@@ -226,10 +174,10 @@ namespace mvc.dataaccess.Migrations
                     UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     CourseId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     LessonId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    IsCompleted = table.Column<bool>(type: "bit", nullable: false),
+                    IsCompleted = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
                     CompletedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
                     LastAccessed = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ProgressPercentage = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
+                    ProgressPercentage = table.Column<decimal>(type: "decimal(5,2)", nullable: false, defaultValue: 0.00m)
                 },
                 constraints: table =>
                 {
@@ -255,28 +203,13 @@ namespace mvc.dataaccess.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Blogs_UserId",
-                table: "Blogs",
-                column: "UserId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_CourseCategoryMappings_CategoryId",
                 table: "CourseCategoryMappings",
                 column: "CategoryId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_CoursePrerequisites_PrerequisiteCourseId",
-                table: "CoursePrerequisites",
-                column: "PrerequisiteCourseId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Lessons_ModuleId",
+                name: "IX_Lessons_CourseId",
                 table: "Lessons",
-                column: "ModuleId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Modules_CourseId",
-                table: "Modules",
                 column: "CourseId");
 
             migrationBuilder.CreateIndex(
@@ -295,9 +228,9 @@ namespace mvc.dataaccess.Migrations
                 column: "LessonId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_UserCourseProgresses_UserId",
+                name: "IX_UserCourseProgresses_UserId_CourseId",
                 table: "UserCourseProgresses",
-                column: "UserId");
+                columns: new[] { "UserId", "CourseId" });
         }
 
         /// <inheritdoc />
@@ -313,9 +246,6 @@ namespace mvc.dataaccess.Migrations
                 name: "CourseCategoryMappings");
 
             migrationBuilder.DropTable(
-                name: "CoursePrerequisites");
-
-            migrationBuilder.DropTable(
                 name: "Posts");
 
             migrationBuilder.DropTable(
@@ -329,9 +259,6 @@ namespace mvc.dataaccess.Migrations
 
             migrationBuilder.DropTable(
                 name: "Users");
-
-            migrationBuilder.DropTable(
-                name: "Modules");
 
             migrationBuilder.DropTable(
                 name: "Courses");

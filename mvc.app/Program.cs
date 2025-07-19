@@ -2,18 +2,19 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration.Json;
 using Microsoft.IdentityModel.Tokens;
-using mvc.dataaccess.Entities;
 using mvc.repositories.Implements;
 using mvc.repositories.Interfaces;
+using mvc.repositories.Implements;
+using mvc.dataaccess.Entities;
 using mvc.repositories.Interfaces.ICourse;
 using mvc.repositories.Implements.CourseRepo;
 using Scalar.AspNetCore;
-using mvc.services.Implementations;
 using mvc.services.Implements;
 using mvc.services.Infrastructure;
 using mvc.services.Interfaces;
 using System.Data;
 using System.Text;
+using Microsoft.AspNetCore.Http.Features;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
@@ -21,26 +22,24 @@ builder.Services.AddSwaggerGen();
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
-builder.Logging.ClearProviders();
-builder.Logging.AddConsole();
-// builder.Logging.AddEventLog(); // Comment out if present
-
 //Injection Repo
 builder.Services.AddScoped<TokenProvider>();
-builder.Services.AddScoped<ISurveyRepository, SurveyRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<ICourseRepository, CourseRepository>();
-builder.Services.AddScoped<IModuleRepository, ModuleRepository>();
+builder.Services.AddScoped<ILessonRepository, LessonRepository>();
+builder.Services.AddScoped<IProgressRepo, ProgressRepo>();
 builder.Services.AddScoped<IBookingRepo, BookingRepo>();
 builder.Services.AddScoped<IBlogRepo, BlogRepo>();
+builder.Services.AddScoped<ICategoryRepo, CategoryRepo>();
 //Injection Service
-builder.Services.AddScoped<ISurveyService, SurveyService>();
 builder.Services.AddScoped<IBookingService, BookingService>();
-builder.Services.AddScoped<IModuleService, ModuleService>();
+builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<ICourseService, CourseService>();
-builder.Services.AddScoped<ILessonRepository, LessonRepository>();
+builder.Services.AddScoped<ILessonService, LessonService>();
+builder.Services.AddScoped<IProgressService, ProgressService>();
 builder.Services.AddScoped<IBlogService, BlogService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddSession(options =>
 {
     options.IdleTimeout = TimeSpan.FromMinutes(20); // Set session timeout
@@ -73,6 +72,16 @@ builder.Services.AddDbContext<AppDbContext>(
     options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnectionDB"))
 );
 
+//Increase the request size
+builder.Services.Configure<IISServerOptions>(options =>
+{
+    options.MaxRequestBodySize = 1073741824; // 1GB
+});
+
+builder.Services.Configure<FormOptions>(options =>
+{
+    options.MultipartBodyLengthLimit = 1073741824; // 1GB
+});
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -90,7 +99,7 @@ app.UseSwaggerUI();
 app.MapControllerRoute(
        name: "default",
        pattern: "{controller=Home}/{action=Index}/{id?}"
-   );
+   ).WithStaticAssets();
 
 app.UseHttpsRedirection();
 app.UseRouting();
@@ -102,9 +111,6 @@ app.UseAuthorization();
 
 app.MapStaticAssets();
 
-app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}")
-    .WithStaticAssets();
 
+  
 app.Run();

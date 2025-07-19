@@ -53,7 +53,7 @@ namespace mvc.services.Implements
             var user = _userRepository.GetUserByEmail(email);
             if (user == null)
             {
-                throw new Exception("User not found.");
+                return null;
             }
 
             if (password.Equals(user.Password))

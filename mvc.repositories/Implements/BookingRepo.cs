@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using mvc.dataaccess.Entities;
+using mvc.dataaccess.ViewModels;
 using mvc.repositories.Interfaces;
 
 namespace mvc.repositories.Implements
@@ -27,14 +27,6 @@ namespace mvc.repositories.Implements
         public async Task DeleteBookingsAsync(int id)
         {
             var book = await _context.Bookings.FirstOrDefaultAsync(b => b.Id == id);
-            // Ensure that each BookingRepo instance is used for a single operation at a time.
-            // DbContext is not thread-safe. Do not share BookingRepo (and thus DbContext) across threads or requests.
-            // If using dependency injection, use AddScoped<AppDbContext>() and AddScoped<BookingRepo>() in your DI setup.
-            // Example (in Program.cs or Startup.cs):
-            // services.AddDbContext<AppDbContext>(options => ...);
-            // services.AddScoped<IBookingRepo, BookingRepo>();
-
-            // No code changes are needed in BookingRepo itself, but ensure you do not use the same BookingRepo instance concurrently.
             if (book != null)
             {
                 _context.Remove(book);
@@ -47,15 +39,97 @@ namespace mvc.repositories.Implements
             return await _context.Bookings.ToListAsync();
         }
 
+        public async Task<List<BookingViewModel>> GetAllBookingsWithNamesAsync()
+        {
+            var query = from booking in _context.Bookings
+                        join customer in _context.Users on booking.CustomerId equals customer.Id into customerGroup
+                        from customer in customerGroup.DefaultIfEmpty()
+                        join consultant in _context.Users on booking.ConsultantId equals consultant.Id into consultantGroup
+                        from consultant in consultantGroup.DefaultIfEmpty()
+                        select new BookingViewModel
+                        {
+                            Id = booking.Id,
+                            BookingDate = booking.BookingDate,
+                            CustomerId = booking.CustomerId,
+                            CustomerName = customer != null ? customer.FullName : "Unknown",
+                            ConsultantId = booking.ConsultantId,
+                            ConsultantName = consultant != null ? consultant.FullName : "Unknown",
+                            StartDate = booking.StartDate,
+                            Status = booking.Status,
+                            Phone = booking.Phone
+                        };
+
+            var result = await query.ToListAsync();
+            System.Diagnostics.Debug.WriteLine($"Retrieved {result.Count} bookings with names.");
+            return result;
+        }
+
+        public async Task<Booking?> GetBookingByCustomerIdAsync(Guid id)
+        {
+            return await _context.Bookings.FirstOrDefaultAsync(c => c.CustomerId.Equals(id));
+        }
+
         public async Task<Booking?> GetBookingByIdAsync(int id)
         {
             return await _context.Bookings.FirstOrDefaultAsync(b => b.Id == id);
+        }
+
+        public async Task<List<UserBookingRequest>> GetBookingsByCustomer()
+        {
+            var bookings = await _context.Bookings.ToListAsync();
+
+            var userBookingRequests = (from booking in bookings
+                                       join user in _context.Users on booking.CustomerId equals user.Id
+                                       select new UserBookingRequest
+                                       {
+                                           customerId = user.Id,
+                                           UserName = user.FullName,
+                                           Email = user.Email,
+                                           PhoneNumber = user.PhoneNumber,
+                                           BookingDate = booking.StartDate,
+                                           Status = booking.Status
+                                       }).ToList();
+
+            return userBookingRequests;
         }
 
         public async Task UpdateBookingAsync(Booking booking)
         {
             _context.Update(booking);
             await _context.SaveChangesAsync();
+        }
+
+        public async Task<List<User>> GetConsultantsAsync()
+        {
+            return await _context.Users
+                .Where(u => u.Role == SystemRole.Consultant && u.IsActive)
+                .ToListAsync();
+        }
+
+        public async Task<User?> GetConsultantWithFewestBookingsAsync()
+        {
+            var activeStatuses = new[] { BookStatus.Pending, BookStatus.Confirmed, BookStatus.Ongoing };
+            var consultant = await _context.Users
+                .Where(u => u.Role == SystemRole.Consultant && u.IsActive)
+                .GroupJoin(_context.Bookings
+                    .Where(b => activeStatuses.Contains(b.Status)),
+                    u => u.Id,
+                    b => b.ConsultantId,
+                    (u, b) => new { User = u, BookingCount = b.Count() })
+                .OrderBy(x => x.BookingCount)
+                .Select(x => x.User)
+                .FirstOrDefaultAsync();
+
+            if (consultant == null)
+            {
+                System.Diagnostics.Debug.WriteLine("No active consultants found.");
+            }
+            else
+            {
+                System.Diagnostics.Debug.WriteLine($"Selected consultant: {consultant.FullName} with ID: {consultant.Id}");
+            }
+
+            return consultant;
         }
     }
 }

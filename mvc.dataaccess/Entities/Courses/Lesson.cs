@@ -9,7 +9,7 @@ namespace mvc.dataaccess.Entities.Courses
     public class Lesson
     {
         public Guid LessonId { get; set; } = Guid.NewGuid();
-        public Guid ModuleId { get; set; }
+        public Guid CourseId { get; set; }
         public string Title { get; set; }
         public string ContentType { get; set; } // Video, Article, Quiz, etc.
         public string ContentUrl { get; set; }
@@ -19,7 +19,7 @@ namespace mvc.dataaccess.Entities.Courses
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         // Navigation properties
-        public Module Module { get; set; }
+        public Course Course { get; set; }
         public ICollection<UserCourseProgress> UserProgresses { get; set; }
     }
 }

@@ -1,52 +1,328 @@
 ﻿@model IEnumerable<mvc.dataaccess.ViewModels.LessonDTO>
 @{
-    ViewData["Title"] = "Lessons";
+    ViewData["Title"] = "Course Lessons";
     var courseId = ViewBag.CourseId;
-    var module = ViewBag.Module;
+    var courseTitle = ViewBag.CourseTitle;
+    var userId = Context.Session.GetString("UserId");
+    var isLoggedIn = !string.IsNullOrEmpty(userId);
+    var isUserEnrolled = ViewBag.IsUserEnrolled ?? false;
+    var isAdmin = Context.Session.GetString("UserRole") == "Admin";
 }
 
-<h1>Lessons in @module.Title</h1>
+<style>
+    :root {
+        --primary-color: #28a745;
+        --primary-light: #5cb85c;
+        --primary-dark: #218838;
+        --secondary-color: #6c757d;
+        --light-color: #f8f9fa;
+        --dark-color: #343a40;
+        --success-color: #28a745;
+        --info-color: #17a2b8;
+        --warning-color: #ffc107;
+        --danger-color: #dc3545;
+    }
 
-<p>
-    <a asp-action="Create" asp-route-courseId="@courseId" asp-route-moduleId="@module.ModuleId" class="btn btn-primary">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>Title</th>
-            <th>Type</th>
-            <th>Duration</th>
-            <th>Preview</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model.OrderBy(l => l.OrderNumber))
-        {
-            <tr>
-                <td>@Html.DisplayFor(modelItem => item.Title)</td>
-                <td>@Html.DisplayFor(modelItem => item.ContentType)</td>
-                <td>@item.Duration minutes</td>
-                <td>@(item.IsFreePreview ? "Yes" : "No")</td>
-                <td>
-                    <a asp-action="Edit"
-                       asp-route-courseId="@courseId"
-                       asp-route-moduleId="@module.ModuleId"
-                       asp-route-lessonId="@item.LessonId">Edit</a> |
-                    <a asp-action="Details"
-                       asp-route-courseId="@courseId"
-                       asp-route-moduleId="@module.ModuleId"
-                       asp-route-lessonId="@item.LessonId">Details</a> |
-                    <a asp-action="Delete"
-                       asp-route-courseId="@courseId"
-                       asp-route-moduleId="@module.ModuleId"
-                       asp-route-lessonId="@item.LessonId">Delete</a>
-                </td>
-            </tr>
+    body {
+        background-color: #f5f9f5;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .card {
+        border: none;
+        border-radius: 10px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        overflow: hidden;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        background-color: white;
+    }
+
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
         }
-    </tbody>
-</table>
 
-<div>
-    <a asp-controller="Modules" asp-action="Details" asp-route-courseId="@courseId" asp-route-moduleId="@module.ModuleId">Back to Module</a>
+    .card-header {
+        background-color: var(--primary-color);
+        color: white;
+        border-bottom: none;
+        padding: 1.25rem 1.5rem;
+    }
+
+    .list-group-item {
+        border: 1px solid rgba(0, 0, 0, 0.05);
+        margin-bottom: 0.75rem;
+        border-radius: 8px !important;
+        transition: all 0.3s ease;
+        padding: 1.25rem;
+    }
+
+        .list-group-item:hover {
+            background-color: #f8fff8;
+            transform: translateX(5px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .list-group-item.bg-light {
+            background-color: #f1f8f1 !important;
+        }
+
+    .btn-primary {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+        font-weight: 500;
+    }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            border-color: var(--primary-dark);
+        }
+
+    .btn-outline-primary {
+        color: var(--primary-color);
+        border-color: var(--primary-color);
+    }
+
+        .btn-outline-primary:hover {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+    .alert-info {
+        background-color: #e8f5e9;
+        border-color: #c8e6c9;
+        color: #2e7d32;
+    }
+
+    .alert-warning {
+        background-color: #fff8e1;
+        border-color: #ffecb3;
+        color: #ff8f00;
+    }
+
+    .badge {
+        font-weight: 500;
+        padding: 0.35em 0.65em;
+        border-radius: 50px;
+    }
+
+        .badge.bg-secondary {
+            background-color: var(--secondary-color) !important;
+        }
+
+        .badge.bg-success {
+            background-color: var(--success-color) !important;
+        }
+
+        .badge.bg-warning {
+            background-color: var(--warning-color) !important;
+            color: var(--dark-color);
+        }
+
+    h1, h2, h3, h4, h5, h6 {
+        color: var(--dark-color);
+        font-weight: 600;
+    }
+
+    .text-muted {
+        color: #6c757d !important;
+    }
+
+    .btn-group .btn {
+        border-radius: 5px !important;
+    }
+</style>
+
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="h3 mb-1 text-dark"><i class="fas fa-book-open mr-2"></i> Course Lessons</h1>
+                    <p class="text-muted mb-0"><i class="fas fa-graduation-cap mr-2"></i>@courseTitle</p>
+                </div>
+                @if (isLoggedIn)
+                {
+                    <div class="text-muted">
+                        <i class="fas fa-user-circle mr-1"></i> @Context.Session.GetString("Username")
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    @if (!isUserEnrolled && !isAdmin && isLoggedIn)
+    {
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="alert alert-info">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <i class="fas fa-info-circle mr-2"></i>
+                            <strong>Enroll to access all lessons</strong> - Only preview lessons are available without enrollment.
+                        </div>
+                        <form asp-controller="Courses" asp-action="Enroll" method="post">
+                            <input type="hidden" name="courseId" value="@courseId" />
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn btn-primary px-4">
+                                <i class="fas fa-user-plus mr-2"></i> Enroll Now
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    else if (!isLoggedIn)
+    {
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-circle mr-2"></i>
+                    <strong>Please <a asp-controller="Auth" asp-action="Login" class="alert-link">login</a> to access lessons</strong>
+                </div>
+            </div>
+        </div>
+    }
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0 text-white">
+                        <i class="fas fa-play-circle mr-2"></i> Lessons (@Model.Count())
+                    </h5>
+                    @if (isAdmin)
+                    {
+                        <a asp-action="Create"
+                           asp-route-courseId="@courseId"
+                           class="btn btn-light">
+                            <i class="fas fa-plus mr-2"></i> Create New Lesson
+                        </a>
+                    }
+                </div>
+                <div class="card-body p-0">
+                    @if (Model.Any())
+                    {
+                        <div class="list-group list-group-flush">
+                            @foreach (var item in Model.OrderBy(l => l.OrderNumber))
+                            {
+                                var canAccess = isUserEnrolled || item.IsFreePreview || isAdmin;
+
+                                <div class="list-group-item @(canAccess ? "" : "bg-light")">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div class="flex-grow-1">
+                                            <div class="d-flex align-items-center mb-2">
+                                                <span class="badge bg-secondary me-3">@item.OrderNumber</span>
+
+                                                @if (canAccess)
+                                                {
+                                                    <h6 class="mb-0">
+                                                        <a asp-action="Details"
+                                                           asp-route-courseId="@courseId"
+                                                           asp-route-lessonId="@item.LessonId"
+                                                           class="text-decoration-none text-dark">
+                                                            @item.Title
+                                                        </a>
+                                                    </h6>
+                                                }
+                                                else
+                                                {
+                                                    <h6 class="mb-0 text-muted">
+                                                        <i class="fas fa-lock me-2"></i>
+                                                        @item.Title
+                                                    </h6>
+                                                }
+
+                                                @if (item.IsFreePreview)
+                                                {
+                                                    <span class="badge bg-success ms-3">
+                                                        <i class="fas fa-eye mr-1"></i> Free Preview
+                                                    </span>
+                                                }
+                                                else if (!canAccess)
+                                                {
+                                                    <span class="badge bg-warning ms-3">
+                                                        <i class="fas fa-lock mr-1"></i> Premium
+                                                    </span>
+                                                }
+                                            </div>
+
+                                            <div class="d-flex align-items-center text-muted ps-5">
+                                                <small class="me-4">
+                                                    <i class="fas fa-play-circle mr-1"></i> @item.ContentType
+                                                </small>
+                                                <small>
+                                                    <i class="fas fa-clock mr-1"></i> @item.Duration min
+                                                </small>
+                                            </div>
+                                        </div>
+
+                                        <div class="d-flex align-items-center">
+                                            @if (canAccess)
+                                            {
+                                                <a asp-action="Details"
+                                                   asp-route-courseId="@courseId"
+                                                   asp-route-lessonId="@item.LessonId"
+                                                   class="btn btn-outline-primary btn-sm me-2 px-3">
+                                                    <i class="fas fa-play mr-1"></i> Watch
+                                                </a>
+                                            }
+
+                                            @if (isAdmin)
+                                            {
+                                                <div class="btn-group btn-group-sm">
+                                                    <a asp-action="Edit"
+                                                       asp-route-courseId="@courseId"
+                                                       asp-route-lessonId="@item.LessonId"
+                                                       class="btn btn-outline-warning px-3"
+                                                       title="Edit">
+                                                        <i class="fas fa-edit"></i>
+                                                    </a>
+                                                    <a asp-action="Delete"
+                                                       asp-route-courseId="@courseId"
+                                                       asp-route-lessonId="@item.LessonId"
+                                                       class="btn btn-outline-danger px-3"
+                                                       title="Delete">
+                                                        <i class="fas fa-trash"></i>
+                                                    </a>
+                                                </div>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-info text-center py-4">
+                            <i class="fas fa-info-circle fa-3x mb-3" style="color: var(--primary-color);"></i>
+                            <h4 class="mb-3">No lessons found</h4>
+                            <p class="mb-4">This course doesn't have any lessons yet.</p>
+                            @if (isAdmin)
+                            {
+                                <a asp-action="Create"
+                                   asp-route-courseId="@courseId"
+                                   class="btn btn-primary px-4">
+                                    <i class="fas fa-plus mr-2"></i> Create First Lesson
+                                </a>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-12">
+            <a asp-action="Details"
+               asp-controller="Courses"
+               asp-route-id="@courseId"
+               class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left mr-2"></i> Back to Course Details
+            </a>
+        </div>
+    </div>
 </div>

@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using mvc.dataaccess.Entities.Courses;
 using mvc.dataaccess.Entities.Surveys;
@@ -17,11 +17,9 @@ namespace mvc.dataaccess.Entities
         public DbSet<Post> Posts { get; set; }
         public DbSet<Blog> Blogs { get; set; }
         public DbSet<Course> Courses { get; set; }
-        public DbSet<Module> Modules { get; set; }
         public DbSet<Lesson> Lessons { get; set; }
         public DbSet<CourseCategory> CourseCategories { get; set; }
         public DbSet<CourseCategoryMapping> CourseCategoryMappings { get; set; }
-        public DbSet<CoursePrerequisite> CoursePrerequisites { get; set; }
         public DbSet<UserCourseProgress> UserCourseProgresses { get; set; }
         public DbSet<Booking> Bookings { get; set; }
 
@@ -35,20 +33,45 @@ namespace mvc.dataaccess.Entities
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // Configure table names
-            modelBuilder.Entity<User>().ToTable("Users");
-            modelBuilder.Entity<Post>().ToTable("Posts");
-            modelBuilder.Entity<Blog>().ToTable("Blogs");
-            modelBuilder.Entity<Course>().ToTable("Courses");
-            modelBuilder.Entity<Module>().ToTable("Modules");
-            modelBuilder.Entity<Lesson>().ToTable("Lessons");
-            modelBuilder.Entity<CourseCategory>().ToTable("CourseCategories");
-            modelBuilder.Entity<Booking>().ToTable("Bookings");
+            // Configure User entity
+            modelBuilder.Entity<User>(entity =>
+            {
+                entity.ToTable("Users");
+                entity.HasKey(u => u.Id);
 
-            // Configure primary keys
-            modelBuilder.Entity<User>().HasKey(u => u.Id);
+                entity.Property(u => u.FullName)
+                    .IsRequired()
+                    .HasMaxLength(100);
+
+                entity.Property(u => u.Email)
+                    .IsRequired()
+                    .HasMaxLength(256);
+
+                entity.Property(u => u.Password)
+                    .IsRequired()
+                    .HasMaxLength(256);
+
+                entity.Property(u => u.PhoneNumber)
+                    .HasMaxLength(20);
+
+                entity.Property(u => u.Address)
+                    .HasMaxLength(500);
+
+                entity.Property(u => u.Role)
+                    .HasConversion<string>()
+                    .HasMaxLength(20);
+
+                entity.Property(u => u.IsActive)
+                    .HasDefaultValue(true);
+
+                entity.Property(u => u.Id)
+                    .HasDefaultValueSql("NEWID()");
+            });
+
+            // Configure Course entity
             modelBuilder.Entity<Course>(entity =>
             {
+                entity.ToTable("Courses");
                 entity.HasKey(e => e.CourseId);
 
                 entity.Property(e => e.Title)
@@ -66,7 +89,6 @@ namespace mvc.dataaccess.Entities
                 entity.Property(e => e.Duration)
                     .IsRequired();
 
-                // Image properties are optional
                 entity.Property(e => e.ImageBytes)
                     .IsRequired(false);
 
@@ -83,62 +105,124 @@ namespace mvc.dataaccess.Entities
                 entity.Property(e => e.IsActive)
                     .IsRequired()
                     .HasDefaultValue(true);
+
+                entity.Property(e => e.CourseId)
+                    .HasDefaultValueSql("NEWID()");
+
             });
-            modelBuilder.Entity<Module>().HasKey(m => m.ModuleId);
-            modelBuilder.Entity<Lesson>().HasKey(l => l.LessonId);
-            modelBuilder.Entity<CourseCategory>().HasKey(cc => cc.CategoryId);
-            modelBuilder.Entity<UserCourseProgress>().HasKey(ucp => ucp.ProgressId);
 
-            // Configure many-to-many relationships
-            modelBuilder.Entity<CourseCategoryMapping>()
-                .HasKey(cc => new { cc.CourseId, cc.CategoryId });
+            // Configure Lesson entity
+            modelBuilder.Entity<Lesson>(entity =>
+            {
+                entity.ToTable("Lessons");
+                entity.HasKey(l => l.LessonId);
 
-            modelBuilder.Entity<CoursePrerequisite>()
-                .HasKey(cp => new { cp.CourseId, cp.PrerequisiteCourseId });
+                entity.Property(l => l.Title)
+                    .IsRequired()
+                    .HasMaxLength(200);
 
-            // Configure relationships with proper delete behavior
-            modelBuilder.Entity<Module>()
-                .HasOne(m => m.Course)
-                .WithMany(c => c.Modules)
-                .HasForeignKey(m => m.CourseId)
-                .OnDelete(DeleteBehavior.Cascade);
+                entity.Property(l => l.ContentType)
+                    .HasMaxLength(100);
 
-            modelBuilder.Entity<Lesson>()
-                .HasOne(l => l.Module)
-                .WithMany(m => m.Lessons)
-                .HasForeignKey(l => l.ModuleId)
-                .OnDelete(DeleteBehavior.Cascade);
+                entity.Property(l => l.ContentUrl)
+                    .HasMaxLength(500);
 
-            modelBuilder.Entity<CoursePrerequisite>()
-                .HasOne(cp => cp.Course)
-                .WithMany(c => c.Prerequisites)
-                .HasForeignKey(cp => cp.CourseId)
-                .OnDelete(DeleteBehavior.Restrict);
+                entity.Property(l => l.Duration)
+                    .IsRequired();
 
-            modelBuilder.Entity<CoursePrerequisite>()
-                .HasOne(cp => cp.PrerequisiteCourse)
-                .WithMany(c => c.RequiredForCourses)
-                .HasForeignKey(cp => cp.PrerequisiteCourseId)
-                .OnDelete(DeleteBehavior.Restrict);
+                entity.Property(l => l.OrderNumber)
+                    .IsRequired();
 
-            // Configure UserCourseProgress relationships
-            modelBuilder.Entity<UserCourseProgress>()
-                .HasOne(ucp => ucp.User)
-                .WithMany(u => u.CourseProgresses)
-                .HasForeignKey(ucp => ucp.UserId)
-                .OnDelete(DeleteBehavior.Cascade);
+                entity.Property(l => l.IsFreePreview)
+                    .HasDefaultValue(false);
 
-            modelBuilder.Entity<UserCourseProgress>()
-                .HasOne(ucp => ucp.Course)
-                .WithMany(c => c.UserProgresses)
-                .HasForeignKey(ucp => ucp.CourseId)
-                .OnDelete(DeleteBehavior.Restrict);
+                entity.Property(l => l.CreatedAt)
+                    .IsRequired();
 
-            modelBuilder.Entity<UserCourseProgress>()
-                .HasOne(ucp => ucp.Lesson)
-                .WithMany(l => l.UserProgresses)
-                .HasForeignKey(ucp => ucp.LessonId)
-                .OnDelete(DeleteBehavior.Restrict);
+                entity.Property(l => l.LessonId)
+                    .HasDefaultValueSql("NEWID()");
+
+                entity.HasOne(l => l.Course)
+                    .WithMany(c => c.Lessons)
+                    .HasForeignKey(l => l.CourseId)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            // Configure CourseCategory entity
+            modelBuilder.Entity<CourseCategory>(entity =>
+            {
+                entity.ToTable("CourseCategories");
+                entity.HasKey(cc => cc.CategoryId);
+
+                entity.Property(cc => cc.Name)
+                    .IsRequired()
+                    .HasMaxLength(100);
+
+               
+
+                entity.Property(cc => cc.CategoryId)
+                    .HasDefaultValueSql("NEWID()");
+            });
+
+            // Configure CourseCategoryMapping entity
+            modelBuilder.Entity<CourseCategoryMapping>(entity =>
+            {
+                entity.ToTable("CourseCategoryMappings");
+                entity.HasKey(cc => new { cc.CourseId, cc.CategoryId });
+
+                entity.HasOne(cc => cc.Course)
+                    .WithMany(c => c.CategoryMappings)
+                    .HasForeignKey(cc => cc.CourseId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(cc => cc.Category)
+                    .WithMany(c => c.CourseMappings)
+                    .HasForeignKey(cc => cc.CategoryId)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            // Configure UserCourseProgress entity
+            modelBuilder.Entity<UserCourseProgress>(entity =>
+            {
+                entity.ToTable("UserCourseProgresses");
+                entity.HasKey(ucp => ucp.ProgressId);
+
+                entity.Property(ucp => ucp.IsCompleted)
+                    .HasDefaultValue(false);
+
+                entity.Property(ucp => ucp.ProgressPercentage)
+                    .HasColumnType("decimal(5,2)")
+                    .HasDefaultValue(0.00m);
+
+                entity.Property(ucp => ucp.LastAccessed)
+                    .IsRequired();
+
+                entity.Property(ucp => ucp.CompletedAt)
+                    .IsRequired(false);
+
+                entity.Property(ucp => ucp.ProgressId)
+                    .HasDefaultValueSql("NEWID()");
+
+                entity.HasOne(ucp => ucp.User)
+                    .WithMany(u => u.CourseProgresses)
+                    .HasForeignKey(ucp => ucp.UserId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(ucp => ucp.Course)
+                    .WithMany(c => c.UserProgresses)
+                    .HasForeignKey(ucp => ucp.CourseId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(ucp => ucp.Lesson)
+                    .WithMany(l => l.UserProgresses)
+                    .HasForeignKey(ucp => ucp.LessonId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasIndex(u => new { u.UserId, u.CourseId });
+                entity.HasIndex(u => u.LessonId);
+            });
+
+            // Configure other entities (Blog, Post, Booking) similarly...
 
             // Survey Table Configurations
             modelBuilder.Entity<Survey>().ToTable("Surveys");
@@ -283,10 +367,8 @@ namespace mvc.dataaccess.Entities
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            // Only configure if not already configured (this helps with DI scenarios)
             if (!optionsBuilder.IsConfigured)
             {
-                // Get the configuration from appsettings.json
                 var configuration = new ConfigurationBuilder()
                     .SetBasePath(Directory.GetCurrentDirectory())
                     .AddJsonFile("appsettings.json")
@@ -302,18 +384,5 @@ namespace mvc.dataaccess.Entities
                 optionsBuilder.UseSqlServer(connectionString);
             }
         }
-    
-        //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        //{
-        //    optionsBuilder.UseSqlServer(GetConnectionString());
-        //}
-
-        //private string GetConnectionString()
-        //{
-        //    IConfiguration configuration = new ConfigurationBuilder()
-        //            .SetBasePath(Directory.GetCurrentDirectory())
-        //            .AddJsonFile("appsettings.json", true, true).Build();
-        //    return configuration["ConnectionStrings:DefaultConnectionDB"];
-        //}
     }
 }

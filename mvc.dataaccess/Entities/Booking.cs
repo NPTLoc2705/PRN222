@@ -12,10 +12,7 @@ public class Booking
     public DateTime StartDate { get; set; }
 
     public BookStatus Status { get; set; }
-
-    // Navigation properties (optional based on your ORM setup)
-    // public Customer Customer { get; set; }
-    // public Consultant Consultant { get; set; }
+    public string Phone {  get; set; }
 }
 
 public enum BookStatus

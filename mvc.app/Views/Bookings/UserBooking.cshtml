@@ -1,28 +1,30 @@
 ﻿@model Booking
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Create Booking";
 }
 
-<h1>Create</h1>
+<h1>Create Booking</h1>
 
-<h4>Booking</h4>
+<h4>Schedule a Consultation</h4>
 <hr />
 <div class="row justify-content-center">
     <div class="col-md-4 booking-create-container">
         <form asp-action="UserBooking">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>            
-          @*   <div class="form-group">
-                <label asp-for="ConsultantId" class="control-label"></label>
-                <input asp-for="ConsultantId" class="form-control" />
-                <span asp-validation-for="ConsultantId" class="text-danger"></span>
-            </div> *@
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
             <div class="form-group">
-                <label asp-for="StartDate" class="control-label"></label>
-                <input asp-for="StartDate" class="form-control" />
+                <label asp-for="StartDate" class="control-label">Start Date</label>
+                <input asp-for="StartDate" class="form-control" type="datetime-local" />
                 <span asp-validation-for="StartDate" class="text-danger"></span>
             </div>
-           
+
+            <div class="form-group">
+                <label asp-for="Phone" class="control-label">Phone Number</label>
+                <input asp-for="Phone" class="form-control" />
+                <span asp-validation-for="Phone" class="text-danger"></span>
+            </div>
+
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />
             </div>
@@ -117,7 +119,4 @@
     .row {
         margin-top: 30px;
     }
-
-    }
 </style>
-

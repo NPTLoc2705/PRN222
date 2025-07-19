@@ -1,4 +1,5 @@
-﻿using mvc.dataaccess.ViewModels;
+﻿using mvc.dataaccess.Entities.Courses;
+using mvc.dataaccess.ViewModels;
 using mvc.repositories.Interfaces.ICourse;
 using mvc.services.Interfaces;
 using System;
@@ -23,9 +24,9 @@ namespace mvc.services.Implements
             return await _lessonRepository.GetLessonByIdAsync(lessonId);
         }
 
-        public async Task<IEnumerable<LessonDTO>> GetLessonsByModuleIdAsync(Guid moduleId)
+        public async Task<IEnumerable<Lesson>> GetLessonsByCourseIdAsync(Guid moduleId)
         {
-            return await _lessonRepository.GetLessonsByModuleIdAsync(moduleId);
+            return await _lessonRepository.GetLessonsByCourseIdAsync(moduleId);
         }
 
         public async Task<LessonDTO> CreateLessonAsync(LessonDTO lessonDto)
@@ -43,10 +44,13 @@ namespace mvc.services.Implements
             return await _lessonRepository.DeleteLessonAsync(lessonId);
         }
 
-        public async Task<bool> ReorderLessonsAsync(LessonDTO reorderDto)
+        public async Task<bool> ReorderLessonsAsync(Guid courseId, List<Guid> orderedLessonIds)
         {
-            return await _lessonRepository.ReorderLessonsAsync(reorderDto);
+            return await _lessonRepository.ReorderLessonsAsync(courseId, orderedLessonIds);
         }
+
+        public Task DeleteLessonsByCourseIdAsync(Guid courseId)
+        => _lessonRepository.DeleteLessonsByCourseIdAsync(courseId);
     }
 }
 

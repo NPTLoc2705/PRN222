@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace mvc.dataaccess.ViewModels
+namespace mvc.dataaccess.ViewModels.Auth
 {
     public class LoginViewModel
     {

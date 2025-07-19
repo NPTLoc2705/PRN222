@@ -243,6 +243,7 @@
             .btn-primary:hover {
                 transform: translateY(-2px);
                 box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+                color: white;
             }
 
         .btn-secondary {
@@ -254,6 +255,7 @@
             .btn-secondary:hover {
                 background: #5a6268;
                 transform: translateY(-2px);
+                color: white;
             }
 
         .btn-danger {
@@ -267,6 +269,7 @@
             .btn-danger:hover {
                 background: #c82333;
                 transform: translateY(-2px);
+                color: white;
             }
 
         /* Empty state */
@@ -321,6 +324,19 @@
                 color: #bbb;
             }
 
+        /* Admin indicator */
+        .admin-indicator {
+            background: #2d3748;
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 4px;
+            font-size: 0.875rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-left: 1rem;
+        }
+
         /* Responsive */
         @@media (max-width: 768px) {
             .blog-container {
@@ -363,12 +379,18 @@
                 flex-direction: column;
                 gap: 0.5rem;
             }
+
+            .admin-indicator {
+                margin-left: 0;
+                margin-top: 0.5rem;
+            }
         }
 
         /* Print friendly */
         @@media print {
             .blog-actions,
-            .image-modal {
+            .image-modal,
+            .admin-indicator {
                 display: none !important;
             }
 
@@ -392,16 +414,25 @@
 <div class="blog-container">
     <!-- Header -->
     <header class="blog-header">
-        <h1 class="blog-title">@(Model?.title ?? "Untitled")</h1>
+        <h1 class="blog-title">
+            @(Model?.title ?? "Untitled")
+            @if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
+            {
+                <span class="admin-indicator">
+                    <i class="bi bi-shield-check"></i>
+                    Admin View
+                </span>
+            }
+        </h1>
         <div class="blog-meta">
             <div class="blog-meta-item">
-                <i class="fas fa-calendar-alt"></i>
+                <i class="bi bi-calendar3"></i>
                 <time datetime="@DateTime.Now.ToString("yyyy-MM-dd")">
                     @DateTime.Now.ToString("MMMM dd, yyyy")
                 </time>
             </div>
             <div class="blog-meta-item">
-                <i class="fas fa-clock"></i>
+                <i class="bi bi-clock"></i>
                 <span>5 min read</span>
             </div>
         </div>
@@ -427,7 +458,7 @@
         else
         {
             <div class="empty-content">
-                <i class="fas fa-file-alt"></i>
+                <i class="bi bi-file-text"></i>
                 <h3>No content available</h3>
                 <p>This blog post doesn't have any content yet.</p>
             </div>
@@ -436,15 +467,26 @@
 
     <!-- Actions -->
     <div class="blog-actions">
-        <a asp-action="Edit" asp-route-id="@Model?.Id" class="btn btn-primary">
-            <i class="fas fa-edit"></i>Edit
-        </a>
-        <a href="/Blogs/AdminBlog" class="btn btn-secondary">
-            <i class="fas fa-arrow-left"></i>Back to Admin
-        </a>
-        <a href="/Blogs/Delete/@Model?.Id" class="btn btn-danger">
-            <i class="fas fa-trash"></i>Delete
-        </a>
+        @if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
+        {
+            <!-- Admin Actions -->
+            <a asp-action="Edit" asp-route-id="@Model?.Id" class="btn btn-primary">
+                <i class="bi bi-pencil"></i>Edit
+            </a>
+            <a asp-action="Delete" asp-route-id="@Model?.Id" class="btn btn-danger">
+                <i class="bi bi-trash"></i>Delete
+            </a>
+            <a asp-action="AdminBlog" asp-controller="Blogs" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i>Back to Admin
+            </a>
+        }
+        else
+        {
+            <!-- User Actions -->
+            <a asp-action="Index" asp-controller="Blogs" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i>Back to Articles
+            </a>
+        }
     </div>
 </div>
 
@@ -455,9 +497,6 @@
 </div>
 
 @section Scripts {
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-
     <script>
         // Image modal functionality
         function openImageModal(img) {

@@ -20,9 +20,8 @@ namespace mvc.services.Implements
         }
 
         public async Task<bool> CourseExistsAsync(Guid courseId)
-        {
-            return await _courseRepository.GetCourseByIdAsync(courseId) != null;
-        }
+        => await _courseRepository.GetCourseByIdAsync(courseId) != null;
+        
 
         public Task<CoursesDTO> CreateCourseFromDTOAsync(CoursesDTO courseDTO, IFormFile imageFile = null)
         => _courseRepository.CreateCourseFromDTOAsync(courseDTO, imageFile);
@@ -35,6 +34,9 @@ namespace mvc.services.Implements
 
         public Task<IEnumerable<Course>> GetAllCoursesAsync()
         => _courseRepository.GetAllCoursesAsync();
+
+        public Task<IEnumerable<Course>> GetAllCoursesWithLessonsAsync()
+        => _courseRepository.GetAllCoursesWithLessonsAsync();
 
         public Task<Course> GetCourseByIdAsync(Guid courseId)
         => _courseRepository.GetCourseByIdAsync(courseId);
@@ -50,6 +52,15 @@ namespace mvc.services.Implements
 
         public Task<IEnumerable<Course>> GetCoursesByCategoryAsync(Guid categoryId)
         => _courseRepository.GetCoursesByCategoryAsync(categoryId);
+
+        public Task<IEnumerable<Course>> GetCoursesByCategoryNameAsync(string categoryName)
+        => _courseRepository.GetCoursesByCategoryNameAsync(categoryName);
+
+        public Task<Course> GetCourseWithLessonsAsync(Guid id)
+        => _courseRepository.GetCourseWithLessonsAsync(id);
+
+        public Task<IEnumerable<Course>> SearchCoursesAsync(string searchTerm)
+        => _courseRepository.SearchCoursesAsync(searchTerm);
 
         public Task<CoursesDTO> UpdateCourseFromDTOAsync(CoursesDTO courseDTO, IFormFile imageFile = null)
         => _courseRepository.UpdateCourseFromDTOAsync(courseDTO, imageFile);

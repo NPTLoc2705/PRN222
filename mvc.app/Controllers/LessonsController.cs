@@ -1,227 +1,297 @@
-﻿// LessonsController.cs
+﻿// Change route and remove IModuleService
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using mvc.dataaccess.Entities.Courses;
 using mvc.dataaccess.ViewModels;
 using mvc.services.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
-namespace mvc.app.Controllers
+[Route("courses/{courseId}/[controller]")]
+public class LessonsController : Controller
 {
-    [Route("courses/{courseId}/modules/{moduleId}/[controller]")]
-    public class LessonsController : Controller
+    private readonly ILessonService _lessonService;
+    private readonly IProgressService _progressService;
+    private readonly ICourseService _courseService;
+    private readonly ILogger<LessonsController> _logger;
+
+    public LessonsController(ILessonService lessonService, IProgressService progressService, ICourseService courseService, ILogger<LessonsController> logger)
     {
-        private readonly ILessonService _lessonService;
-        private readonly IModuleService _moduleService;
+        _lessonService = lessonService;
+        _progressService = progressService;
+        _courseService = courseService;
+        _logger = logger;
+    }
+    private bool IsAdmin()
+    {
+        return HttpContext.Session.GetString("UserRole") == "Admin";
+    }
 
-        public LessonsController(ILessonService lessonService, IModuleService moduleService)
+    // Update all actions to work with courseId instead of moduleId
+    [HttpGet]
+    public async Task<IActionResult> Index(Guid courseId)
+    {
+        var userIdString = HttpContext.Session.GetString("UserId");
+        if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out Guid userId))
         {
-            _lessonService = lessonService;
-            _moduleService = moduleService;
+            return Unauthorized("User not logged in or invalid session");
         }
 
-        // GET: courses/{courseId}/modules/{moduleId}/lessons
-        [HttpGet]
-        public async Task<IActionResult> Index(Guid courseId, Guid moduleId)
+        var course = await _courseService.GetCourseByIdAsync(courseId);
+        if (course == null)
         {
-            var module = await _moduleService.GetModuleByIdAsync(moduleId);
-            if (module == null || module.CourseId != courseId)
-            {
-                return NotFound();
-            }
+            return NotFound();
+        }
 
-            var lessons = await _lessonService.GetLessonsByModuleIdAsync(moduleId);
+        var lessons = await _lessonService.GetLessonsByCourseIdAsync(courseId);
+        var completedLessons = await _progressService.GetCompletedLessonIds(userId, courseId);
+
+        // Convert to DTOs
+        var lessonDTOs = lessons.Select(l => new LessonDTO
+        {
+            LessonId = l.LessonId,
+            CourseId = l.CourseId,
+            Title = l.Title,
+            ContentType = l.ContentType,
+            ContentUrl = l.ContentUrl,
+            Duration = l.Duration,
+            OrderNumber = l.OrderNumber,
+            IsFreePreview = l.IsFreePreview,
+            CreatedAt = l.CreatedAt
+        }).ToList();
+
+        ViewBag.CourseId = courseId;
+        ViewBag.Course = course;
+        ViewBag.CompletedLessons = completedLessons;
+        return View(lessonDTOs);
+    }
+
+    [HttpGet("details/{lessonId}")]
+    public async Task<IActionResult> Details(Guid courseId, Guid lessonId)
+    {
+        var userIdString = HttpContext.Session.GetString("UserId");
+        if (string.IsNullOrEmpty(userIdString)) return RedirectToAction("Login", "Auth");
+
+        var userId = Guid.Parse(userIdString);
+
+        var lesson = await _lessonService.GetLessonByIdAsync(lessonId);
+        if (lesson == null || lesson.CourseId != courseId) return NotFound();
+
+        // Ensure these values are being set
+        ViewBag.IsUserEnrolled = await _progressService.IsUserEnrolled(userId, courseId);
+        ViewBag.IsLessonCompleted = await _progressService.IsLessonCompleted(userId, courseId, lessonId);
+        ViewBag.CourseProgressPercentage = await _progressService.GetCourseProgressPercentage(userId, courseId);
+
+        return View(lesson);
+    }
+
+    [HttpGet("create")]
+    public async Task<IActionResult> Create(Guid courseId)
+    {
+        if (!IsAdmin()) return RedirectToAction("AccessDenied", "Home");
+        var course = await _courseService.GetCourseByIdAsync(courseId);
+        if (course == null)
+        {
+            return NotFound();
+        }
+
+        ViewBag.CourseId = courseId;
+        ViewBag.CourseTitle = course.Title;
+        return View(new LessonDTO { CourseId = courseId });
+    }
+    [HttpPost("create")]
+[ValidateAntiForgeryToken]
+    [RequestSizeLimit(1073741824)] // 1GB
+    [RequestFormLimits(MultipartBodyLengthLimit = 1073741824)]
+    public async Task<IActionResult> Create(Guid courseId, LessonDTO lessonDto)
+    {
+        if (!IsAdmin()) return RedirectToAction("AccessDenied", "Home");
+        // Check if user is admin/instructor
+        var userRole = HttpContext.Session.GetString("UserRole");
+        if (userRole != "Admin")
+        {
+            return Unauthorized();
+        }
+
+        if (courseId != lessonDto.CourseId)
+        {
+            return BadRequest("Course ID mismatch");
+        }
+        if (lessonDto.ContentFile != null && lessonDto.ContentFile.Length > 1073741824)
+        {
+            ModelState.AddModelError("ContentFile", "File size must be less than 1GB");
             ViewBag.CourseId = courseId;
-            ViewBag.Module = module;
-            return View(lessons);
+            ViewBag.CourseTitle = (await _courseService.GetCourseByIdAsync(courseId))?.Title;
+            return View(lessonDto);
         }
-
-        // GET: courses/{courseId}/modules/{moduleId}/lessons/details/{lessonId}
-        [HttpGet("details/{lessonId}")]
-        public async Task<IActionResult> Details(Guid courseId, Guid moduleId, Guid lessonId)
+        if (ModelState.IsValid)
         {
-            var lesson = await _lessonService.GetLessonByIdAsync(lessonId);
-            if (lesson == null || lesson.ModuleId != moduleId)
+            try
             {
-                return NotFound();
-            }
+                // Process file upload if present
+                if (lessonDto.ContentFile != null && lessonDto.ContentFile.Length > 0)
+                {
+                    var filePath = await SaveLessonContent(lessonDto.ContentFile);
+                    lessonDto.ContentUrl = filePath;
+                }
 
-            var module = await _moduleService.GetModuleByIdAsync(moduleId);
-            if (module == null || module.CourseId != courseId)
-            {
-                return NotFound();
-            }
-
-            ViewBag.CourseId = courseId;
-            ViewBag.Module = module;
-            return View(lesson); // Now returns LessonResponseDTO
-        }
-
-        // GET: courses/{courseId}/modules/{moduleId}/lessons/create
-        [HttpGet("create")]
-        public async Task<IActionResult> Create(Guid courseId, Guid moduleId)
-        {
-            var module = await _moduleService.GetModuleByIdAsync(moduleId);
-            if (module == null || module.CourseId != courseId)
-            {
-                return NotFound();
-            }
-
-            ViewBag.CourseId = courseId;
-            ViewBag.Module = module;
-            return View(new LessonDTO { ModuleId = moduleId });
-        }
-
-        // POST: courses/{courseId}/modules/{moduleId}/lessons/create
-        [HttpPost("create")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Guid courseId, Guid moduleId, LessonDTO lessonDto)
-        {
-            if (moduleId != lessonDto.ModuleId)
-            {
-                return BadRequest();
-            }
-
-            if (ModelState.IsValid)
-            {
                 var result = await _lessonService.CreateLessonAsync(lessonDto);
+
                 if (result.Error)
                 {
                     ModelState.AddModelError("", result.Message);
                 }
                 else
                 {
-                    return RedirectToAction(nameof(Index), new { courseId, moduleId });
+                    TempData["SuccessMessage"] = "Lesson created successfully!";
+                    return RedirectToAction("Details", "Admin", new { id = courseId });
                 }
             }
-
-            var module = await _moduleService.GetModuleByIdAsync(moduleId);
-            ViewBag.CourseId = courseId;
-            ViewBag.Module = module;
-            return View(lessonDto);
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error creating lesson");
+                ModelState.AddModelError("", "An error occurred while creating the lesson.");
+            }
         }
 
-        // GET: courses/{courseId}/modules/{moduleId}/lessons/edit/{lessonId}
-        [HttpGet("edit/{lessonId}")]
-        public async Task<IActionResult> Edit(Guid courseId, Guid moduleId, Guid lessonId)
+        ViewBag.CourseId = courseId;
+        ViewBag.CourseTitle = (await _courseService.GetCourseByIdAsync(courseId))?.Title;
+        return View(lessonDto);
+    }
+    private async Task<string> SaveLessonContent(IFormFile file)
+    {
+        // Implement your file storage logic here
+        // This could save to wwwroot, cloud storage, etc.
+        // Example for local storage:
+        var uploadsFolder = Path.Combine("wwwroot", "lesson-content");
+        if (!Directory.Exists(uploadsFolder))
         {
-            var lesson = await _lessonService.GetLessonByIdAsync(lessonId);
-            if (lesson == null || lesson.ModuleId != moduleId)
-            {
-                return NotFound();
-            }
-
-            var module = await _moduleService.GetModuleByIdAsync(moduleId);
-            if (module == null || module.CourseId != courseId)
-            {
-                return NotFound();
-            }
-
-            ViewBag.CourseId = courseId;
-            ViewBag.Module = module;
-
-            // Convert to LessonDTO for editing
-            var lessonDto = new LessonDTO
-            {
-                LessonId = lesson.LessonId,
-                ModuleId = lesson.ModuleId,
-                Title = lesson.Title,
-                ContentType = lesson.ContentType,
-                ContentUrl = lesson.ContentUrl,
-                Duration = lesson.Duration,
-                OrderNumber = lesson.OrderNumber,
-                IsFreePreview = lesson.IsFreePreview,
-                CreatedAt = lesson.CreatedAt
-            };
-
-            return View(lessonDto);
+            Directory.CreateDirectory(uploadsFolder);
         }
 
-        // POST: courses/{courseId}/modules/{moduleId}/lessons/edit/{lessonId}
-        [HttpPost("edit/{lessonId}")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(Guid courseId, Guid moduleId, Guid lessonId, LessonDTO lessonDto)
-        {
-            if (lessonId != lessonDto.LessonId || moduleId != lessonDto.ModuleId)
-            {
-                return NotFound();
-            }
+        var uniqueFileName = Guid.NewGuid().ToString() + "_" + file.FileName;
+        var filePath = Path.Combine(uploadsFolder, uniqueFileName);
 
-            if (ModelState.IsValid)
+        using (var fileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.None, bufferSize: 81920, useAsync: true))
+        {
+            await file.CopyToAsync(fileStream);
+        }
+
+        return $"/lesson-content/{uniqueFileName}";
+    }
+
+    [HttpGet("edit/{lessonId}")]
+    public async Task<IActionResult> Edit(Guid courseId, Guid lessonId)
+    {
+        if (!IsAdmin()) return RedirectToAction("AccessDenied", "Home");
+
+        var lesson = await _lessonService.GetLessonByIdAsync(lessonId);
+        if (lesson == null || lesson.CourseId != courseId)
+        {
+            return NotFound();
+        }
+
+        var course = await _courseService.GetCourseByIdAsync(courseId);
+        if (course == null)
+        {
+            return NotFound();
+        }
+
+        ViewBag.CourseId = courseId;
+        ViewBag.Module = course; // Using course since we removed modules
+        return View(lesson);
+    }
+
+    [HttpPost("edit/{lessonId}")]
+    [ValidateAntiForgeryToken]
+    [RequestSizeLimit(1073741824)] // 1GB
+    [RequestFormLimits(MultipartBodyLengthLimit = 1073741824)]
+    public async Task<IActionResult> Edit(Guid courseId, Guid lessonId, LessonDTO lessonDto)
+    {
+        if (!IsAdmin()) return RedirectToAction("AccessDenied", "Home");
+
+        if (lessonId != lessonDto.LessonId || courseId != lessonDto.CourseId)
+        {
+            return BadRequest("ID mismatch");
+        }
+
+        if (ModelState.IsValid)
+        {
+            try
             {
+                // Process file upload if present
+                if (lessonDto.ContentFile != null && lessonDto.ContentFile.Length > 0)
+                {
+                    var filePath = await SaveLessonContent(lessonDto.ContentFile);
+                    lessonDto.ContentUrl = filePath;
+                }
+
                 var result = await _lessonService.UpdateLessonAsync(lessonDto);
+
                 if (result.Error)
                 {
                     ModelState.AddModelError("", result.Message);
                 }
                 else
                 {
-                    return RedirectToAction(nameof(Index), new { courseId, moduleId });
+                    TempData["SuccessMessage"] = "Lesson updated successfully!";
+                    return RedirectToAction("Details", "Admin", new { id = courseId });
                 }
             }
-
-            var module = await _moduleService.GetModuleByIdAsync(moduleId);
-            ViewBag.CourseId = courseId;
-            ViewBag.Module = module;
-            return View(lessonDto);
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error updating lesson");
+                ModelState.AddModelError("", "An error occurred while updating the lesson.");
+            }
         }
 
-        // GET: courses/{courseId}/modules/{moduleId}/lessons/delete/{lessonId}
-        [HttpGet("delete/{lessonId}")]
-        public async Task<IActionResult> Delete(Guid courseId, Guid moduleId, Guid lessonId)
+        var course = await _courseService.GetCourseByIdAsync(courseId);
+        ViewBag.CourseId = courseId;
+        ViewBag.Module = course; // Using course since we removed modules
+        return View(lessonDto);
+    }
+
+    [HttpGet("delete/{lessonId}")]
+    public async Task<IActionResult> Delete(Guid courseId, Guid lessonId)
+    {
+        if (!IsAdmin()) return RedirectToAction("AccessDenied", "Home");
+
+        var lesson = await _lessonService.GetLessonByIdAsync(lessonId);
+        if (lesson == null || lesson.CourseId != courseId)
         {
-            var lesson = await _lessonService.GetLessonByIdAsync(lessonId);
-            if (lesson == null || lesson.ModuleId != moduleId)
-            {
-                return NotFound();
-            }
-
-            var module = await _moduleService.GetModuleByIdAsync(moduleId);
-            if (module == null || module.CourseId != courseId)
-            {
-                return NotFound();
-            }
-
-            ViewBag.CourseId = courseId;
-            ViewBag.Module = module;
-            return View(lesson);
+            return NotFound();
         }
 
-        // POST: courses/{courseId}/modules/{moduleId}/lessons/delete/{lessonId}
-        [HttpPost("delete/{lessonId}"), ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(Guid courseId, Guid moduleId, Guid lessonId)
+        var course = await _courseService.GetCourseByIdAsync(courseId);
+        if (course == null)
         {
-            var success = await _lessonService.DeleteLessonAsync(lessonId);
-            if (!success)
-            {
-                return NotFound();
-            }
-
-            return RedirectToAction(nameof(Index), new { courseId, moduleId });
+            return NotFound();
         }
 
-        // POST: courses/{courseId}/modules/{moduleId}/lessons/reorder
-        [HttpPost("reorder")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Reorder(Guid courseId, Guid moduleId, LessonDTO reorderDto)
+        ViewBag.CourseId = courseId;
+        ViewBag.Module = course; // Using course since we removed modules
+        return View(lesson);
+    }
+
+    [HttpPost("delete/{lessonId}")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> DeleteConfirmed(Guid courseId, Guid lessonId)
+    {
+        if (!IsAdmin()) return RedirectToAction("AccessDenied", "Home");
+
+        try
         {
-            if (moduleId != reorderDto.ModuleId)
+            var result = await _lessonService.DeleteLessonAsync(lessonId);
+            if (!result)
             {
-                return BadRequest();
+                TempData["ErrorMessage"] = "Failed to delete lesson";
+                return RedirectToAction(nameof(Index), new { courseId });
             }
 
-            var success = await _lessonService.ReorderLessonsAsync(reorderDto);
-            if (!success)
-            {
-                return BadRequest("Failed to reorder lessons");
-            }
-
-            return RedirectToAction(nameof(Index), new { courseId, moduleId });
+            TempData["SuccessMessage"] = "Lesson deleted successfully!";
+            return RedirectToAction("Details", "Admin", new { id = courseId });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error deleting lesson");
+            TempData["ErrorMessage"] = "An error occurred while deleting the lesson.";
+            return RedirectToAction("Details", "Admin", new { id = courseId });
         }
     }
 }
