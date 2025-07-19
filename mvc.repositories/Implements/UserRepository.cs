@@ -23,7 +23,14 @@ namespace mvc.repositories.Implements
         { 
             try
             {
-                return _context.Users.FirstOrDefault(u => u.Email.Equals(email));
+                var existingUser = _context.Users.FirstOrDefault(u => u.Email.Equals(email));
+
+                if (existingUser == null)
+                {
+                    return null; // Return null if no user is found with the given email
+                }
+
+                return existingUser; // Return the found user
             }
             catch (Exception ex)
             {

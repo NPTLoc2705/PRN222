@@ -1,0 +1,718 @@
+﻿@model mvc.dataaccess.Entities.Surveys.Survey
+
+@{
+    ViewData["Title"] = "Edit Survey";
+}
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drug-Free World - Edit Survey</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        :root {
+            --primary-color: #00a79d;
+            --secondary-color: #008c83;
+            --background-color: #f8f9fa;
+            --text-color: #333;
+            --shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--background-color);
+            padding-top: 80px;
+        }
+
+        .content-container {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 32px 24px;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+        }
+
+        h1, h4, h5 {
+            color: var(--primary-color);
+            font-weight: 700;
+            margin-bottom: 18px;
+        }
+
+        hr {
+            margin: 18px 0;
+            border: none;
+            border-top: 1.5px solid #e0e0e0;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: border 0.2s;
+        }
+
+            .form-control:focus {
+                border-color: var(--primary-color);
+                outline: none;
+            }
+
+        .btn {
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: 500;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: #fff;
+            border: none;
+            box-shadow: var(--shadow);
+        }
+
+            .btn-primary:hover {
+                background: var(--secondary-color);
+            }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: #fff;
+            border: none;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: #fff;
+            border: none;
+        }
+
+        .btn-sm {
+            padding: 5px 10px;
+            font-size: 0.875rem;
+        }
+
+        .text-danger {
+            color: #dc3545;
+            font-size: 0.95em;
+        }
+
+        .form-check-label {
+            font-weight: 500;
+        }
+
+        .form-check-input {
+            margin-right: 8px;
+        }
+
+        a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+            a:hover {
+                color: var(--secondary-color);
+                text-decoration: underline;
+            }
+
+        /* Question and option styling */
+        .question-container, .option-container {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            position: relative;
+        }
+
+        .option-container {
+            background: #f1f1f1;
+            margin-left: 20px;
+        }
+
+        .remove-btn {
+            position: absolute;
+            right: 10px;
+            top: 10px;
+        }
+
+        .options-section {
+            margin-top: 15px;
+            padding-left: 15px;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="content-container">
+        <h1>Edit Survey</h1>
+        <hr />
+
+        <!-- Survey Basic Info Form -->
+        <form id="surveyForm" asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="SurveyId" />
+
+            <div class="form-group">
+                <label asp-for="Title" class="control-label"></label>
+                <input asp-for="Title" class="form-control" />
+                <span asp-validation-for="Title" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Description" class="control-label">Description</label>
+                <textarea asp-for="Description" class="form-control" rows="3"></textarea>
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Type" class="control-label">Survey Type</label>
+                <select asp-for="Type" class="form-control" asp-items="Html.GetEnumSelectList<mvc.dataaccess.Entities.Surveys.SurveyType>()"></select>
+                <span asp-validation-for="Type" class="text-danger"></span>
+            </div>
+
+            <div class="form-group form-check">
+                <label class="form-check-label">
+                    <input class="form-check-input" asp-for="IsActive" /> @Html.DisplayNameFor(model => model.IsActive)
+                </label>
+            </div>
+
+            <div class="form-group">
+                <input type="hidden" asp-for="CreatedAt" />
+            </div>
+
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary">Save Survey Details</button>
+            </div>
+        </form>
+
+        <hr />
+        <h4>Questions and Options</h4>
+
+        <!-- Questions Section -->
+        <div id="questions-container">
+            @if (Model.Questions != null && Model.Questions.Any())
+            {
+                @foreach (var question in Model.Questions.OrderBy(q => q.OrderIndex))
+                {
+                    <div class="question-container" data-question-id="@question.QuestionId">
+                        <button type="button" class="btn btn-danger btn-sm remove-btn delete-question" data-id="@question.QuestionId">
+                            <i class="fas fa-times"></i>
+                        </button>
+
+                        <form class="edit-question-form">
+                            <input type="hidden" name="QuestionId" value="@question.QuestionId" />
+
+                            <div class="form-group">
+                                <label class="control-label">Question Text</label>
+                                <input name="QuestionText" class="form-control question-text" value="@question.QuestionText" required />
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label">Order</label>
+                                <input name="OrderIndex" type="number" class="form-control" value="@question.OrderIndex" min="0" />
+                            </div>
+
+                            <div class="form-group">
+                                <button type="button" class="btn btn-secondary btn-sm update-question" data-id="@question.QuestionId">
+                                    Update Question
+                                </button>
+                            </div>
+                        </form>
+
+                        <!-- Options Section -->
+                        <div class="options-section">
+                            <h5>Options</h5>
+                            <div class="options-container" data-question-id="@question.QuestionId">
+                                @if (question.Options != null && question.Options.Any())
+                                {
+                                    @foreach (var option in question.Options.OrderBy(o => o.OrderIndex))
+                                    {
+                                        <div class="option-container" data-option-id="@option.OptionId">
+                                            <button type="button" class="btn btn-danger btn-sm remove-btn delete-option" data-id="@option.OptionId">
+                                                <i class="fas fa-times"></i>
+                                            </button>
+
+                                            <form class="edit-option-form">
+                                                <input type="hidden" name="OptionId" value="@option.OptionId" />
+                                                <input type="hidden" name="QuestionId" value="@question.QuestionId" />
+
+                                                <div class="form-group">
+                                                    <label class="control-label">Option Text</label>
+                                                    <input name="OptionText" class="form-control" value="@option.OptionText" required />
+                                                </div>
+
+                                                <div class="form-group">
+                                                    <label class="control-label">Score</label>
+                                                    <input name="Score" type="number" class="form-control" value="@option.Score" />
+                                                </div>
+
+                                                <div class="form-group">
+                                                    <label class="control-label">Order</label>
+                                                    <input name="OrderIndex" type="number" class="form-control" value="@option.OrderIndex" min="0" />
+                                                </div>
+
+                                                <div class="form-group">
+                                                    <button type="button" class="btn btn-secondary btn-sm update-option" data-id="@option.OptionId">
+                                                        Update Option
+                                                    </button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    }
+                                }
+                            </div>
+
+                            <!-- Add new option form -->
+                            <div class="add-option-form-container">
+                                <form class="add-option-form">
+                                    <input type="hidden" name="QuestionId" value="@question.QuestionId" />
+
+                                    <div class="form-group">
+                                        <label class="control-label">New Option Text</label>
+                                        <input name="OptionText" class="form-control" required />
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="control-label">Score</label>
+                                        <input name="Score" type="number" class="form-control" value="0" />
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="control-label">Order</label>
+                                        <input name="OrderIndex" type="number" class="form-control" value="0" min="0" />
+                                    </div>
+
+                                    <div class="form-group">
+                                        <button type="button" class="btn btn-primary btn-sm add-option" data-question-id="@question.QuestionId">
+                                            <i class="fas fa-plus"></i> Add Option
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+
+        <!-- Add new question form -->
+        <div class="add-question-form-container">
+            <h5>Add New Question</h5>
+            <form id="add-question-form">
+                <input type="hidden" name="SurveyId" value="@Model.SurveyId" />
+
+                <div class="form-group">
+                    <label class="control-label">Question Text</label>
+                    <input name="QuestionText" class="form-control" required />
+                </div>
+
+                <div class="form-group">
+                    <label class="control-label">Order</label>
+                    <input name="OrderIndex" type="number" class="form-control" value="0" min="0" />
+                </div>
+
+                <div class="form-group">
+                    <button type="button" id="add-question-btn" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Add Question
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <div style="margin-top: 18px;">
+            <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+            <a asp-action="Details" asp-route-id="@Model.SurveyId" class="btn btn-primary">View Survey</a>
+        </div>
+    </div>
+
+        @{
+            await Html.RenderPartialAsync("_ValidationScriptsPartial");
+        }
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"></script>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                // Update Question
+                document.querySelectorAll('.update-question').forEach(button => {
+                    button.addEventListener('click', async function() {
+                        const questionId = this.getAttribute('data-id');
+                        const form = this.closest('form');
+                        const formData = new FormData(form);
+
+                        try {
+                            const response = await fetch(`/Surveys/UpdateQuestion/${questionId}`, {
+                                method: 'POST',
+                                headers: {
+                                    'X-CSRF-TOKEN': document.querySelector('input[name="__RequestVerificationToken"]').value
+                                },
+                                body: formData
+                            });
+
+                            if (response.ok) {
+                                showToast('Question updated successfully');
+                            } else {
+                                showToast('Error updating question', true);
+                            }
+                        } catch (error) {
+                            console.error('Error:', error);
+                            showToast('Error updating question', true);
+                        }
+                    });
+                });
+
+                // Delete Question
+                document.querySelectorAll('.delete-question').forEach(button => {
+                    button.addEventListener('click', async function() {
+                        if (confirm('Are you sure you want to delete this question? All its options will also be deleted.')) {
+                            const questionId = this.getAttribute('data-id');
+
+                            try {
+                                const response = await fetch(`/Surveys/DeleteQuestion/${questionId}`, {
+                                    method: 'POST',
+                                    headers: {
+                                        'X-CSRF-TOKEN': document.querySelector('input[name="__RequestVerificationToken"]').value
+                                    }
+                                });
+
+                                if (response.ok) {
+                                    this.closest('.question-container').remove();
+                                    showToast('Question deleted successfully');
+                                } else {
+                                    showToast('Error deleting question', true);
+                                }
+                            } catch (error) {
+                                console.error('Error:', error);
+                                showToast('Error deleting question', true);
+                            }
+                        }
+                    });
+                });
+
+                // Update Option
+                document.querySelectorAll('.update-option').forEach(button => {
+                    button.addEventListener('click', async function() {
+                        const optionId = this.getAttribute('data-id');
+                        const form = this.closest('form');
+                        const formData = new FormData(form);
+
+                        try {
+                            const response = await fetch(`/Surveys/UpdateOption/${optionId}`, {
+                                method: 'POST',
+                                headers: {
+                                    'X-CSRF-TOKEN': document.querySelector('input[name="__RequestVerificationToken"]').value
+                                },
+                                body: formData
+                            });
+
+                            if (response.ok) {
+                                showToast('Option updated successfully');
+                            } else {
+                                showToast('Error updating option', true);
+                            }
+                        } catch (error) {
+                            console.error('Error:', error);
+                            showToast('Error updating option', true);
+                        }
+                    });
+                });
+
+                // Delete Option
+                document.querySelectorAll('.delete-option').forEach(button => {
+                    button.addEventListener('click', async function() {
+                        if (confirm('Are you sure you want to delete this option?')) {
+                            const optionId = this.getAttribute('data-id');
+
+                            try {
+                                const response = await fetch(`/Surveys/DeleteOption/${optionId}`, {
+                                    method: 'POST',
+                                    headers: {
+                                        'X-CSRF-TOKEN': document.querySelector('input[name="__RequestVerificationToken"]').value
+                                    }
+                                });
+
+                                if (response.ok) {
+                                    this.closest('.option-container').remove();
+                                    showToast('Option deleted successfully');
+                                } else {
+                                    showToast('Error deleting option', true);
+                                }
+                            } catch (error) {
+                                console.error('Error:', error);
+                                showToast('Error deleting option', true);
+                            }
+                        }
+                    });
+                });
+
+                // Add Option
+                document.querySelectorAll('.add-option').forEach(button => {
+                    button.addEventListener('click', async function() {
+                        const questionId = this.getAttribute('data-question-id');
+                        const form = this.closest('form');
+                        const formData = new FormData(form);
+
+                        try {
+                            const response = await fetch('/Surveys/AddOption', {
+                                method: 'POST',
+                                headers: {
+                                    'X-CSRF-TOKEN': document.querySelector('input[name="__RequestVerificationToken"]').value
+                                },
+                                body: formData
+                            });
+
+                            if (response.ok) {
+                                const result = await response.json();
+                                // Add the new option to the DOM
+                                const optionsContainer = document.querySelector(`.options-container[data-question-id="${questionId}"]`);
+                                const newOptionHtml = createOptionHtml(result);
+                                optionsContainer.insertAdjacentHTML('beforeend', newOptionHtml);
+
+                                // Reset form
+                                form.reset();
+                                form.querySelector('input[name="QuestionId"]').value = questionId;
+
+                                // Add event listeners to new buttons
+                                addOptionEventListeners();
+
+                                showToast('Option added successfully');
+                            } else {
+                                showToast('Error adding option', true);
+                            }
+                        } catch (error) {
+                            console.error('Error:', error);
+                            showToast('Error adding option', true);
+                        }
+                    });
+                });
+
+                // Add Question
+                document.getElementById('add-question-btn').addEventListener('click', async function() {
+                    const form = document.getElementById('add-question-form');
+                    const formData = new FormData(form);
+
+                    try {
+                        const response = await fetch('/Surveys/AddQuestion', {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRF-TOKEN': document.querySelector('input[name="__RequestVerificationToken"]').value
+                            },
+                            body: formData
+                        });
+
+                        if (response.ok) {
+                            const result = await response.json();
+                            // Add the new question to the DOM
+                            const questionsContainer = document.getElementById('questions-container');
+                            const newQuestionHtml = createQuestionHtml(result);
+                            questionsContainer.insertAdjacentHTML('beforeend', newQuestionHtml);
+
+                            // Reset form
+                            form.reset();
+                            form.querySelector('input[name="SurveyId"]').value = '@Model.SurveyId';
+
+                            // Add event listeners to new buttons
+                            addQuestionEventListeners();
+
+                            showToast('Question added successfully');
+                        } else {
+                            showToast('Error adding question', true);
+                        }
+                    } catch (error) {
+                        console.error('Error:', error);
+                        showToast('Error adding question', true);
+                    }
+                });
+
+                // Helper function to create option HTML
+                function createOptionHtml(option) {
+                    return `
+                        <div class="option-container" data-option-id="${option.optionId}">
+                            <button type="button" class="btn btn-danger btn-sm remove-btn delete-option" data-id="${option.optionId}">
+                                <i class="fas fa-times"></i>
+                            </button>
+
+                            <form class="edit-option-form">
+                                <input type="hidden" name="OptionId" value="${option.optionId}" />
+                                <input type="hidden" name="QuestionId" value="${option.questionId}" />
+
+                                <div class="form-group">
+                                    <label class="control-label">Option Text</label>
+                                    <input name="OptionText" class="form-control" value="${option.optionText}" required />
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="control-label">Score</label>
+                                    <input name="Score" type="number" class="form-control" value="${option.score}" />
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="control-label">Order</label>
+                                    <input name="OrderIndex" type="number" class="form-control" value="${option.orderIndex}" min="0" />
+                                </div>
+
+                                <div class="form-group">
+                                    <button type="button" class="btn btn-secondary btn-sm update-option" data-id="${option.optionId}">
+                                        Update Option
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    `;
+                }
+
+                // Helper function to create question HTML
+                function createQuestionHtml(question) {
+                    return `
+                        <div class="question-container" data-question-id="${question.questionId}">
+                            <button type="button" class="btn btn-danger btn-sm remove-btn delete-question" data-id="${question.questionId}">
+                                <i class="fas fa-times"></i>
+                            </button>
+
+                            <form class="edit-question-form">
+                                <input type="hidden" name="QuestionId" value="${question.questionId}" />
+
+                                <div class="form-group">
+                                    <label class="control-label">Question Text</label>
+                                    <input name="QuestionText" class="form-control question-text" value="${question.questionText}" required />
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="control-label">Order</label>
+                                    <input name="OrderIndex" type="number" class="form-control" value="${question.orderIndex}" min="0" />
+                                </div>
+
+                                <div class="form-group">
+                                    <button type="button" class="btn btn-secondary btn-sm update-question" data-id="${question.questionId}">
+                                        Update Question
+                                    </button>
+                                </div>
+                            </form>
+
+                            <div class="options-section">
+                                <h5>Options</h5>
+                                <div class="options-container" data-question-id="${question.questionId}">
+                                    <!-- Options will be added here -->
+                                </div>
+
+                                <div class="add-option-form-container">
+                                    <form class="add-option-form">
+                                        <input type="hidden" name="QuestionId" value="${question.questionId}" />
+
+                                        <div class="form-group">
+                                            <label class="control-label">New Option Text</label>
+                                            <input name="OptionText" class="form-control" required />
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="control-label">Score</label>
+                                            <input name="Score" type="number" class="form-control" value="0" />
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="control-label">Order</label>
+                                            <input name="OrderIndex" type="number" class="form-control" value="0" min="0" />
+                                        </div>
+
+                                        <div class="form-group">
+                                            <button type="button" class="btn btn-primary btn-sm add-option" data-question-id="${question.questionId}">
+                                                <i class="fas fa-plus"></i> Add Option
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                // Add event listeners to new elements
+                function addQuestionEventListeners() {
+                    document.querySelectorAll('.update-question').forEach(button => {
+                        button.removeEventListener('click', updateQuestionHandler);
+                        button.addEventListener('click', updateQuestionHandler);
+                    });
+
+                    document.querySelectorAll('.delete-question').forEach(button => {
+                        button.removeEventListener('click', deleteQuestionHandler);
+                        button.addEventListener('click', deleteQuestionHandler);
+                    });
+
+                    addOptionEventListeners();
+                }
+
+                function addOptionEventListeners() {
+                    document.querySelectorAll('.update-option').forEach(button => {
+                        button.removeEventListener('click', updateOptionHandler);
+                        button.addEventListener('click', updateOptionHandler);
+                    });
+
+                    document.querySelectorAll('.delete-option').forEach(button => {
+                        button.removeEventListener('click', deleteOptionHandler);
+                        button.addEventListener('click', deleteOptionHandler);
+                    });
+
+                    document.querySelectorAll('.add-option').forEach(button => {
+                        button.removeEventListener('click', addOptionHandler);
+                        button.addEventListener('click', addOptionHandler);
+                    });
+                }
+
+                // Toast notification
+                function showToast(message, isError = false) {
+                    // Create toast container if it doesn't exist
+                    let toastContainer = document.getElementById('toast-container');
+                    if (!toastContainer) {
+                        toastContainer = document.createElement('div');
+                        toastContainer.id = 'toast-container';
+                        toastContainer.style.position = 'fixed';
+                        toastContainer.style.top = '20px';
+                        toastContainer.style.right = '20px';
+                        toastContainer.style.zIndex = '9999';
+                        document.body.appendChild(toastContainer);
+                    }
+
+                    // Create toast
+                    const toast = document.createElement('div');
+                    toast.style.minWidth = '250px';
+                    toast.style.padding = '15px';
+                    toast.style.marginBottom = '10px';
+                    toast.style.borderRadius = '4px';
+                    toast.style.boxShadow = '0 0 10px rgba(0,0,0,0.2)';
+                    toast.style.color = '#fff';
+                    toast.style.backgroundColor = isError ? '#dc3545' : '#00a79d';
+                    toast.textContent = message;
+
+                    // Add to container
+                    toastContainer.appendChild(toast);
+
+                    // Auto remove
+                    setTimeout(() => {
+                        toast.style.opacity = '0';
+                        toast.style.transition = 'opacity 0.5s';
+                        setTimeout(() => {
+                            toastContainer.removeChild(toast);
+                        }, 500);
+                    }, 3000);
+                }
+            });
+        </script>
+</body>

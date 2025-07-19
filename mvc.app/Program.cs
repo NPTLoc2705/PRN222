@@ -4,7 +4,6 @@ using Microsoft.Extensions.Configuration.Json;
 using Microsoft.IdentityModel.Tokens;
 using mvc.repositories.Implements;
 using mvc.repositories.Interfaces;
-using mvc.repositories.Implements;
 using mvc.dataaccess.Entities;
 using mvc.repositories.Interfaces.ICourse;
 using mvc.repositories.Implements.CourseRepo;
@@ -31,6 +30,7 @@ builder.Services.AddScoped<IProgressRepo, ProgressRepo>();
 builder.Services.AddScoped<IBookingRepo, BookingRepo>();
 builder.Services.AddScoped<IBlogRepo, BlogRepo>();
 builder.Services.AddScoped<ICategoryRepo, CategoryRepo>();
+builder.Services.AddScoped<ISurveyRepository, SurveyRepository>();
 //Injection Service
 builder.Services.AddScoped<IBookingService, BookingService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
@@ -40,6 +40,7 @@ builder.Services.AddScoped<IProgressService, ProgressService>();
 builder.Services.AddScoped<IBlogService, BlogService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<ISurveyService, SurveyService>();
 builder.Services.AddSession(options =>
 {
     options.IdleTimeout = TimeSpan.FromMinutes(20); // Set session timeout
