@@ -2,6 +2,12 @@
 
 @{
     ViewData["Title"] = "Delete";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var userId = Context.Session.GetString("UserId");
+    var isLoggedIn = !string.IsNullOrEmpty(userId);
+    var username = Context.Session.GetString("Username");
+    var IsCon = Context.Session.GetString("UserRole");
 }
 
 <head>
@@ -10,20 +16,93 @@
     <title>Drug-Free World - Delete Survey</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
-        :root { --primary-color: #00a79d; --secondary-color: #008c83; --background-color: #f8f9fa; --text-color: #333; --shadow: 0 2px 10px rgba(0, 0, 0, 0.1); }
-        body { line-height: 1.6; color: var(--text-color); background-color: var(--background-color); padding-top: 80px; }
-        .content-container { max-width: 600px; margin: 40px auto; padding: 32px 24px; background: #fff; border-radius: 12px; box-shadow: var(--shadow); }
-        h1, h3, h4 { color: var(--primary-color); font-weight: 700; margin-bottom: 18px; }
-        hr { margin: 18px 0; border: none; border-top: 1.5px solid #e0e0e0; }
-        dl.row { margin-bottom: 24px; }
-        dt, dd { font-size: 1.05rem; }
-        dt { color: var(--secondary-color); font-weight: 600; }
-        dd { color: var(--text-color); margin-bottom: 10px; }
-        .btn-danger { background: #dc3545; color: #fff; border: none; padding: 12px 28px; border-radius: 6px; font-weight: 500; transition: background 0.3s, box-shadow 0.3s; box-shadow: var(--shadow); }
-        .btn-danger:hover { background: #b52a37; box-shadow: 0 4px 16px 0 rgba(220, 53, 69, 0.12); }
-        a { color: var(--primary-color); text-decoration: none; font-weight: 500; }
-        a:hover { color: var(--secondary-color); text-decoration: underline; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', Arial, sans-serif;
+        }
+
+        :root {
+            --primary-color: #00a79d;
+            --secondary-color: #008c83;
+            --background-color: #f8f9fa;
+            --text-color: #333;
+            --shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--background-color);
+            padding-top: 80px;
+        }
+
+        .content-container {
+            max-width: 600px;
+            margin: 40px auto;
+            padding: 32px 24px;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+        }
+
+        h1, h3, h4 {
+            color: var(--primary-color);
+            font-weight: 700;
+            margin-bottom: 18px;
+        }
+
+        hr {
+            margin: 18px 0;
+            border: none;
+            border-top: 1.5px solid #e0e0e0;
+        }
+
+        dl.row {
+            margin-bottom: 24px;
+        }
+
+        dt, dd {
+            font-size: 1.05rem;
+        }
+
+        dt {
+            color: var(--secondary-color);
+            font-weight: 600;
+        }
+
+        dd {
+            color: var(--text-color);
+            margin-bottom: 10px;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: #fff;
+            border: none;
+            padding: 12px 28px;
+            border-radius: 6px;
+            font-weight: 500;
+            transition: background 0.3s, box-shadow 0.3s;
+            box-shadow: var(--shadow);
+        }
+
+            .btn-danger:hover {
+                background: #b52a37;
+                box-shadow: 0 4px 16px 0 rgba(220, 53, 69, 0.12);
+            }
+
+        a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+            a:hover {
+                color: var(--secondary-color);
+                text-decoration: underline;
+            }
     </style>
 </head>
 <body>
