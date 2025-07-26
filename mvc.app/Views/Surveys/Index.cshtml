@@ -1,11 +1,15 @@
 ﻿@model IEnumerable<mvc.dataaccess.Entities.Surveys.Survey>
 
 @{
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     ViewData["Title"] = "Surveys";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var userId = Context.Session.GetString("UserId");
+    var isLoggedIn = !string.IsNullOrEmpty(userId);
+    var username = Context.Session.GetString("Username");
+    var IsCon = Context.Session.GetString("UserRole");
 }
-
-
-@* Index.cshtml for Surveys *@
 
 <head>
     <meta charset="UTF-8">
@@ -13,294 +17,308 @@
     <title>Drug-Free World - Surveys</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Poppins', sans-serif;
-        }
-
         :root {
-            --primary-color: #00a79d;
-            --secondary-color: #008c83;
-            --background-color: #f8f9fa;
-            --text-color: #333;
-            --shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            --primary: #00a79d;
+            --primary-light: #e0f7fa;
+            --secondary: #00695c;
+            --card-bg: #f8f9fa;
+            --card-bg-dark: #22272e;
+            --text: #222;
+            --text-light: #fff;
+            --shadow: 0 6px 32px 0 rgba(0,0,0,0.10), 0 1.5px 8px 0 rgba(0,0,0,0.07);
+            --hover-shadow: 0 10px 40px 0 rgba(0,167,157,0.16), 0 2px 12px 0 rgba(0,0,0,0.07);
+            --radius: 23px;
+            --accent: #ffcf66;
         }
 
         body {
-            line-height: 1.6;
-            color: var(--text-color);
-            background-color: var(--background-color);
-            padding-top: 80px;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #e0f7fa 0%, #f8f9fa 100%);
+            font-family: 'Poppins', Arial, sans-serif;
+            margin: 0;
+            padding-top: 90px;
+            color: var(--text);
+            position: relative;
+            overflow-x: hidden;
         }
-
-        /* Header Styles */
-        header {
-            background: #fff;
-            box-shadow: var(--shadow);
+        /* Soft animated bubbles background */
+        .animated-bg {
+            pointer-events: none;
+            z-index: 0;
             position: fixed;
-            width: 100%;
             top: 0;
-            z-index: 1000;
-        }
-
-        .header-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px 20px;
-        }
-
-        .logo img {
-            height: 50px;
-            transition: transform 0.3s;
-        }
-
-            .logo img:hover {
-                transform: scale(1.05);
-            }
-
-        nav ul {
-            list-style: none;
-            display: flex;
-            gap: 20px;
-            align-items: center;
-        }
-
-            nav ul li a {
-                text-decoration: none;
-                color: var(--text-color);
-                font-weight: 500;
-                font-size: 16px;
-                transition: all 0.3s;
-                padding: 8px 12px;
-                border-radius: 5px;
-            }
-
-                nav ul li a:hover {
-                    color: var(--primary-color);
-                    background: rgba(0, 167, 157, 0.1);
-                }
-
-        .user-welcome {
-            color: var(--primary-color);
-            font-weight: 600;
-            font-size: 16px;
-            padding: 8px 12px;
-            background: rgba(0, 167, 157, 0.1);
-            border-radius: 5px;
-        }
-
-        /* Main Content Styles */
-        .content-container {
-            max-width: 1200px;
-            margin: 40px auto;
-            padding: 0 20px;
-        }
-
-        .create-new {
-            margin-bottom: 30px;
-        }
-
-            .create-new a {
-                background: var(--primary-color);
-                color: #fff;
-                padding: 12px 24px;
-                text-decoration: none;
-                border-radius: 5px;
-                font-weight: 500;
-                transition: all 0.3s;
-                display: inline-block;
-            }
-
-                .create-new a:hover {
-                    background: var(--secondary-color);
-                    transform: translateY(-2px);
-                    box-shadow: var(--shadow);
-                }
-
-        /* Table Styles */
-        .table-container {
-            background: #fff;
-            border-radius: 10px;
-            box-shadow: var(--shadow);
+            left: 0;
+            width: 100vw;
+            height: 100vh;
             overflow: hidden;
         }
 
-        .table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 0;
+        .bubble {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0.25;
+            animation: floatBubbles 14s infinite alternate;
         }
 
-            .table thead {
-                background: rgba(0, 167, 157, 0.1);
-            }
-
-            .table th {
-                padding: 15px;
-                text-align: left;
-                font-weight: 600;
-                color: var(--primary-color);
-            }
-
-            .table td {
-                padding: 15px;
-                border-bottom: 1px solid #eee;
-            }
-
-            .table tbody tr {
-                transition: all 0.3s;
-            }
-
-                .table tbody tr:hover {
-                    background: rgba(0, 167, 157, 0.05);
-                }
-
-                .table tbody tr:last-child td {
-                    border-bottom: none;
-                }
-
-        /* Action Links */
-        .action-links a {
-            text-decoration: none;
-            color: var(--primary-color);
-            margin-right: 15px;
-            font-weight: 500;
-            transition: all 0.3s;
+        .bubble1 {
+            width: 180px;
+            height: 180px;
+            left: 6vw;
+            top: 14vh;
+            background: var(--primary);
+            animation-delay: 0s;
         }
 
-            .action-links a:hover {
-                color: var(--secondary-color);
-            }
-
-        /* Status Indicators */
-        .status-active {
-            color: #28a745;
-            font-weight: 500;
+        .bubble2 {
+            width: 120px;
+            height: 120px;
+            right: 8vw;
+            top: 30vh;
+            background: var(--accent);
+            animation-delay: 3s;
         }
 
-        .status-inactive {
-            color: #dc3545;
-            font-weight: 500;
+        .bubble3 {
+            width: 90px;
+            height: 90px;
+            left: 55vw;
+            top: 70vh;
+            background: var(--secondary);
+            animation-delay: 2s;
+        }
+
+        .bubble4 {
+            width: 65px;
+            height: 65px;
+            left: 24vw;
+            top: 82vh;
+            background: var(--primary-light);
+            animation-delay: 7s;
+        }
+
+        @@keyframes floatBubbles {
+            0% {
+                transform: translateY(0) scale(1);
+            }
+
+            100% {
+                transform: translateY(-55px) scale(1.09);
+            }
+        }
+
+        .content-container {
+            max-width: 1320px;
+            margin: 0 auto;
+            padding: 0 24px 42px 24px;
+            position: relative;
+            z-index: 1;
         }
 
         .surveys-heading {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 18px;
-            padding: 30px 0 18px 0;
-            font-size: clamp(2.3rem, 4vw, 3.5rem);
-            font-weight: 700;
+            font-size: clamp(2.1rem, 4vw, 3.5rem);
+            font-weight: 600;
+            text-align: center;
             color: transparent;
-            letter-spacing: 1px;
-            background: linear-gradient(90deg, #00796b 10%, #45e1b8 60%, #00bfae 100%);
+            background: linear-gradient(90deg, var(--primary) 60%, var(--secondary) 100%);
             background-clip: text;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            text-shadow: 0 8px 32px rgba(0,121,107,0.14), 0 2px 8px rgba(0,0,0,0.06), 0 2.5px 9px rgba(0,121,107,0.10);
-            border-radius: 18px;
-            box-shadow: 0 4px 24px 0 rgba(0, 121, 107, 0.12);
+            padding: 22px 10px 12px 10px;
+            margin-bottom: 16px;
+            border-radius: 16px;
+            box-shadow: 0 4px 24px 0 rgba(0, 121, 107, 0.11);
+            letter-spacing: 1px;
             position: relative;
             overflow: hidden;
-            min-height: 90px;
-            transition: box-shadow 0.3s;
         }
 
-        .surveys-heading:hover {
-            box-shadow: 0 8px 32px 0 rgba(0, 121, 107, 0.18);
+        .create-new {
+            text-align: left;
+            margin: 18px 0 30px 0;
         }
 
-        .surveys-heading-accent {
-            position: absolute;
-            right: 5%;
-            top: 22%;
-            width: 64px;
-            height: 64px;
-            background: radial-gradient(circle at 60% 40%, #00796b22 0%, transparent 70%);
-            z-index: 0;
-            pointer-events: none;
-            filter: blur(2.5px);
-            animation: accentPulse 2.5s infinite alternate;
+            .create-new a {
+                background: linear-gradient(90deg, var(--primary) 80%, var(--secondary) 100%);
+                color: #fff;
+                padding: 11px 28px;
+                text-decoration: none;
+                border-radius: 7px;
+                font-weight: 500;
+                font-size: 1.04rem;
+                box-shadow: 0 2px 8px rgba(0,167,157,0.09);
+                transition: all 0.24s cubic-bezier(0.45,0,0.55,1);
+                display: inline-block;
+            }
+
+                .create-new a:hover, .create-new a:focus {
+                    background: linear-gradient(90deg, var(--secondary) 60%, var(--primary) 100%);
+                    transform: translateY(-2px) scale(1.045);
+                    box-shadow: 0 7px 24px rgba(0,167,157,0.17);
+                    outline: none;
+                }
+
+        /* Responsive Survey Card Grid */
+        .survey-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(330px, 1fr));
+            gap: 36px;
+            margin-top: 16px;
+        }
+
+        .survey-card-link {
+            display: block;
+            text-decoration: none;
+            color: inherit;
+            outline: none;
+        }
+
+        .survey-card {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 28px 22px 22px 22px;
+            min-height: 195px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            cursor: pointer;
+            position: relative;
+            transition: box-shadow 0.32s cubic-bezier(0.45,0,0.55,1), transform 0.19s;
+        }
+
+            .survey-card:hover, .survey-card-link:focus .survey-card {
+                box-shadow: var(--hover-shadow);
+                transform: translateY(-5px) scale(1.018);
+                border: 1.5px solid var(--primary);
+            }
+
+        .survey-title {
+            font-size: 1.27rem;
+            font-weight: 600;
+            color: var(--secondary);
+            margin-bottom: 2px;
+        }
+
+        .survey-description {
+            font-size: 1.01rem;
+            color: #4a4a4a;
+            margin-bottom: 4px;
+            line-height: 1.5;
+        }
+
+        .survey-type {
+            display: inline-block;
+            font-size: 0.99rem;
+            font-weight: 500;
+            color: var(--primary);
+            background: var(--primary-light);
+            padding: 2.5px 12px 2px 12px;
+            border-radius: 7px;
+            margin-bottom: 6px;
+        }
+
+        .survey-date {
+            font-size: 0.95rem;
+            color: #888;
+            margin-bottom: 2px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+            .survey-date i {
+                color: var(--primary);
+            }
+
+        .card-actions {
+            margin-top: auto;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            justify-content: flex-end;
+        }
+
+        .card-action-btn {
+            background: none;
+            border: none;
+            color: var(--primary);
+            font-size: 1.17rem;
+            cursor: pointer;
+            padding: 5px 7px;
+            border-radius: 7px;
+            transition: background 0.19s, color 0.19s;
+        }
+
+            .card-action-btn:hover, .card-action-btn:focus {
+                background: var(--primary-light);
+                color: var(--secondary);
+                outline: none;
+            }
+
+            .card-action-btn[aria-label]::after {
+                content: attr(aria-label);
+                font-size: 0.94rem;
+                color: #666;
+                margin-left: 8px;
+                opacity: 0;
+                pointer-events: none;
+                transition: opacity 0.2s;
+            }
+
+            .card-action-btn:focus[aria-label]::after,
+            .card-action-btn:hover[aria-label]::after {
+                opacity: 1;
+            }
+        /* Card focus ring */
+        .survey-card-link:focus .survey-card {
+            box-shadow: 0 0 0 3px var(--primary-light), var(--hover-shadow);
         }
     </style>
 </head>
 <body>
-    <header>
-        <div class="header-container">
-            <div class="logo">
-                <img src="https://via.placeholder.com/150x50?text=DrugFreeWorld" alt="Drug Free World Logo">
-            </div>
-            <nav>
-                <ul>
-                    <li><a href="/">Home</a></li>
-                    <li><a href="/">About</a></li>
-                    <li><a href="/">Education</a></li>
-                    <li><a href="/Blogs">Blog</a></li>
-                    <li><a href="/Courses">Course</a></li>
-                    <li><a href="/Bookings">Booking</a></li>
-                    <li><a href="/Surveys">Surveys</a></li>
-
-                    @if (ViewData["IsLoggedIn"] != null && (bool)ViewData["IsLoggedIn"])
-                    {
-                        <li><span class="user-welcome">@ViewData["UserMessage"]</span></li>
-                        <li><a asp-controller="Auth" asp-action="Logout">Logout</a></li>
-                    }
-                    else
-                    {
-                        <li><a href="/Auth/Login">Login</a></li>
-                        <li><a href="/Auth/Register">Register</a></li>
-                    }
-                </ul>
-            </nav>
-        </div>
-    </header>
+    <div class="animated-bg" aria-hidden="true">
+        <div class="bubble bubble1"></div>
+        <div class="bubble bubble2"></div>
+        <div class="bubble bubble3"></div>
+        <div class="bubble bubble4"></div>
+    </div>
     <div class="content-container">
         <h1 class="surveys-heading">
             Surveys to determine the level of drug abuse in the community
-            <span class="surveys-heading-accent"></span>
         </h1>
-        <div class="create-new">
-            <a asp-action="Create">Create New Survey</a>
-        </div>
-        <div class="table-container">
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>@Html.DisplayNameFor(model => model.Title)</th>
-                        <th>@Html.DisplayNameFor(model => model.Description)</th>
-                        <th>@Html.DisplayNameFor(model => model.Type)</th>
-                        <th>@Html.DisplayNameFor(model => model.IsActive)</th>
-                        <th>@Html.DisplayNameFor(model => model.CreatedAt)</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var item in Model)
-                    {
-                        <tr>
-                            <td>@Html.DisplayFor(modelItem => item.Title)</td>
-                            <td>@Html.DisplayFor(modelItem => item.Description)</td>
-                            <td>@Html.DisplayFor(modelItem => item.Type)</td>
-                            <td>
-                                <span class="@(item.IsActive ? "status-active" : "status-inactive")">
-                                    @Html.DisplayFor(modelItem => item.IsActive)
-                                </span>
-                            </td>
-                            <td>@Html.DisplayFor(modelItem => item.CreatedAt)</td>
-                            <td class="action-links">
-                                <a asp-action="Edit" asp-route-id="@item.SurveyId">Edit</a>
-                                <a asp-action="Details" asp-route-id="@item.SurveyId">Details</a>
-                                <a asp-action="Delete" asp-route-id="@item.SurveyId">Delete</a>
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
+        @if(IsCon == "Admin")
+        {
+            <div class="create-new">
+                <a asp-action="Create" aria-label="Create a new survey"><i class="fa fa-plus"></i> Create New Survey</a>
+            </div>
+        }
+ 
+
+        <div class="survey-grid">
+            @foreach (var item in Model)
+            {
+                <div class="survey-card" tabindex="0">
+                    <div class="survey-title">@item.Title</div>
+                    <div class="survey-description">@item.Description</div>
+                    <span class="survey-type">@item.Type</span>
+                    <div class="survey-date"><i class="fa fa-calendar-alt"></i> @item.CreatedAt.ToString("yyyy-MM-dd")</div>
+                    <div class="card-actions">
+                        <span style="flex:1;"></span>
+                        <a class="card-action-btn" aria-label="See Details" title="Details" asp-action="Details" asp-route-id="@item.SurveyId">
+                            <i class="fa fa-eye"></i>
+                        </a>
+                        @if (IsCon == "Admin")
+                        {
+                            <a class="card-action-btn" aria-label="Edit Survey" title="Edit" asp-action="Edit" asp-route-id="@item.SurveyId">
+                                <i class="fa fa-edit"></i>
+                            </a>
+                            <a class="card-action-btn" aria-label="Delete Survey" title="Delete" asp-action="Delete" asp-route-id="@item.SurveyId">
+                                <i class="fa fa-trash"></i>
+                            </a>
+                        }
+                    </div>
+                </div>
+            }
         </div>
     </div>
 </body>

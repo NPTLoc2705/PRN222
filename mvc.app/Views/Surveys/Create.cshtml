@@ -1,6 +1,12 @@
 ﻿@model mvc.dataaccess.ViewModels.SurveyDTO
 @{
     ViewData["Title"] = "Create Survey";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var userId = Context.Session.GetString("UserId");
+    var isLoggedIn = !string.IsNullOrEmpty(userId);
+    var username = Context.Session.GetString("Username");
+    var IsCon = Context.Session.GetString("UserRole");
 }
 
 
@@ -14,7 +20,7 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Poppins', sans-serif;
+            font-family: 'Poppins', Arial, sans-serif;
         }
 
         :root {

@@ -1,0 +1,150 @@
+﻿@model mvc.dataaccess.ViewModels.SurveyDTO.SurveyResultViewModel
+
+@{
+    ViewData["Title"] = "Survey Result";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="content-container">
+    <h1>Survey Result</h1>
+    <hr />
+
+    <div class="survey-meta">
+        <h3>@Model.Response.Survey.Title</h3>
+        <p>@Model.Response.Survey.Description</p>
+        <hr />
+
+        <div class="meta-item">
+            <div class="meta-label">Survey Type:</div>
+            <div class="meta-value">@Model.Response.Survey.Type</div>
+        </div>
+
+        <div class="meta-item">
+            <div class="meta-label">Total Score:</div>
+            <div class="meta-value">@Model.Response.TotalScore</div>
+        </div>
+
+        <div class="meta-item">
+            <div class="meta-label">Risk Level:</div>
+            <div class="meta-value" style="color:@Model.RiskLevelColor">@Model.RiskLevelText</div>
+        </div>
+
+        <div class="meta-item">
+            <div class="meta-label">Completed At:</div>
+            <div class="meta-value">@Model.Response.CompletedAt?.ToString("MMM dd, yyyy HH:mm")</div>
+        </div>
+    </div>
+
+    <hr />
+    <h2>Recommended Actions</h2>
+
+    @if (Model.Actions != null && Model.Actions.Any())
+    {
+        <ul class="actions-list">
+            @foreach (var action in Model.Actions)
+            {
+                <li class="action-item">
+                    <h4>@action.Title</h4>
+                    <p>@action.Description</p>
+                    <p><strong>Type:</strong> @action.Type</p>
+                </li>
+            }
+        </ul>
+    }
+    else
+    {
+        <p><em>No recommended actions available for this survey.</em></p>
+    }
+
+    <div class="actions">
+        <a asp-action="Index" class="btn btn-secondary">Back to Surveys</a>
+    </div>
+</div>
+
+<style>
+    :root {
+        --primary-color: #00a79d;
+        --secondary-color: #008c83;
+        --text-color: #333;
+        --background-color: #f4f4f4;
+        font-family: 'Poppins', Arial, sans-serif;
+	}
+
+    .content-container {
+        max-width: 800px;
+        margin: 40px auto;
+        padding: 32px 24px;
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    h1, h2, h3, h4 {
+        color: #00a79d;
+        font-weight: 700;
+        margin-bottom: 18px;
+    }
+
+    hr {
+        margin: 18px 0;
+        border: none;
+        border-top: 1.5px solid #e0e0e0;
+    }
+
+    .survey-meta {
+        background: #f9f9f9;
+        padding: 16px;
+        border-radius: 8px;
+        margin-bottom: 24px;
+    }
+
+    .meta-item {
+        margin-bottom: 10px;
+        display: flex;
+    }
+
+    .meta-label {
+        font-weight: 600;
+        width: 120px;
+        color: #008c83;
+    }
+
+    .meta-value {
+        flex: 1;
+    }
+
+    .actions-list {
+        list-style-type: none;
+        padding-left: 0;
+    }
+
+    .action-item {
+        background: #f9f9f9;
+        padding: 16px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        border-left: 4px solid #00a79d;
+    }
+
+    .btn {
+        padding: 8px 16px;
+        border-radius: 6px;
+        font-weight: 500;
+        transition: all 0.3s;
+        cursor: pointer;
+        display: inline-block;
+        text-decoration: none;
+        text-align: center;
+    }
+
+    .btn-secondary {
+        background: #6c757d;
+        color: #fff !important;
+        border: none;
+    }
+
+        .btn-secondary:hover {
+            text-decoration: none;
+            background: #5a6268;
+        }
+</style>

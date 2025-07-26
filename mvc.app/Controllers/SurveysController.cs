@@ -8,7 +8,7 @@ using mvc.dataaccess.Entities.Surveys;
 
 namespace mvc.app.Controllers
 {
-    public class SurveysController : Controller
+    public class SurveysController : BaseController
     {
         private readonly ISurveyService _surveyService;
 
@@ -45,6 +45,9 @@ namespace mvc.app.Controllers
         // GET: Surveys/Create
         public IActionResult Create()
         {
+            var userRole = HttpContext.Session.GetString("UserRole");
+            if (userRole != "Admin")
+                return RedirectToAction("Index");
             return View();
         }
 
@@ -53,7 +56,9 @@ namespace mvc.app.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(SurveyDTO model)
         {
-
+            var userRole = HttpContext.Session.GetString("UserRole");
+            if (userRole != "Admin")
+                return RedirectToAction("Index");
             model.Survey.SurveyId = Guid.NewGuid();
             model.Survey.CreatedAt = DateTime.UtcNow;
 
@@ -61,20 +66,21 @@ namespace mvc.app.Controllers
             var survey = await _surveyService.CreateFullSurveyAsync(model.Survey, model.QuestionDtos);
 
             return RedirectToAction(nameof(Details), new { id = survey.SurveyId });
-
-
-            return View(model);
         }
 
         // GET: Surveys/Edit/5
         public async Task<IActionResult> Edit(Guid id)
         {
+            var userRole = HttpContext.Session.GetString("UserRole");
+            if (userRole != "Admin")
+                return RedirectToAction("Index");
+
             if (id == Guid.Empty)
             {
                 return NotFound();
             }
 
-            var survey = await _surveyService.GetSurveyByIdAsync(id);
+            var survey = await _surveyService.GetSurveyWithQuestionsAndOptionsAsync(id);
             if (survey == null)
             {
                 return NotFound();
@@ -82,11 +88,33 @@ namespace mvc.app.Controllers
             return View(survey);
         }
 
+        // POST: Surveys/Edit/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(Survey survey)
+        {
+            var userRole = HttpContext.Session.GetString("UserRole");
+            if (userRole != "Admin")
+                return RedirectToAction("Index");
+
+            if (survey == null || survey.SurveyId == Guid.Empty)
+                return NotFound();
+
+            await _surveyService.UpdateSurveyAsync(survey);
+
+            // Optionally, show a success message or redirect to details
+            return RedirectToAction("Details", new { id = survey.SurveyId });
+        }
+
         // POST: Surveys/UpdateQuestion/{id}
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> UpdateQuestion(Guid id, [Bind("QuestionId,QuestionText,OrderIndex")] SurveyQuestion question)
         {
+            var userRole = HttpContext.Session.GetString("UserRole");
+            if (userRole != "Admin")
+                return RedirectToAction("Index");
+
             if (id != question.QuestionId)
             {
                 return BadRequest();
@@ -112,6 +140,10 @@ namespace mvc.app.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteQuestion(Guid id)
         {
+            var userRole = HttpContext.Session.GetString("UserRole");
+            if (userRole != "Admin")
+                return RedirectToAction("Index");
+
             var result = await _surveyService.DeleteQuestionAsync(id);
             if (!result)
             {
@@ -125,6 +157,10 @@ namespace mvc.app.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> UpdateOption(Guid id, [Bind("OptionId,OptionText,Score,OrderIndex")] QuestionOption option)
         {
+            var userRole = HttpContext.Session.GetString("UserRole");
+            if (userRole != "Admin")
+                return RedirectToAction("Index");
+
             if (id != option.OptionId)
             {
                 return BadRequest();
@@ -151,6 +187,10 @@ namespace mvc.app.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteOption(Guid id)
         {
+            var userRole = HttpContext.Session.GetString("UserRole");
+            if (userRole != "Admin")
+                return RedirectToAction("Index");
+
             var result = await _surveyService.DeleteOptionAsync(id);
             if (!result)
             {
@@ -164,6 +204,10 @@ namespace mvc.app.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddQuestion([Bind("SurveyId,QuestionText,OrderIndex")] SurveyQuestion question)
         {
+            var userRole = HttpContext.Session.GetString("UserRole");
+            if (userRole != "Admin")
+                return RedirectToAction("Index");
+
             if (question.SurveyId == Guid.Empty)
             {
                 return BadRequest();
@@ -179,6 +223,10 @@ namespace mvc.app.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddOption([Bind("QuestionId,OptionText,Score,OrderIndex")] QuestionOption option)
         {
+            var userRole = HttpContext.Session.GetString("UserRole");
+            if (userRole != "Admin")
+                return RedirectToAction("Index");
+
             if (option.QuestionId == Guid.Empty)
             {
                 return BadRequest();
@@ -192,6 +240,10 @@ namespace mvc.app.Controllers
         // GET: Surveys/GetOptionByIdAsync/{id}
         public async Task<IActionResult> GetOptionByIdAsync(Guid id)
         {
+            var userRole = HttpContext.Session.GetString("UserRole");
+            if (userRole != "Admin")
+                return RedirectToAction("Index");
+
             var option = await _surveyService.GetOptionByIdAsync(id);
             if (option == null)
             {
@@ -203,6 +255,10 @@ namespace mvc.app.Controllers
         // GET: Surveys/GetQuestionWithOptionsAsync/{id}
         public async Task<IActionResult> GetQuestionWithOptionsAsync(Guid id)
         {
+            var userRole = HttpContext.Session.GetString("UserRole");
+            if (userRole != "Admin")
+                return RedirectToAction("Index");
+
             var question = await _surveyService.GetQuestionWithOptionsAsync(id);
             if (question == null)
             {
@@ -214,6 +270,10 @@ namespace mvc.app.Controllers
         // GET: Surveys/Delete/5
         public async Task<IActionResult> Delete(Guid id)
         {
+            var userRole = HttpContext.Session.GetString("UserRole");
+            if (userRole != "Admin")
+                return RedirectToAction("Index");
+
             if (id == Guid.Empty)
             {
                 return NotFound();
@@ -232,6 +292,10 @@ namespace mvc.app.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(Guid id)
         {
+            var userRole = HttpContext.Session.GetString("UserRole");
+            if (userRole != "Admin")
+                return RedirectToAction("Index");
+
             var result = await _surveyService.DeleteSurveyAsync(id);
 
             if(result == null)
@@ -247,6 +311,10 @@ namespace mvc.app.Controllers
         // GET: Surveys/TakeSurvey/{id}
         public async Task<IActionResult> TakeSurvey(Guid id)
         {
+            var userRole = HttpContext.Session.GetString("UserRole");
+            if (userRole == null)
+                return RedirectToAction("Index");
+
             if (id == Guid.Empty)
             {
                 return NotFound();
@@ -280,13 +348,17 @@ namespace mvc.app.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> SubmitSurvey(SurveyDTO.SubmitAnswerModel model)
         {
+            var userRole = HttpContext.Session.GetString("UserRole");
+            if (userRole == null)
+                return RedirectToAction("Index");
+
             if (!ModelState.IsValid)
             {
                 return BadRequest();
             }
 
             // Retrieve MemberId from session
-            var memberIdString = HttpContext.Session.GetString("MemberId");
+            var memberIdString = HttpContext.Session.GetString("UserId");
             if (string.IsNullOrEmpty(memberIdString) || !Guid.TryParse(memberIdString, out var memberId))
             {
                 return Unauthorized(); // Session expired or user not logged in
@@ -305,6 +377,10 @@ namespace mvc.app.Controllers
         // GET: Surveys/SurveyResult/{responseId}
         public async Task<IActionResult> SurveyResult(Guid responseId)
         {
+            var userRole = HttpContext.Session.GetString("UserRole");
+            if (userRole == null)
+                return RedirectToAction("Index");
+
             var response = await _surveyService.GetSurveyResponseAsync(responseId);
             if (response == null)
             {
