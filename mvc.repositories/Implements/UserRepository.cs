@@ -107,6 +107,7 @@ namespace mvc.repositories.Implements
                 Email = user.Email,
                 PhoneNumber = user.PhoneNumber,
                 Address = user.Address,
+                Role = user.Role,
                 IsActive = user.IsActive,
                 CourseProgresses = user.CourseProgresses.Select(p => new UserCourseProgressDTO
                 {

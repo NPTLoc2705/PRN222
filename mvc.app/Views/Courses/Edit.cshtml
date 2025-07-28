@@ -413,7 +413,7 @@
         // Init Quill
                 var quill = new Quill('#descriptionEditor', {
             theme: 'snow',
-            placeholder: 'Start writing your amazing blog post...',
+            placeholder: 'Start writing',
             modules: {
                 toolbar: [
                     [{ 'header': [1, 2, 3, false] }],
@@ -432,7 +432,7 @@
         quill.root.innerHTML = @Html.Raw(Json.Serialize(Model.Description));
 
         // Sync content on form submit
-        document.getElementById('createForm').addEventListener('submit', function () {
+        document.getElementById('editForm').addEventListener('submit', function () {
             document.getElementById('descriptionContent').value = quill.root.innerHTML;
         });
     </script>
