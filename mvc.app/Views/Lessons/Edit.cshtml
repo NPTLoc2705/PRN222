@@ -2,24 +2,31 @@
 @{
     ViewData["Title"] = "Edit Lesson";
     var courseId = ViewBag.CourseId;
-    var course = ViewBag.Module; // Using course since modules are removed
+    var courseTitle = string.IsNullOrWhiteSpace(ViewBag.CourseTitle as string) ? "Untitled Course" : ViewBag.CourseTitle as string;
+
+    // Ensure courseTitle is not too long for display
+    var displayTitle = courseTitle.Length > 50 ? courseTitle.Substring(0, 50) + "..." : courseTitle;
+
 }
 
 <style>
     :root {
-        --primary-color: #00a79d;
-        --primary-dark: #008c83;
-        --primary-light: #4db8ad;
+        --primary-color: #4CAF50;
+        --primary-light: #81C784;
+        --primary-dark: #388E3C;
+        --primary-darker: #2E7D32;
+        --primary-bg: #E8F5E9;
         --secondary-color: #6c757d;
-        --success-color: #28a745;
-        --warning-color: #ffc107;
+        --success-color: #4CAF50;
+        --warning-color: #FFC107;
         --danger-color: #dc3545;
-        --light-bg: #f8f9fa;
+        --light-bg: #f5f9f5;
         --white: #ffffff;
         --text-dark: #2c3e50;
         --text-muted: #6c757d;
-        --shadow: 0 4px 12px rgba(0,0,0,0.1);
-        --shadow-hover: 0 6px 20px rgba(0,0,0,0.15);
+        --shadow: 0 2px 8px rgba(0,0,0,0.08);
+        --shadow-hover: 0 4px 16px rgba(0,0,0,0.12);
+        --border-radius: 12px;
     }
 
     body {
@@ -27,87 +34,182 @@
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
 
+    /* Page Header */
     .page-header {
-        background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
-        color: white;
-        padding: 3rem 0;
-        margin-bottom: 3rem;
-        border-radius: 0 0 50px 50px;
-        box-shadow: var(--shadow);
+        background: white;
+        padding: 1.5rem 0;
+        margin-bottom: 2rem;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
     }
 
-        .page-header h1 {
-            font-size: 2.5rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-        }
+
+    .breadcrumb-container {
+        background: linear-gradient(to right, var(--primary-bg), rgba(232, 245, 233, 0.5));
+        padding: 0.75rem 0;
+        border-bottom: 1px solid rgba(76, 175, 80, 0.2);
+        margin-bottom: 1.5rem;
+    }
 
     .breadcrumb {
         background: transparent;
         padding: 0;
         margin: 0;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        font-size: 0.875rem;
     }
 
     .breadcrumb-item {
-        color: rgba(255, 255, 255, 0.8);
+        color: var(--text-muted);
+        max-width: 200px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
     }
 
-        .breadcrumb-item.active {
-            color: white;
-        }
-
         .breadcrumb-item + .breadcrumb-item::before {
-            color: rgba(255, 255, 255, 0.6);
+            content: "/";
+            color: var(--text-muted);
+            margin: 0 0.5rem;
+            font-weight: 300;
         }
 
     .breadcrumb a {
-        color: rgba(255, 255, 255, 0.9);
+        color: var(--primary-dark);
         text-decoration: none;
+        transition: all 0.3s ease;
+        font-weight: 500;
     }
 
         .breadcrumb a:hover {
-            color: white;
+            color: var(--primary-color);
+            text-decoration: underline;
         }
 
+    .breadcrumb-item.active {
+        color: var(--text-dark);
+        font-weight: 600;
+    }
+
+    .breadcrumb-item a i {
+        font-size: 0.875rem;
+        margin-right: 0.25rem;
+    }
+    .header-content h1 {
+        color: var(--primary-darker);
+        font-size: 1.75rem;
+        font-weight: 600;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+        .header-content h1 i {
+            color: var(--primary-color);
+            font-size: 1.5rem;
+        }
+
+    .header-subtitle {
+        color: var(--text-muted);
+        margin-top: 0.5rem;
+    }
+
+    /* Container */
+    .container {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+
+    /* Form Container */
     .form-container {
         background: white;
-        border-radius: 16px;
+        border-radius: var(--border-radius);
         padding: 2.5rem;
         box-shadow: var(--shadow);
-        margin-bottom: 3rem;
+        margin-bottom: 2rem;
+        border: 1px solid rgba(76, 175, 80, 0.1);
+        animation: fadeInUp 0.5s ease-out;
+    }
+
+    @@keyframes fadeInUp {
+        from
+
+    {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
     }
 
     .form-header {
-        border-bottom: 2px solid var(--primary-light);
+        border-bottom: 2px solid var(--primary-bg);
         padding-bottom: 1rem;
         margin-bottom: 2rem;
     }
 
         .form-header h3 {
-            color: var(--text-dark);
+            color: var(--primary-darker);
             font-weight: 600;
             margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
 
+            .form-header h3 i {
+                color: var(--primary-color);
+            }
+
+    /* Current Info Box */
     .current-info {
-        background: var(--light-bg);
-        border-left: 4px solid var(--warning-color);
-        padding: 1rem;
+        background: linear-gradient(to right, var(--primary-bg), rgba(232, 245, 233, 0.5));
+        border-left: 4px solid var(--primary-color);
+        padding: 1.25rem;
         border-radius: 0 8px 8px 0;
-        margin-bottom: 1.5rem;
+        margin-bottom: 2rem;
     }
 
         .current-info h6 {
-            color: var(--text-dark);
-            margin-bottom: 0.5rem;
+            color: var(--primary-darker);
+            margin-bottom: 0.75rem;
             font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
 
+            .current-info h6 i {
+                color: var(--primary-color);
+            }
+
         .current-info p {
-            margin: 0;
+            margin: 0.25rem 0;
             color: var(--text-muted);
         }
 
+            .current-info p strong {
+                color: var(--text-dark);
+            }
+
+        .current-info a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+            .current-info a:hover {
+                color: var(--primary-dark);
+                text-decoration: underline;
+            }
+
+    /* Form Elements */
     .form-group {
         margin-bottom: 1.5rem;
     }
@@ -117,19 +219,25 @@
         font-weight: 500;
         margin-bottom: 0.5rem;
         display: block;
+        font-size: 0.95rem;
     }
 
+        .form-label .required {
+            color: var(--danger-color);
+        }
+
     .form-control, .form-select {
-        border: 2px solid #e1e8ed;
+        border: 1px solid #e0e0e0;
         border-radius: 8px;
         padding: 0.75rem 1rem;
         font-size: 1rem;
         transition: all 0.3s ease;
+        background-color: white;
     }
 
         .form-control:focus, .form-select:focus {
             border-color: var(--primary-color);
-            box-shadow: 0 0 0 0.2rem rgba(0, 167, 157, 0.15);
+            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.15);
             outline: none;
         }
 
@@ -139,9 +247,10 @@
 
     .form-check {
         padding: 0.75rem;
-        background: var(--light-bg);
+        background: var(--primary-bg);
         border-radius: 8px;
         margin-bottom: 1.5rem;
+        border: 1px solid var(--primary-light);
     }
 
     .form-check-input {
@@ -156,6 +265,14 @@
             border-color: var(--primary-color);
         }
 
+    .form-check-label {
+        margin-left: 0.5rem;
+    }
+
+        .form-check-label strong {
+            color: var(--primary-darker);
+        }
+
     .form-text {
         color: var(--text-muted);
         font-size: 0.875rem;
@@ -168,6 +285,44 @@
         margin-top: 0.25rem;
     }
 
+    /* Upload Area */
+    .upload-area {
+        border: 2px dashed var(--primary-light);
+        border-radius: 12px;
+        padding: 2rem;
+        text-align: center;
+        background: var(--primary-bg);
+        transition: all 0.3s ease;
+        position: relative;
+    }
+
+        .upload-area:hover {
+            border-color: var(--primary-color);
+            background: rgba(76, 175, 80, 0.1);
+        }
+
+    .upload-icon {
+        font-size: 3rem;
+        color: var(--primary-color);
+        margin-bottom: 1rem;
+    }
+
+    .upload-area input[type="file"] {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        opacity: 0;
+        cursor: pointer;
+    }
+
+    .upload-area p {
+        margin: 0;
+        color: var(--text-muted);
+    }
+
+    /* Buttons */
     .btn {
         padding: 0.75rem 2rem;
         border-radius: 8px;
@@ -183,26 +338,28 @@
     }
 
     .btn-primary {
-        background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+        background: var(--primary-color);
         color: white;
     }
 
         .btn-primary:hover {
-            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-color) 100%);
+            background: var(--primary-dark);
             transform: translateY(-2px);
             box-shadow: var(--shadow-hover);
             color: white;
         }
 
     .btn-secondary {
-        background: var(--secondary-color);
-        color: white;
+        background: white;
+        color: var(--secondary-color);
+        border: 1px solid #dee2e6;
     }
 
         .btn-secondary:hover {
-            background: #5a6268;
-            transform: translateY(-2px);
+            background: var(--secondary-color);
             color: white;
+            border-color: var(--secondary-color);
+            transform: translateY(-2px);
         }
 
     .btn-group {
@@ -211,88 +368,157 @@
         margin-top: 2rem;
     }
 
-    .upload-area {
-        border: 2px dashed var(--primary-light);
-        border-radius: 12px;
+    /* Info Cards */
+    .info-container {
+        background: white;
+        border-radius: var(--border-radius);
         padding: 2rem;
-        text-align: center;
-        background: rgba(0, 167, 157, 0.05);
-        transition: all 0.3s ease;
+        box-shadow: var(--shadow);
+        border: 1px solid rgba(76, 175, 80, 0.1);
+        animation: fadeInUp 0.5s ease-out 0.2s both;
     }
 
-        .upload-area:hover {
-            border-color: var(--primary-color);
-            background: rgba(0, 167, 157, 0.1);
-        }
-
-    .upload-icon {
-        font-size: 3rem;
-        color: var(--primary-color);
-        margin-bottom: 1rem;
-    }
-
-    .info-card {
-        background: var(--light-bg);
-        border-radius: 12px;
-        padding: 1.5rem;
-        margin-bottom: 1.5rem;
-    }
-
-        .info-card h5 {
-            color: var(--primary-dark);
-            margin-bottom: 1rem;
+        .info-container h5 {
+            color: var(--primary-darker);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
             font-weight: 600;
         }
+
+            .info-container h5 i {
+                color: var(--primary-color);
+            }
+
+    .info-card {
+        background: var(--primary-bg);
+        border-radius: 8px;
+        padding: 1.25rem;
+        margin-bottom: 1rem;
+        border-left: 4px solid var(--primary-color);
+    }
+
+        .info-card:last-child {
+            margin-bottom: 0;
+        }
+
+        .info-card h6 {
+            color: var(--primary-dark);
+            margin-bottom: 0.75rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+            .info-card h6 i {
+                color: var(--primary-color);
+                font-size: 1rem;
+            }
 
     .info-item {
         display: flex;
         align-items: center;
-        margin-bottom: 0.75rem;
+        margin-bottom: 0.5rem;
         color: var(--text-muted);
+        font-size: 0.9rem;
     }
+
+        .info-item:last-child {
+            margin-bottom: 0;
+        }
 
         .info-item i {
             color: var(--primary-color);
             margin-right: 0.75rem;
-            font-size: 1.2rem;
+            font-size: 1rem;
         }
 
+    .info-card ul {
+        margin: 0;
+        padding-left: 1.5rem;
+        color: var(--text-muted);
+        font-size: 0.9rem;
+    }
+
+        .info-card ul li {
+            margin-bottom: 0.25rem;
+        }
+
+    /* Loading state */
+    .btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+
+    /* Responsive */
     @@media (max-width: 768px) {
-        .page-header {
-            padding: 2rem 0;
-            border-radius: 0 0 30px 30px;
-        }
+        .page-header
 
-            .page-header h1 {
-                font-size: 2rem;
-            }
+    {
+        padding: 1rem 0;
+    }
 
-        .form-container {
-            padding: 1.5rem;
-        }
+    .header-content h1 {
+        font-size: 1.5rem;
+    }
 
-        .btn-group {
-            flex-direction: column;
-        }
+    .form-container {
+        padding: 1.5rem;
+    }
 
-        .btn {
-            width: 100%;
-            justify-content: center;
-        }
+    .info-container {
+        padding: 1.5rem;
+    }
+
+    .btn-group {
+        flex-direction: column;
+    }
+
+    .btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .upload-area {
+        padding: 1.5rem;
+    }
+
+    }
+
+    .course-title-truncate {
+        display: inline-block;
+        max-width: 250px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        vertical-align: middle;
     }
 </style>
 
-<div class="page-header">
+@* <div class="breadcrumb-container">
     <div class="container">
         <nav aria-label="breadcrumb">
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="@Url.Action("Index", "Courses")">Courses</a></li>
-                <li class="breadcrumb-item"><a href="@Url.Action("Details", "Courses", new { id = courseId })">@course?.Title</a></li>
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="@Url.Action("Index", "Admin")"><i class="bi bi-house-door"></i> Courses</a></li>
+                <li class="breadcrumb-item">
+                    <a href="@Url.Action("Details", "Courses", new { id = courseId })" title="@courseTitle">
+                        <span class="course-title-truncate">@displayTitle</span>
+                    </a>
+                </li>
                 <li class="breadcrumb-item active" aria-current="page">Edit Lesson</li>
             </ol>
         </nav>
-        <h1><i class="bi bi-pencil-square me-2"></i>Edit Lesson</h1>
-        <p class="mb-0">Update lesson content and settings</p>
+    </div>
+</div> *@
+
+<div class="page-header">
+    <div class="container">
+        <div class="header-content">
+            <h1><i class="bi bi-pencil-square"></i> Edit Lesson</h1>
+            <p class="header-subtitle mb-0">Update lesson content and settings</p>
+        </div>
     </div>
 </div>
 
@@ -301,33 +527,43 @@
         <div class="col-lg-8">
             <div class="form-container">
                 <div class="form-header">
-                    <h3><i class="bi bi-file-earmark-text me-2"></i>Lesson Information</h3>
+                    <h3><i class="bi bi-file-earmark-text"></i> Lesson Information</h3>
                 </div>
 
                 <div class="current-info">
-                    <h6><i class="bi bi-info-circle me-2"></i>Current Lesson</h6>
+                    <h6><i class="bi bi-info-circle"></i> Current Lesson Details</h6>
                     <p><strong>Title:</strong> @Model.Title</p>
                     <p><strong>Type:</strong> @Model.ContentType</p>
+                    <p><strong>Order:</strong> Lesson #@Model.OrderNumber</p>
                     @if (!string.IsNullOrEmpty(Model.ContentUrl))
                     {
-                        <p><strong>Content:</strong> <a href="@Model.ContentUrl" target="_blank" class="text-primary">View current file</a></p>
+                        <p><strong>Content:</strong> <a href="@Model.ContentUrl" target="_blank"><i class="bi bi-link-45deg"></i> View current file</a></p>
                     }
                 </div>
 
-                <form asp-controller="Lessons" asp-action="Edit" asp-route-courseId="@courseId" asp-route-lessonId="@Model.LessonId" enctype="multipart/form-data">
+                <form asp-controller="Lessons" asp-action="Edit"
+                      asp-route-courseId="@courseId"
+                      asp-route-lessonId="@Model.LessonId"
+                      enctype="multipart/form-data">
+
                     <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+                    @Html.AntiForgeryToken()
                     <input type="hidden" asp-for="LessonId" />
                     <input type="hidden" asp-for="CourseId" value="@courseId" />
                     <input type="hidden" asp-for="CreatedAt" />
 
                     <div class="form-group">
-                        <label asp-for="Title" class="form-label">Lesson Title *</label>
+                        <label asp-for="Title" class="form-label">
+                            Lesson Title <span class="required">*</span>
+                        </label>
                         <input asp-for="Title" class="form-control" placeholder="Enter a descriptive title for your lesson" />
                         <span asp-validation-for="Title" class="text-danger"></span>
                     </div>
 
                     <div class="form-group">
-                        <label asp-for="ContentType" class="form-label">Content Type *</label>
+                        <label asp-for="ContentType" class="form-label">
+                            Content Type <span class="required">*</span>
+                        </label>
                         <select asp-for="ContentType" class="form-select">
                             <option value="Video">📹 Video</option>
                             <option value="Article">📄 Article</option>
@@ -341,42 +577,48 @@
                         <label asp-for="ContentFile" class="form-label">Update Content File (Optional)</label>
                         <div class="upload-area">
                             <i class="bi bi-cloud-upload upload-icon"></i>
-                            <input type="file" asp-for="ContentFile" class="form-control"
+                            <input type="file" asp-for="ContentFile"
                                    data-val="true"
                                    data-val-filesize="The file must be less than 1GB"
                                    data-val-filesize-max="1073741824"
                                    accept="video/mp4,video/x-m4v,video/*,.pdf,.doc,.docx" />
                             <p class="form-text mb-0 mt-2">
+                                <strong>Click to upload or drag and drop</strong><br>
                                 Upload a new file to replace the current one<br>
-                                Maximum file size: 1GB
+                                <small>Maximum file size: 1GB</small>
                             </p>
                         </div>
                         <span asp-validation-for="ContentFile" class="text-danger"></span>
                     </div>
 
                     <div class="form-group">
-                        <label asp-for="Duration" class="form-label">Duration (minutes) *</label>
+                        <label asp-for="Duration" class="form-label">
+                            Duration (minutes) <span class="required">*</span>
+                        </label>
                         <input asp-for="Duration" type="number" class="form-control" placeholder="Estimated time to complete" min="1" />
                         <span asp-validation-for="Duration" class="text-danger"></span>
+                        <small class="form-text">How long will it take to complete this lesson?</small>
                     </div>
 
                     <div class="form-group">
-                        <label asp-for="OrderNumber" class="form-label">Order Number *</label>
-                        <input asp-for="OrderNumber" type="number" class="form-control" placeholder="Lesson sequence in the course" min="1" />
+                        <label asp-for="OrderNumber" class="form-label">
+                            Lesson Order <span class="required">*</span>
+                        </label>
+                        <input asp-for="OrderNumber" type="number" class="form-control" placeholder="Display order in course" min="1" />
                         <span asp-validation-for="OrderNumber" class="text-danger"></span>
-                        <small class="form-text">Determines the order of lessons in the course</small>
+                        <small class="form-text">The position of this lesson in the course sequence</small>
                     </div>
 
                     <div class="form-check">
-                        <input class="form-check-input" asp-for="IsFreePreview" />
-                        <label class="form-check-label" asp-for="IsFreePreview">
+                        <input asp-for="IsFreePreview" class="form-check-input" type="checkbox" />
+                        <label asp-for="IsFreePreview" class="form-check-label">
                             <strong>Free Preview</strong><br>
                             <small class="text-muted">Allow users to preview this lesson without enrollment</small>
                         </label>
                     </div>
 
                     <div class="btn-group">
-                        <button type="submit" class="btn btn-primary">
+                        <button type="submit" class="btn btn-primary" id="saveBtn">
                             <i class="bi bi-check-circle"></i> Save Changes
                         </button>
                         <a asp-controller="Admin" asp-action="Details" asp-route-id="@courseId" class="btn btn-secondary">
@@ -388,11 +630,11 @@
         </div>
 
         <div class="col-lg-4">
-            <div class="form-container">
-                <h5 class="text-primary mb-3"><i class="bi bi-info-circle me-2"></i>Lesson Details</h5>
+            <div class="info-container">
+                <h5><i class="bi bi-info-circle"></i> Lesson Details</h5>
 
                 <div class="info-card">
-                    <h6><i class="bi bi-calendar3 me-2"></i>Timeline</h6>
+                    <h6><i class="bi bi-calendar3"></i> Timeline</h6>
                     <div class="info-item">
                         <i class="bi bi-calendar-plus"></i>
                         <span>Created: @Model.CreatedAt.ToString("MMM dd, yyyy")</span>
@@ -404,12 +646,22 @@
                 </div>
 
                 <div class="info-card">
-                    <h6><i class="bi bi-lightbulb me-2"></i>Quick Tips</h6>
-                    <ul class="ps-3 mb-0">
+                    <h6><i class="bi bi-lightbulb"></i> Quick Tips</h6>
+                    <ul>
                         <li>Keep the title clear and descriptive</li>
                         <li>Only upload a new file if you want to replace the current one</li>
                         <li>Order numbers should be sequential</li>
                         <li>Free preview lessons help attract new students</li>
+                        <li>Review your changes before saving</li>
+                    </ul>
+                </div>
+
+                <div class="info-card">
+                    <h6><i class="bi bi-file-earmark-check"></i> Supported Formats</h6>
+                    <ul>
+                        <li><strong>Video:</strong> MP4, MOV, AVI</li>
+                        <li><strong>Documents:</strong> PDF, DOC, DOCX</li>
+                        <li><strong>Maximum size:</strong> 1GB per file</li>
                     </ul>
                 </div>
             </div>
@@ -436,12 +688,68 @@
         });
 
         // File upload preview
-        document.getElementById('ContentFile').addEventListener('change', function(e) {
+        document.querySelector('input[type="file"]').addEventListener('change', function(e) {
             const fileName = e.target.files[0]?.name;
+            const fileSize = e.target.files[0]?.size;
+
             if (fileName) {
                 const uploadText = document.querySelector('.upload-area p');
-                uploadText.innerHTML = `<strong>Selected:</strong> ${fileName}<br><small class="text-warning">This will replace the current file</small>`;
+                const sizeInMB = (fileSize / (1024 * 1024)).toFixed(2);
+                uploadText.innerHTML = `
+                    <strong>Selected:</strong> ${fileName}<br>
+                    <small>Size: ${sizeInMB} MB</small><br>
+                    <small class="text-warning"><i class="bi bi-exclamation-triangle"></i> This will replace the current file</small>
+                `;
             }
+        });
+
+        // Drag and drop functionality
+        const uploadArea = document.querySelector('.upload-area');
+        const fileInput = document.querySelector('input[type="file"]');
+
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, preventDefaults, false);
+        });
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, highlight, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, unhighlight, false);
+        });
+
+        function highlight(e) {
+            uploadArea.style.borderColor = '#388E3C';
+            uploadArea.style.backgroundColor = 'rgba(76, 175, 80, 0.15)';
+        }
+
+        function unhighlight(e) {
+            uploadArea.style.borderColor = '';
+            uploadArea.style.backgroundColor = '';
+        }
+
+        uploadArea.addEventListener('drop', handleDrop, false);
+
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            fileInput.files = files;
+
+            const event = new Event('change', { bubbles: true });
+            fileInput.dispatchEvent(event);
+        }
+
+        // Form submit loading state
+        document.querySelector('form').addEventListener('submit', function(e) {
+            const saveBtn = document.getElementById('saveBtn');
+            saveBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status"></span> Saving...';
+            saveBtn.disabled = true;
         });
     </script>
 }
