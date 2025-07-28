@@ -12,8 +12,9 @@ namespace mvc.app.Controllers
         private readonly IBookingService _bookingService;
         private readonly ICourseService _courseService;
         private readonly ILessonService _lessonService;
+        private readonly ICategoryService _categoryService;
         private readonly IProgressService _progressService;
-        public AdminController(IBookingService bookingService, IAuthService userService, ICourseService courseService,
+        public AdminController(IBookingService bookingService, IAuthService userService, ICourseService courseService, ICategoryService categoryService,
      ILessonService lessonService,
      IProgressService progressService)
         {
@@ -21,17 +22,19 @@ namespace mvc.app.Controllers
             _courseService = courseService;
             _lessonService = lessonService;
             _progressService = progressService;
+            _categoryService = categoryService;
 
         }
         public async Task<IActionResult> Dashboard()
         {
-            var role = HttpContext.Session.GetString("Role");            // This action could be used to display admin dashboard information
             var customerIdObj = HttpContext.Session.GetString("UserId");
-            if (customerIdObj == null || role == "Admin")
+            if (customerIdObj == null || !IsAdmin())
             {
                 return RedirectToAction("Login", "Auth");
             }
             var list = await _bookingService.GetAllBookingsWithNamesAsync();
+            var categories = await _categoryService.GetAllCategoriesAsync();
+            ViewBag.Categories = categories;
             return View("AdminPage",list);
         }
         public async Task<IActionResult> Edit(int? id)

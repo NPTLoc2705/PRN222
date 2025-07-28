@@ -266,6 +266,7 @@ namespace mvc.app.Controllers
 
             // Debug: Log model values
             _logger.LogInformation("Editing course: {@CourseDTO}", courseDTO);
+            _logger.LogInformation("Received Description: {Description}", courseDTO.Description);
 
             // Special handling for categories - remove validation if not needed
             if (courseDTO.SelectedCategoryIds.Count == 0)
@@ -338,8 +339,9 @@ namespace mvc.app.Controllers
         }
 
         // POST: Courses/Delete/5
-        [HttpPost("Courses/DeleteConfirmed/{id}")]
+        [HttpPost]
         [ValidateAntiForgeryToken]
+        [ActionName("Delete")]
         public async Task<IActionResult> DeleteConfirmed(Guid id)
         {
             if (!IsAdmin()) return RedirectToAction("AccessDenied", "Home");
@@ -351,9 +353,7 @@ namespace mvc.app.Controllers
                 }
 
                 // Delete dependent records in proper order
-                await _progressService.DeleteProgressByCourseIdAsync(id);
-                await _lessonService.DeleteLessonsByCourseIdAsync(id);
-                await _categoryService.DeleteCategoryMappingsForCourseAsync(id); // Use the new method
+               
 
                 // Then delete the course
                 var result = await _courseService.DeleteCourseAsync(id);
