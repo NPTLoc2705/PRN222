@@ -1,15 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using mvc.dataaccess.Entities;
+
 using mvc.dataaccess.Entities.Courses;
 using mvc.dataaccess.ViewModels;
 using mvc.services.Interfaces;
-using static mvc.dataaccess.ViewModels.CategoryDTO;
 
 namespace mvc.app.Controllers
 {
@@ -29,6 +23,7 @@ namespace mvc.app.Controllers
         // GET: Categories
         public async Task<IActionResult> Index()
         {
+            if (!IsAdmin()) return RedirectToAction("AccessDenied", "Home");
             try
             {
                 var categories = await _categoryService.GetAllCategoriesAsync();
@@ -44,6 +39,7 @@ namespace mvc.app.Controllers
         // GET: Categories/Details/5
         public async Task<IActionResult> Details(Guid? id)
         {
+            if (!IsAdmin()) return RedirectToAction("AccessDenied", "Home");
             if (id == null) return NotFound();
 
             try
@@ -63,6 +59,7 @@ namespace mvc.app.Controllers
         // GET: Categories/Create
         public IActionResult Create()
         {
+            if (!IsAdmin()) return RedirectToAction("AccessDenied", "Home");
             return View(new CreateCategoryDto());
         }
 
@@ -71,6 +68,7 @@ namespace mvc.app.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(CreateCategoryDto dto)
         {
+            if (!IsAdmin()) return RedirectToAction("AccessDenied", "Home");
             if (!ModelState.IsValid)
             {
                 return View(dto);
@@ -92,7 +90,7 @@ namespace mvc.app.Controllers
                 };
 
                 await _categoryService.CreateCategoryAsync(category);
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction("Dashboard", "Admin", new { showSection = "categories" });
             }
             catch (Exception ex)
             {
@@ -105,6 +103,7 @@ namespace mvc.app.Controllers
         // GET: Categories/Edit/5
         public async Task<IActionResult> Edit(Guid? id)
         {
+            if (!IsAdmin()) return RedirectToAction("AccessDenied", "Home");
             if (id == null) return NotFound();
 
             try
@@ -126,6 +125,7 @@ namespace mvc.app.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(Guid id, [Bind("CategoryId,Name")] CourseCategory category)
         {
+            if (!IsAdmin()) return RedirectToAction("AccessDenied", "Home");
             if (id != category.CategoryId) return NotFound();
 
             if (ModelState.IsValid)
@@ -140,7 +140,8 @@ namespace mvc.app.Controllers
                     }
 
                     await _categoryService.UpdateCategoryAsync(category);
-                    return RedirectToAction(nameof(Index));
+                    return RedirectToAction("Dashboard", "Admin", new { showSection = "categories" });
+
                 }
                 catch (Exception ex)
                 {
@@ -154,6 +155,7 @@ namespace mvc.app.Controllers
         // GET: Categories/Delete/5
         public async Task<IActionResult> Delete(Guid? id)
         {
+            if (!IsAdmin()) return RedirectToAction("AccessDenied", "Home");
             if (id == null) return NotFound();
 
             try
@@ -179,22 +181,27 @@ namespace mvc.app.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(Guid id)
         {
+            if (!IsAdmin()) return RedirectToAction("AccessDenied", "Home");
             try
             {
                 var result = await _categoryService.DeleteCategoryAsync(id);
                 if (!result)
                 {
-                    TempData["ErrorMessage"] = "Could not delete category. It may be in use by one or more courses.";
+                    TempData["ErrorMessage"] = "An error occurred while deleting the category.";
                     return RedirectToAction(nameof(Delete), new { id });
                 }
 
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction("Dashboard", "Admin", new { showSection = "categories" });
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error deleting category");
                 return View("Error");
             }
+        }
+        private bool IsAdmin()
+        {
+            return HttpContext.Session.GetString("UserRole") == "Admin";
         }
     }
 
