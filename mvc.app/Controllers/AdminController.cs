@@ -12,6 +12,7 @@ namespace mvc.app.Controllers
         private readonly IBookingService _bookingService;
         private readonly ICourseService _courseService;
         private readonly ILessonService _lessonService;
+        private readonly ICategoryService _categoryService;
         private readonly IProgressService _progressService;
         private readonly IUserService _userService;
 
@@ -20,13 +21,16 @@ namespace mvc.app.Controllers
             IUserService userService,
             ICourseService courseService,
             ILessonService lessonService,
-            IProgressService progressService)
+            IProgressService progressService,
+            ICategoryService categoryService)
         {
             _bookingService = bookingService;
             _userService = userService;
             _courseService = courseService;
             _lessonService = lessonService;
             _progressService = progressService;
+            _categoryService = categoryService;
+
         }
 
         public async Task<IActionResult> Dashboard()
@@ -42,8 +46,10 @@ namespace mvc.app.Controllers
             {
                 var bookings = await _bookingService.GetAllBookingsWithNamesAsync();
                 var users = await _userService.GetAllUsers();
+                var categories = await _categoryService.GetAllCategoriesAsync();
                 ViewBag.Users = users;
                 ViewBag.CurrentUserId = userId;
+                ViewBag.Categories = categories;
                 return View("AdminPage", bookings);
             }
             catch (Exception ex)

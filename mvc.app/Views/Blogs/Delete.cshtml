@@ -7,23 +7,65 @@
 
 @section Styles {
     <style>
+        :root {
+            --primary-color: #4CAF50;
+            --primary-light: #81C784;
+            --primary-dark: #388E3C;
+            --primary-darker: #2E7D32;
+            --primary-bg: #E8F5E9;
+            --secondary-color: #6c757d;
+            --danger-color: #dc3545;
+            --danger-dark: #c82333;
+            --danger-light: #fee;
+            --warning-color: #FFC107;
+            --warning-light: #fff3cd;
+            --light-bg: #f5f9f5;
+            --white: #ffffff;
+            --text-dark: #2c3e50;
+            --text-muted: #6c757d;
+            --shadow: 0 2px 8px rgba(0,0,0,0.08);
+            --shadow-hover: 0 4px 16px rgba(0,0,0,0.12);
+            --border-radius: 12px;
+        }
+
+        body {
+            background-color: var(--light-bg);
+        }
+
         /* Container */
         .delete-container {
             max-width: 700px;
             margin: 2rem auto;
-            padding: 0;
+            padding: 0 1rem;
         }
 
-        /* Warning Card */
+        /* Delete Card */
         .delete-card {
             background: white;
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
             overflow: hidden;
+            border: 1px solid rgba(220, 53, 69, 0.1);
+            animation: fadeInUp 0.5s ease-out;
+        }
+
+        @@keyframes fadeInUp {
+            from
+
+        {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
         }
 
         .delete-header {
-            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            background: linear-gradient(135deg, var(--danger-color) 0%, var(--danger-dark) 100%);
             color: white;
             padding: 2rem;
             text-align: center;
@@ -48,17 +90,20 @@
         }
 
         @@keyframes pulse {
-            0% {
-                transform: scale(1);
-            }
+            0%
 
-            50% {
-                transform: scale(1.1);
-            }
+        {
+            transform: scale(1);
+        }
 
-            100% {
-                transform: scale(1);
-            }
+        50% {
+            transform: scale(1.1);
+        }
+
+        100% {
+            transform: scale(1);
+        }
+
         }
 
         /* Content */
@@ -67,8 +112,8 @@
         }
 
         .blog-preview {
-            background: #f8f9fa;
-            border: 2px solid #e9ecef;
+            background: var(--light-bg);
+            border: 1px solid rgba(76, 175, 80, 0.2);
             border-radius: 8px;
             padding: 1.5rem;
             margin-bottom: 2rem;
@@ -76,7 +121,7 @@
 
         .preview-label {
             font-weight: 600;
-            color: #495057;
+            color: var(--primary-darker);
             margin-bottom: 0.5rem;
             display: block;
             font-size: 0.9rem;
@@ -87,12 +132,12 @@
         .preview-title {
             font-size: 1.5rem;
             font-weight: 700;
-            color: #212529;
+            color: var(--text-dark);
             margin-bottom: 1rem;
         }
 
         .preview-content {
-            color: #6c757d;
+            color: var(--text-muted);
             font-size: 1rem;
             line-height: 1.6;
             max-height: 100px;
@@ -110,7 +155,7 @@
                 max-height: 200px;
                 object-fit: cover;
                 border-radius: 8px;
-                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+                box-shadow: var(--shadow);
             }
 
         .blog-meta {
@@ -120,7 +165,7 @@
             padding-top: 1rem;
             border-top: 1px solid #dee2e6;
             font-size: 0.9rem;
-            color: #6c757d;
+            color: var(--text-muted);
         }
 
         .meta-item {
@@ -129,11 +174,15 @@
             gap: 0.5rem;
         }
 
+            .meta-item i {
+                color: var(--primary-color);
+            }
+
         /* Warning Message */
         .warning-message {
-            background: #fff3cd;
-            border: 1px solid #ffeaa7;
-            color: #856404;
+            background: var(--danger-light);
+            border: 1px solid #f5c6cb;
+            color: var(--danger-color);
             padding: 1rem 1.5rem;
             border-radius: 8px;
             margin-bottom: 2rem;
@@ -162,7 +211,7 @@
             gap: 1rem;
             justify-content: center;
             padding: 2rem;
-            background: #f8f9fa;
+            background: var(--light-bg);
             border-top: 1px solid #dee2e6;
         }
 
@@ -181,54 +230,111 @@
         }
 
         .btn-delete {
-            background: #dc3545;
+            background: var(--danger-color);
             color: white;
         }
 
             .btn-delete:hover {
-                background: #c82333;
+                background: var(--danger-dark);
                 transform: translateY(-2px);
                 box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
             }
 
         .btn-cancel {
-            background: #6c757d;
-            color: white;
+            background: white;
+            color: var(--secondary-color);
+            border: 1px solid #dee2e6;
         }
 
             .btn-cancel:hover {
-                background: #5a6268;
+                background: var(--secondary-color);
+                color: white;
+                border-color: var(--secondary-color);
                 transform: translateY(-2px);
             }
 
+        /* Breadcrumb */
+        .breadcrumb-container {
+            background: white;
+            padding: 1rem 0;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid rgba(76, 175, 80, 0.1);
+        }
+
+        .breadcrumb {
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 0 1rem;
+            display: flex;
+            align-items: center;
+            font-size: 0.9rem;
+        }
+
+        .breadcrumb-item {
+            color: var(--text-muted);
+        }
+
+            .breadcrumb-item + .breadcrumb-item::before {
+                content: "/";
+                color: var(--text-muted);
+                margin: 0 0.5rem;
+            }
+
+        .breadcrumb a {
+            color: var(--primary-dark);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+            .breadcrumb a:hover {
+                color: var(--primary-color);
+                text-decoration: underline;
+            }
+
+        .breadcrumb-item.active {
+            color: var(--danger-color);
+            font-weight: 600;
+        }
+
         /* Responsive */
         @@media (max-width: 768px) {
-            .delete-container {
-                margin: 0;
-                border-radius: 0;
-            }
+            .delete-container
 
-            .delete-card {
-                border-radius: 0;
-                box-shadow: none;
-            }
+        {
+            margin: 0;
+            padding: 0;
+        }
 
-            .delete-actions {
-                flex-direction: column-reverse;
-            }
+        .delete-card {
+            border-radius: 0;
+            box-shadow: none;
+        }
 
-            .btn {
-                width: 100%;
-                justify-content: center;
-            }
+        .delete-actions {
+            flex-direction: column-reverse;
+        }
 
-            .blog-meta {
-                flex-direction: column;
-                gap: 0.5rem;
-            }
+        .btn {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .blog-meta {
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
         }
     </style>
 }
+
+<nav aria-label="breadcrumb" class="breadcrumb-container">
+    <ol class="breadcrumb mb-0">
+        <li class="breadcrumb-item"><a href="@Url.Action("Index", "Blogs")"><i class="bi bi-house-door"></i> Blogs</a></li>
+        <li class="breadcrumb-item"><a href="@Url.Action("AdminBlog", "Blogs")">Admin</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Delete</li>
+    </ol>
+</nav>
 
 <div class="delete-container">
     <div class="delete-card">
@@ -275,13 +381,13 @@
 
                 <div class="blog-meta">
                     <div class="meta-item">
-                        <i class="fas fa-calendar"></i>
+                        <i class="bi bi-calendar"></i>
                         <span>Created: @DateTime.Now.ToString("MMM dd, yyyy")</span>
                     </div>
                     @if (Model?.blog_content?.Contains("<img") == true)
                     {
                         <div class="meta-item">
-                            <i class="fas fa-image"></i>
+                            <i class="bi bi-image"></i>
                             <span>Contains images</span>
                         </div>
                     }
@@ -289,7 +395,7 @@
             </div>
 
             <div class="warning-message">
-                <i class="fas fa-info-circle"></i>
+                <i class="bi bi-exclamation-circle-fill"></i>
                 <div class="warning-text">
                     <strong>This action cannot be undone!</strong>
                     Once deleted, this blog post and all its content will be permanently removed from the system.
@@ -298,13 +404,14 @@
         </div>
 
         <form asp-action="Delete" method="post">
+            @Html.AntiForgeryToken()
             <input type="hidden" asp-for="Id" />
             <div class="delete-actions">
                 <a href="/Blogs/AdminBlog" class="btn btn-cancel">
-                    <i class="fas fa-times"></i>Cancel
+                    <i class="bi bi-x-circle"></i> Cancel
                 </a>
-                <button type="submit" class="btn btn-delete">
-                    <i class="fas fa-trash"></i>Yes, Delete This Post
+                <button type="submit" class="btn btn-delete" id="deleteBtn">
+                    <i class="bi bi-trash"></i> Yes, Delete This Post
                 </button>
             </div>
         </form>
@@ -316,10 +423,19 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
     <script>
-        // Add confirmation on delete button
-        document.querySelector('.btn-delete').addEventListener('click', function(e) {
-            if (!confirm('Final confirmation: Delete this blog post?')) {
-                e.preventDefault();
+        // Add final confirmation and loading state
+        document.querySelector('form').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const deleteBtn = document.getElementById('deleteBtn');
+
+            if (confirm('Final confirmation: Delete this blog post?')) {
+                // Show loading state
+                deleteBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status"></span> Deleting...';
+                deleteBtn.disabled = true;
+
+                // Submit the form
+                this.submit();
             }
         });
     </script>

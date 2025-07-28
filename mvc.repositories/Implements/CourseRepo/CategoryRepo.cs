@@ -40,9 +40,15 @@ namespace mvc.repositories.Implements.CourseRepo
             var category = await _context.CourseCategories.FindAsync(categoryId);
             if (category == null) return false;
 
-            // Check if category is in use
-            var isInUse = await _context.CourseCategoryMappings.AnyAsync(cc => cc.CategoryId == categoryId);
-            if (isInUse) return false;
+            // Delete all mappings for this category first
+            var mappings = await _context.CourseCategoryMappings
+                .Where(cc => cc.CategoryId == categoryId)
+                .ToListAsync();
+
+            if (mappings.Any())
+            {
+                _context.CourseCategoryMappings.RemoveRange(mappings);
+            }
 
             _context.CourseCategories.Remove(category);
             await _context.SaveChangesAsync();

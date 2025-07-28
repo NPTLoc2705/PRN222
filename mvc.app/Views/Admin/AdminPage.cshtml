@@ -344,6 +344,27 @@
             margin: 20px 30px;
             border-radius: 10px;
         }
+        .category-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+            .category-table th {
+                padding: 15px;
+                text-align: left;
+                background: #f8f9fa;
+                border-bottom: 2px solid #e9ecef;
+            }
+
+            .category-table td {
+                padding: 15px;
+                border-bottom: 1px solid #e9ecef;
+                vertical-align: middle;
+            }
+
+            .category-table tr:hover {
+                background: rgba(39, 174, 96, 0.05);
+            }
     </style>
 </head>
 <body>
@@ -376,6 +397,10 @@
             <a asp-controller="Admin" asp-action="Index">
                 <i class="fas fa-book"></i>
                 <span>Course Management</span>
+            </a>
+            <a href="#" onclick="showSection(event, 'categories')" class="nav-link">
+                <i class="fas fa-tags"></i>
+                <span>Categories</span>
             </a>
         </nav>
     </div>
@@ -680,6 +705,63 @@
                 </div>
             </div>
         </div>
+        <!-- Categories Section -->
+        <div id="categories-section" class="content-section" style="display: none;">
+            <div class="content-header">
+                <h2><i class="fas fa-tags"></i> Category Management</h2>
+                <p>Manage all your course categories</p>
+            </div>
+            <div class="content-body">
+                <div class="table-container">
+                    <div class="table-header">
+                        <h4><i class="fas fa-list"></i> All Categories</h4>
+                        <a asp-controller="Categories" asp-action="Create" class="btn-create">
+                            <i class="fas fa-plus"></i> Create New Category
+                        </a>
+                    </div>
+                    <div class="table-wrapper">
+                        <table class="booking-table">
+                            <thead>
+                                <tr>
+                                    <th><i class="fas fa-tag"></i> Category Name</th>
+                                    <th><i class="fas fa-cogs"></i> Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (ViewBag.Categories != null)
+                                {
+                                    @foreach (var category in ViewBag.Categories)
+                                    {
+                                        <tr>
+                                            <td>@category.Name</td>
+                                            <td>
+                                                <div class="action-buttons">
+                                                    <a asp-controller="Categories" asp-action="Edit" asp-route-id="@category.CategoryId" class="action-btn btn-edit">
+                                                        <i class="fas fa-edit"></i> Edit
+                                                    </a>
+                                                    <a asp-controller="Categories" asp-action="Details" asp-route-id="@category.CategoryId" class="action-btn btn-details">
+                                                        <i class="fas fa-info-circle"></i> Details
+                                                    </a>
+                                                    <a asp-controller="Categories" asp-action="Delete" asp-route-id="@category.CategoryId" class="action-btn btn-delete">
+                                                        <i class="fas fa-trash-alt"></i> Delete
+                                                    </a>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                                else
+                                {
+                                    <tr>
+                                        <td colspan="2" class="text-center">No categories found</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -695,6 +777,11 @@
         function showSection(sectionName) {
             // Store current section in session storage
             sessionStorage.setItem('currentAdminSection', sectionName);
+                function showSection(event, sectionName) {
+            // Prevent default anchor behavior if event exists
+            if (event && event.preventDefault) {
+                event.preventDefault();
+            }
 
             // Hide all sections
             const sections = document.querySelectorAll('.content-section');
@@ -734,6 +821,16 @@
             } else {
                 showSection('welcome');
             }
+            // Find and activate the clicked nav link
+            const clickedLink = event ? event.currentTarget : document.querySelector('.nav-link.active');
+            if (clickedLink) {
+                clickedLink.classList.add('active');
+            }
+        }
+
+        // Initialize with welcome section
+        document.addEventListener('DOMContentLoaded', function() {
+            showSection(null, 'welcome');
         });
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
