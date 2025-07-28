@@ -130,16 +130,14 @@ namespace mvc.app.Controllers
         }
 
         // GET: Blogs/Delete/5
-        public IActionResult Delete(int? id)
+        public IActionResult Delete(Guid? id)
         {
             if (id == null)
             {
                 return NotFound();
             }
 
-            // Convert int to Guid if your service expects Guid
-            var guidId = new Guid(); // You'll need to handle the conversion properly
-            var blog = _blogService.GetById(guidId);
+            var blog = _blogService.GetById(id.Value);
 
             if (blog == null)
             {

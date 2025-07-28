@@ -2,24 +2,63 @@
 @{
     ViewData["Title"] = "Delete Lesson";
     var courseId = ViewBag.CourseId;
-    var course = ViewBag.Module; // Using course since modules are removed
+
+    // Handle course title properly
+    // Note: Make sure in LessonsController Delete action, you set either:
+    // ViewBag.Module = course (where course is the Course object)
+    // OR ViewBag.CourseTitle = course.Title
+    // OR ViewBag.CourseName = course.Title
+    string courseTitle = "Course";
+    if (ViewBag.Module != null)
+    {
+        // Check if Module is a course object with Title property
+        var course = ViewBag.Module as dynamic;
+        try
+        {
+            courseTitle = course?.Title ?? "Course";
+        }
+        catch
+        {
+            // If accessing Title fails, use Module as string
+            courseTitle = ViewBag.Module.ToString();
+        }
+    }
+    else if (ViewBag.CourseTitle != null)
+    {
+        courseTitle = ViewBag.CourseTitle.ToString();
+    }
+    else if (ViewBag.CourseName != null)
+    {
+        courseTitle = ViewBag.CourseName.ToString();
+    }
+
+    // Final validation
+    if (string.IsNullOrWhiteSpace(courseTitle))
+    {
+        courseTitle = "Course";
+    }
 }
 
 <style>
     :root {
-        --primary-color: #00a79d;
-        --primary-dark: #008c83;
-        --primary-light: #4db8ad;
+        --primary-color: #4CAF50;
+        --primary-light: #81C784;
+        --primary-dark: #388E3C;
+        --primary-darker: #2E7D32;
+        --primary-bg: #E8F5E9;
         --secondary-color: #6c757d;
         --danger-color: #dc3545;
         --danger-dark: #c82333;
-        --warning-color: #ffc107;
-        --light-bg: #f8f9fa;
+        --danger-light: #f8d7da;
+        --warning-color: #FFC107;
+        --warning-light: #fff3cd;
+        --light-bg: #f5f9f5;
         --white: #ffffff;
         --text-dark: #2c3e50;
         --text-muted: #6c757d;
-        --shadow: 0 4px 12px rgba(0,0,0,0.1);
-        --shadow-hover: 0 6px 20px rgba(0,0,0,0.15);
+        --shadow: 0 2px 8px rgba(0,0,0,0.08);
+        --shadow-hover: 0 4px 16px rgba(0,0,0,0.12);
+        --border-radius: 12px;
     }
 
     body {
@@ -27,70 +66,152 @@
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
 
+    /* Page Header */
     .page-header {
-        background: linear-gradient(135deg, var(--danger-color) 0%, #e74c3c 100%);
-        color: white;
-        padding: 3rem 0;
-        margin-bottom: 3rem;
-        border-radius: 0 0 50px 50px;
-        box-shadow: var(--shadow);
+        background: white;
+        padding: 2rem 0;
+        margin-bottom: 2rem;
+        border-bottom: 1px solid rgba(76, 175, 80, 0.1);
     }
 
-        .page-header h1 {
-            font-size: 2.5rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-        }
+    .breadcrumb-container {
+        background: linear-gradient(to right, var(--primary-bg), rgba(232, 245, 233, 0.5));
+        padding: 0.75rem 0;
+        border-bottom: 1px solid rgba(76, 175, 80, 0.2);
+        margin-bottom: 1.5rem;
+    }
 
     .breadcrumb {
         background: transparent;
         padding: 0;
         margin: 0;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        font-size: 0.875rem;
     }
 
     .breadcrumb-item {
-        color: rgba(255, 255, 255, 0.8);
+        color: var(--text-muted);
+        max-width: 200px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
     }
 
-        .breadcrumb-item.active {
-            color: white;
+        .breadcrumb-item a {
+            display: inline-block;
+            max-width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
 
+            .breadcrumb-item a i {
+                margin-right: 0.25rem;
+                font-size: 0.875rem;
+            }
+
         .breadcrumb-item + .breadcrumb-item::before {
-            color: rgba(255, 255, 255, 0.6);
+            content: "/";
+            color: var(--text-muted);
+            margin: 0 0.5rem;
         }
 
     .breadcrumb a {
-        color: rgba(255, 255, 255, 0.9);
+        color: var(--primary-dark);
         text-decoration: none;
+        transition: all 0.3s ease;
+        font-weight: 500;
     }
 
         .breadcrumb a:hover {
-            color: white;
+            color: var(--primary-color);
+            text-decoration: underline;
         }
 
-    .delete-container {
-        background: white;
-        border-radius: 16px;
-        padding: 2.5rem;
-        box-shadow: var(--shadow);
-        margin-bottom: 3rem;
-        max-width: 800px;
-        margin-left: auto;
-        margin-right: auto;
+    .breadcrumb-item.active {
+        color: var(--text-dark);
+        font-weight: 600;
     }
 
+    .header-content h1 {
+        color: var(--primary-darker);
+        font-size: 1.75rem;
+        font-weight: 600;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+        .header-content h1 i {
+            color: var(--danger-color);
+            font-size: 1.5rem;
+        }
+
+    .header-subtitle {
+        color: var(--text-muted);
+        margin-top: 0.5rem;
+    }
+
+    /* Delete Container */
+    .delete-container {
+        background: white;
+        border-radius: var(--border-radius);
+        padding: 2.5rem;
+        box-shadow: var(--shadow);
+        max-width: 800px;
+        margin: 0 auto 2rem;
+        border: 1px solid rgba(76, 175, 80, 0.1);
+        animation: fadeInUp 0.5s ease-out;
+    }
+
+    @@keyframes fadeInUp {
+        from
+
+    {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    }
+
+    /* Warning Box */
     .warning-box {
-        background: #fff5f5;
-        border: 2px solid #ffdddd;
+        background: var(--danger-light);
+        border: 2px solid #f5c6cb;
         border-radius: 12px;
-        padding: 1.5rem;
+        padding: 2rem;
         margin-bottom: 2rem;
         text-align: center;
+        animation: pulse 2s infinite;
+    }
+
+    @@keyframes pulse {
+        0%
+
+    {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.02);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+
     }
 
     .warning-icon {
-        font-size: 4rem;
+        font-size: 3.5rem;
         color: var(--danger-color);
         margin-bottom: 1rem;
     }
@@ -99,22 +220,26 @@
         color: var(--danger-color);
         margin-bottom: 0.5rem;
         font-weight: 600;
+        font-size: 1.5rem;
     }
 
     .warning-box p {
         color: #721c24;
         margin: 0;
+        font-size: 1.1rem;
     }
 
+    /* Lesson Details */
     .lesson-details {
         background: var(--light-bg);
         border-radius: 12px;
         padding: 2rem;
         margin-bottom: 2rem;
+        border: 1px solid rgba(76, 175, 80, 0.1);
     }
 
         .lesson-details h4 {
-            color: var(--text-dark);
+            color: var(--primary-darker);
             margin-bottom: 1.5rem;
             font-weight: 600;
             display: flex;
@@ -122,10 +247,15 @@
             gap: 0.5rem;
         }
 
+            .lesson-details h4 i {
+                color: var(--primary-color);
+            }
+
     .detail-row {
         display: flex;
         padding: 0.75rem 0;
-        border-bottom: 1px solid #e1e8ed;
+        border-bottom: 1px solid #e9ecef;
+        align-items: center;
     }
 
         .detail-row:last-child {
@@ -134,7 +264,7 @@
 
     .detail-label {
         font-weight: 600;
-        color: var(--text-dark);
+        color: var(--text-muted);
         width: 150px;
         display: flex;
         align-items: center;
@@ -143,15 +273,27 @@
 
         .detail-label i {
             color: var(--primary-color);
+            font-size: 1rem;
         }
 
     .detail-value {
         flex: 1;
-        color: var(--text-muted);
+        color: var(--text-dark);
     }
 
+        .detail-value strong {
+            color: var(--primary-darker);
+        }
+
+    .badge.bg-success {
+        background-color: var(--primary-color) !important;
+        padding: 0.35em 0.65em;
+        border-radius: 50px;
+    }
+
+    /* Impact Section */
     .impact-section {
-        background: #fffbf0;
+        background: var(--warning-light);
         border: 1px solid #ffeaa7;
         border-radius: 12px;
         padding: 1.5rem;
@@ -159,12 +301,17 @@
     }
 
         .impact-section h5 {
-            color: var(--warning-color);
+            color: #856404;
             margin-bottom: 1rem;
             display: flex;
             align-items: center;
             gap: 0.5rem;
+            font-weight: 600;
         }
+
+            .impact-section h5 i {
+                color: var(--warning-color);
+            }
 
     .impact-list {
         list-style: none;
@@ -185,8 +332,10 @@
                 font-weight: bold;
                 position: absolute;
                 left: 0;
+                font-size: 1.2rem;
             }
 
+    /* Buttons */
     .btn {
         padding: 0.75rem 2rem;
         border-radius: 8px;
@@ -202,26 +351,28 @@
     }
 
     .btn-danger {
-        background: linear-gradient(135deg, var(--danger-color) 0%, var(--danger-dark) 100%);
+        background: var(--danger-color);
         color: white;
     }
 
         .btn-danger:hover {
-            background: linear-gradient(135deg, var(--danger-dark) 0%, var(--danger-color) 100%);
+            background: var(--danger-dark);
             transform: translateY(-2px);
             box-shadow: var(--shadow-hover);
             color: white;
         }
 
     .btn-secondary {
-        background: var(--secondary-color);
-        color: white;
+        background: white;
+        color: var(--secondary-color);
+        border: 1px solid #dee2e6;
     }
 
         .btn-secondary:hover {
-            background: #5a6268;
-            transform: translateY(-2px);
+            background: var(--secondary-color);
             color: white;
+            border-color: var(--secondary-color);
+            transform: translateY(-2px);
         }
 
     .btn-group {
@@ -236,54 +387,82 @@
         margin: 2rem 0;
         font-size: 1.1rem;
         color: var(--text-dark);
+        font-weight: 500;
     }
 
+    /* Container padding */
+    .container {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+
+    /* Loading state */
+    .btn-danger:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+
+    /* Responsive */
     @@media (max-width: 768px) {
-        .page-header {
-            padding: 2rem 0;
-            border-radius: 0 0 30px 30px;
-        }
+        .page-header
 
-            .page-header h1 {
-                font-size: 2rem;
-            }
+    {
+        padding: 1rem 0;
+    }
 
-        .delete-container {
-            padding: 1.5rem;
-        }
+    .header-content h1 {
+        font-size: 1.5rem;
+    }
 
-        .detail-row {
-            flex-direction: column;
-            gap: 0.5rem;
-        }
+    .delete-container {
+        padding: 1.5rem;
+    }
 
-        .detail-label {
-            width: auto;
-            font-size: 0.9rem;
-        }
+    .detail-row {
+        flex-direction: column;
+        gap: 0.25rem;
+        align-items: flex-start;
+    }
 
-        .btn-group {
-            flex-direction: column-reverse;
-        }
+    .detail-label {
+        width: auto;
+        font-size: 0.9rem;
+    }
 
-        .btn {
-            width: 100%;
-            justify-content: center;
-        }
+    .btn-group {
+        flex-direction: column-reverse;
+    }
+
+    .btn {
+        width: 100%;
+        justify-content: center;
+    }
+
     }
 </style>
 
-<div class="page-header">
+<div class="breadcrumb-container">
     <div class="container">
         <nav aria-label="breadcrumb">
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="@Url.Action("Index", "Courses")">Courses</a></li>
-                <li class="breadcrumb-item"><a href="@Url.Action("Details", "Courses", new { id = courseId })">@course?.Title</a></li>
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="@Url.Action("Index", "Courses")"><i class="bi bi-house-door"></i> Courses</a></li>
+                <li class="breadcrumb-item">
+                    <a href="@Url.Action("Details", "Courses", new { id = courseId })">
+                        @@(course?.Title?.Length > 30 ? course.Title.Substring(0, 30) + "..." : course?.Title)
+                    </a>
+                </li>
                 <li class="breadcrumb-item active" aria-current="page">Delete Lesson</li>
             </ol>
         </nav>
-        <h1><i class="bi bi-trash me-2"></i>Delete Lesson</h1>
-        <p class="mb-0">Remove lesson from course</p>
+    </div>
+</div>
+
+<div class="page-header">
+    <div class="container">
+        <div class="header-content">
+            <h1><i class="bi bi-trash"></i> Delete Lesson</h1>
+            <p class="header-subtitle mb-0">Remove lesson from course</p>
+        </div>
     </div>
 </div>
 
@@ -330,7 +509,16 @@
                     <i class="bi bi-book"></i> Course
                 </div>
                 <div class="detail-value">
-                    @course?.Title
+                    @courseTitle
+                </div>
+            </div>
+
+            <div class="detail-row">
+                <div class="detail-label">
+                    <i class="bi bi-sort-numeric-up"></i> Order
+                </div>
+                <div class="detail-value">
+                    Lesson #@Model.OrderNumber
                 </div>
             </div>
 
@@ -358,16 +546,17 @@
         </div>
 
         <p class="confirmation-text">
-            <strong>Please confirm that you want to delete this lesson.</strong>
+            Please confirm that you want to delete this lesson.
         </p>
 
-        <form asp-controller="Lessons" asp-action="DeleteConfirmed" asp-route-courseId="@courseId" asp-route-lessonId="@Model.LessonId" method="post">
+        <form id="deleteForm" asp-controller="Lessons" asp-action="DeleteConfirmed"
+              asp-route-courseId="@courseId" asp-route-lessonId="@Model.LessonId" method="post">
             @Html.AntiForgeryToken()
             <div class="btn-group">
                 <a asp-controller="Admin" asp-action="Details" asp-route-id="@courseId" class="btn btn-secondary">
                     <i class="bi bi-x-circle"></i> Cancel
                 </a>
-                <button type="submit" class="btn btn-danger" onclick="return confirm('This is your last chance. Are you absolutely sure you want to delete this lesson?');">
+                <button type="submit" class="btn btn-danger" id="deleteBtn">
                     <i class="bi bi-trash"></i> Yes, Delete Lesson
                 </button>
             </div>
@@ -377,6 +566,22 @@
 
 @section Scripts {
     <script>
+        document.getElementById('deleteForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const deleteBtn = document.getElementById('deleteBtn');
+            const originalText = deleteBtn.innerHTML;
+
+            if (confirm('This is your last chance. Are you absolutely sure you want to delete this lesson?')) {
+                // Show loading state
+                deleteBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status"></span> Deleting...';
+                deleteBtn.disabled = true;
+
+                // Submit the form
+                this.submit();
+            }
+        });
+
         // Add shake animation when hovering delete button
         document.querySelector('.btn-danger').addEventListener('mouseenter', function() {
             this.style.animation = 'shake 0.5s';

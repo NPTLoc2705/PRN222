@@ -6,9 +6,25 @@
 }
 
 <style>
+    :root {
+        --primary-color: #4CAF50;
+        --primary-light: #81C784;
+        --primary-dark: #388E3C;
+        --primary-darker: #2E7D32;
+        --primary-bg: #E8F5E9;
+        --secondary-color: #6c757d;
+        --light-bg: #f5f9f5;
+        --white: #ffffff;
+        --text-dark: #2c3e50;
+        --text-muted: #6c757d;
+        --shadow: 0 2px 8px rgba(0,0,0,0.08);
+        --shadow-hover: 0 4px 16px rgba(0,0,0,0.12);
+        --border-radius: 12px;
+    }
+
     /* Admin Bar */
     .admin-bar {
-        background-color: #2d3748;
+        background-color: var(--primary-darker);
         color: white;
         padding: 10px 0;
         position: fixed;
@@ -36,7 +52,7 @@
     }
 
         .admin-label i {
-            color: #ffd700;
+            color: var(--primary-light);
         }
 
     .admin-nav {
@@ -60,12 +76,12 @@
             }
 
         .admin-nav .btn-admin-dashboard {
-            background-color: #667eea;
+            background-color: var(--primary-color);
             font-weight: 600;
         }
 
             .admin-nav .btn-admin-dashboard:hover {
-                background-color: #764ba2;
+                background-color: var(--primary-dark);
             }
 
     /* Adjust body padding when admin bar is present */
@@ -75,7 +91,7 @@
 
     /* Hero Section */
     .blog-hero {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
         color: white;
         padding: 4rem 0;
         margin-bottom: 3rem;
@@ -113,18 +129,20 @@
     /* Article Card */
     .article-card {
         background: #fff;
-        border-radius: 12px;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow);
         overflow: hidden;
         transition: all 0.3s ease;
         display: flex;
         flex-direction: column;
         height: 100%;
+        border: 1px solid rgba(76, 175, 80, 0.1);
     }
 
         .article-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+            box-shadow: var(--shadow-hover);
+            border-color: var(--primary-light);
         }
 
     /* Article Image */
@@ -149,18 +167,19 @@
     .no-image {
         width: 100%;
         height: 100%;
-        background: linear-gradient(135deg, #e0e0e0 0%, #bdbdbd 100%);
+        background: linear-gradient(135deg, var(--primary-bg) 0%, #C8E6C9 100%);
         display: flex;
         align-items: center;
         justify-content: center;
-        color: #666;
+        color: var(--primary-dark);
         font-size: 1.2rem;
         font-style: italic;
     }
 
         .no-image i {
             font-size: 3rem;
-            opacity: 0.3;
+            opacity: 0.5;
+            color: var(--primary-color);
         }
 
     /* Article Content */
@@ -177,7 +196,7 @@
         gap: 15px;
         margin-bottom: 15px;
         font-size: 0.9rem;
-        color: #666;
+        color: var(--text-muted);
     }
 
         .article-meta span {
@@ -186,11 +205,15 @@
             gap: 5px;
         }
 
+        .article-meta i {
+            color: var(--primary-color);
+        }
+
     .article-title {
         font-size: 1.5rem;
         font-weight: 600;
         margin: 0 0 15px;
-        color: #1a1a1a;
+        color: var(--text-dark);
         line-height: 1.3;
         display: -webkit-box;
         -webkit-line-clamp: 2;
@@ -225,14 +248,14 @@
         display: inline-flex;
         align-items: center;
         gap: 8px;
-        color: #667eea;
+        color: var(--primary-color);
         text-decoration: none;
         font-weight: 600;
         transition: all 0.3s ease;
     }
 
         .article-link:hover {
-            color: #764ba2;
+            color: var(--primary-dark);
             transform: translateX(5px);
         }
 
@@ -247,8 +270,8 @@
     }
 
     .badge-image {
-        background-color: #e3f2fd;
-        color: #1976d2;
+        background-color: var(--primary-bg);
+        color: var(--primary-dark);
     }
 
     .badge-text {
@@ -264,17 +287,17 @@
 
         .empty-state i {
             font-size: 5rem;
-            color: #e0e0e0;
+            color: var(--primary-light);
             margin-bottom: 2rem;
         }
 
         .empty-state h2 {
-            color: #666;
+            color: var(--primary-darker);
             margin-bottom: 1rem;
         }
 
         .empty-state p {
-            color: #999;
+            color: var(--text-muted);
             margin-bottom: 2rem;
         }
 
@@ -285,7 +308,7 @@
     }
 
     .btn-create {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: var(--primary-color);
         color: white;
         padding: 12px 30px;
         border-radius: 30px;
@@ -299,61 +322,68 @@
     }
 
         .btn-create:hover {
+            background: var(--primary-dark);
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+            box-shadow: 0 4px 12px rgba(76, 175, 80, 0.4);
             color: white;
         }
 
     /* Responsive */
     @@media (max-width: 768px) {
-        .admin-bar-content {
-            flex-direction: column;
-            gap: 10px;
-        }
+        .admin-bar-content
 
-        .admin-nav {
-            flex-wrap: wrap;
-            justify-content: center;
-        }
+    {
+        flex-direction: column;
+        gap: 10px;
+    }
 
-        body.has-admin-bar {
-            padding-top: 80px;
-        }
+    .admin-nav {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
 
-        .blog-hero h1 {
-            font-size: 2rem;
-        }
+    body.has-admin-bar {
+        padding-top: 80px;
+    }
 
-        .article-grid {
-            grid-template-columns: 1fr;
-            gap: 20px;
-        }
+    .blog-hero h1 {
+        font-size: 2rem;
+    }
 
-        .article-title {
-            font-size: 1.3rem;
-        }
+    .article-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
 
-        .article-actions {
-            flex-direction: column;
-            gap: 10px;
-            align-items: flex-start;
-        }
+    .article-title {
+        font-size: 1.3rem;
+    }
+
+    .article-actions {
+        flex-direction: column;
+        gap: 10px;
+        align-items: flex-start;
+    }
+
     }
 
     @@media (max-width: 480px) {
-        .blog-hero {
-            padding: 2rem 0;
-        }
+        .blog-hero
 
-        .article-content {
-            padding: 20px;
-        }
+    {
+        padding: 2rem 0;
+    }
+
+    .article-content {
+        padding: 20px;
+    }
+
     }
 </style>
 @{
     var userRole = Context.Session.GetString("UserRole");
 }
-
+@* 
 @if (!string.IsNullOrEmpty(userRole) && userRole == "Admin")
 {
     <div class="admin-bar">
@@ -382,7 +412,7 @@
     <script>
         document.body.classList.add('has-admin-bar');
     </script>
-}
+} *@
 
 <div class="blog-hero">
     <div class="blog-container">
