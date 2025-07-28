@@ -7,35 +7,91 @@
 
 @section Styles {
     <style>
+        :root {
+            --primary-color: #4CAF50;
+            --primary-light: #81C784;
+            --primary-dark: #388E3C;
+            --danger-color: #dc3545;
+            --danger-light: #f8d7da;
+            --danger-dark: #721c24;
+            --secondary-color: #6c757d;
+            --light-bg: #f5f9f5;
+            --white: #ffffff;
+            --text-dark: #2c3e50;
+            --text-muted: #6c757d;
+            --shadow: 0 2px 8px rgba(0,0,0,0.08);
+            --shadow-hover: 0 4px 16px rgba(0,0,0,0.12);
+            --border-radius: 12px;
+        }
+
+        body {
+            background-color: var(--light-bg);
+        }
+
         .delete-container {
             max-width: 600px;
-            margin: 0 auto;
+            margin: 2rem auto;
+            padding: 0 1rem;
         }
 
         .delete-card {
             background: white;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
             overflow: hidden;
+            animation: fadeInUp 0.5s ease-out;
+        }
+
+        @@keyframes fadeInUp {
+            from
+
+        {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
         }
 
         .delete-header {
-            background: #fed7d7;
+            background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
             padding: 2rem;
             text-align: center;
-            border-bottom: 3px solid #fc8181;
+            border-bottom: 3px solid var(--danger-color);
         }
 
         .delete-icon {
             font-size: 3rem;
-            color: #e53e3e;
+            color: var(--danger-color);
             margin-bottom: 1rem;
+            animation: pulse 2s infinite;
+        }
+
+        @@keyframes pulse {
+            0%
+
+        {
+            transform: scale(1);
+        }
+
+        50% {
+            transform: scale(1.05);
+        }
+
+        100% {
+            transform: scale(1);
+        }
+
         }
 
         .delete-title {
-            font-size: 1.5rem;
+            font-size: 1.75rem;
             font-weight: 700;
-            color: #742a2a;
+            color: var(--danger-dark);
             margin: 0;
         }
 
@@ -44,10 +100,10 @@
         }
 
         .warning-message {
-            background: #fffaf0;
-            border: 1px solid #feb2b2;
-            color: #7c2d12;
-            padding: 1rem;
+            background: var(--danger-light);
+            border: 1px solid #f5c6cb;
+            color: var(--danger-dark);
+            padding: 1rem 1.25rem;
             border-radius: 8px;
             margin-bottom: 2rem;
             display: flex;
@@ -56,23 +112,37 @@
         }
 
         .warning-icon {
-            color: #f56565;
+            color: var(--danger-color);
             font-size: 1.25rem;
             flex-shrink: 0;
         }
 
         .course-details {
-            background: #f7fafc;
+            background: #f8f9fa;
             border-radius: 8px;
             padding: 1.5rem;
             margin-bottom: 2rem;
+            border: 1px solid #e9ecef;
+        }
+
+        .course-title-display {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 0.75rem;
+        }
+
+        .course-description-display {
+            color: var(--text-muted);
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
         }
 
         .detail-item {
             display: flex;
             justify-content: space-between;
             padding: 0.75rem 0;
-            border-bottom: 1px solid #e2e8f0;
+            border-bottom: 1px solid #e9ecef;
         }
 
             .detail-item:last-child {
@@ -81,45 +151,64 @@
 
         .detail-label {
             font-weight: 600;
-            color: #4a5568;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
 
+            .detail-label i {
+                color: var(--primary-color);
+                font-size: 0.9rem;
+            }
+
         .detail-value {
-            color: #2d3748;
+            color: var(--text-dark);
             text-align: right;
         }
 
-        .course-title-display {
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: #2d3748;
-            margin-bottom: 0.5rem;
+        .badge {
+            padding: 0.35em 0.65em;
+            border-radius: 50px;
+            font-size: 0.875rem;
+            font-weight: 500;
         }
 
-        .course-description-display {
-            color: #718096;
-            margin-bottom: 1rem;
-        }
+            .badge.bg-success {
+                background-color: var(--primary-color) !important;
+            }
 
         .affected-items {
-            background: #fff5f5;
-            border: 1px solid #feb2b2;
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
             border-radius: 8px;
-            padding: 1rem;
+            padding: 1rem 1.25rem;
             margin-bottom: 2rem;
         }
 
         .affected-title {
             font-weight: 600;
-            color: #c53030;
-            margin-bottom: 0.5rem;
+            color: #856404;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
+
+            .affected-title i {
+                color: #f39c12;
+            }
 
         .affected-list {
             margin: 0;
             padding-left: 1.5rem;
-            color: #742a2a;
+            color: #856404;
+            font-size: 0.95rem;
         }
+
+            .affected-list li {
+                margin-bottom: 0.25rem;
+            }
 
         .delete-actions {
             display: flex;
@@ -127,58 +216,80 @@
             margin-top: 2rem;
         }
 
-        .btn-delete {
-            background-color: #e53e3e;
-            color: white;
-            border: none;
+        .btn {
             padding: 0.75rem 1.5rem;
             border-radius: 8px;
             font-weight: 500;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.3s ease;
             flex: 1;
+            text-decoration: none;
+            text-align: center;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .btn-delete {
+            background-color: var(--danger-color);
+            color: white;
         }
 
             .btn-delete:hover {
-                background-color: #c53030;
-                transform: translateY(-1px);
+                background-color: #c82333;
+                transform: translateY(-2px);
+                box-shadow: var(--shadow-hover);
             }
 
         .btn-cancel {
-            background-color: #e2e8f0;
-            color: #4a5568;
-            border: none;
-            padding: 0.75rem 1.5rem;
-            border-radius: 8px;
-            font-weight: 500;
-            text-decoration: none;
-            text-align: center;
-            transition: all 0.2s;
-            flex: 1;
+            background-color: white;
+            color: var(--secondary-color);
+            border: 1px solid #dee2e6;
         }
 
             .btn-cancel:hover {
-                background-color: #cbd5e0;
-                color: #2d3748;
+                background-color: var(--secondary-color);
+                color: white;
+                border-color: var(--secondary-color);
+                transform: translateY(-2px);
             }
+
+        /* Loading state */
+        .btn-delete:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
 
         @@media (max-width: 768px) {
-            .delete-container {
-                padding: 0 1rem;
-            }
+            .delete-container
 
-            .delete-actions {
-                flex-direction: column-reverse;
-            }
+        {
+            margin: 1rem auto;
+        }
 
-            .detail-item {
-                flex-direction: column;
-                gap: 0.25rem;
-            }
+        .delete-header {
+            padding: 1.5rem;
+        }
 
-            .detail-value {
-                text-align: left;
-            }
+        .delete-body {
+            padding: 1.5rem;
+        }
+
+        .delete-actions {
+            flex-direction: column-reverse;
+        }
+
+        .detail-item {
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .detail-value {
+            text-align: left;
+        }
+
         }
     </style>
 }
@@ -193,26 +304,34 @@
 
             <div class="delete-body">
                 <div class="warning-message">
-                    <i class="bi bi-info-circle-fill warning-icon"></i>
+                    <i class="bi bi-exclamation-circle-fill warning-icon"></i>
                     <div>
-                        <strong>Warning:</strong> This action cannot be undone. All associated modules, lessons, and progress data will be permanently deleted.
+                        <strong>Warning:</strong> This action cannot be undone. All associated lessons and student progress data will be permanently deleted.
                     </div>
                 </div>
 
                 <div class="course-details">
                     <h2 class="course-title-display">@Model.Title</h2>
-                    <p class="course-description-display">@Model.Description</p>
+                    <div class="course-description-display">
+                        @Html.Raw(System.Text.RegularExpressions.Regex.Replace(Model.Description ?? "", "<.*?>", string.Empty))
+                    </div>
 
                     <div class="detail-item">
-                        <span class="detail-label">Duration</span>
+                        <span class="detail-label">
+                            <i class="bi bi-clock"></i> Duration
+                        </span>
                         <span class="detail-value">@Model.Duration minutes</span>
                     </div>
                     <div class="detail-item">
-                        <span class="detail-label">Difficulty Level</span>
+                        <span class="detail-label">
+                            <i class="bi bi-speedometer2"></i> Difficulty Level
+                        </span>
                         <span class="detail-value">@Model.DifficultyLevel</span>
                     </div>
                     <div class="detail-item">
-                        <span class="detail-label">Status</span>
+                        <span class="detail-label">
+                            <i class="bi bi-toggle-on"></i> Status
+                        </span>
                         <span class="detail-value">
                             @if (Model.IsActive)
                             {
@@ -225,7 +344,9 @@
                         </span>
                     </div>
                     <div class="detail-item">
-                        <span class="detail-label">Created</span>
+                        <span class="detail-label">
+                            <i class="bi bi-calendar-plus"></i> Created
+                        </span>
                         <span class="detail-value">@Model.CreatedAt.ToString("MMM dd, yyyy")</span>
                     </div>
                 </div>
@@ -233,24 +354,27 @@
                 @if (Model.Lessons != null && Model.Lessons.Any())
                 {
                     <div class="affected-items">
-                        <div class="affected-title">This course contains:</div>
+                        <div class="affected-title">
+                            <i class="bi bi-info-circle"></i>
+                            This course contains:
+                        </div>
                         <ul class="affected-list">
-                            <li>@Model.Lessons.Count() module(s)</li>
-                            <li>All associated lessons</li>
-                            <li>All student progress records</li>
+                            <li>@Model.Lessons.Count() lesson(s)</li>
+                            <li>All associated student progress records</li>
+                            <li>All enrollment data</li>
                         </ul>
                     </div>
                 }
 
-                <form asp-action="Delete" method="post" onsubmit="return confirmDelete()">
-                    <input type="hidden" asp-for="CourseId" />
+                <form id="deleteForm" asp-controller="Courses" asp-action="DeleteConfirmed" asp-route-id="@Model.CourseId" method="post">
+                    @Html.AntiForgeryToken()
 
                     <div class="delete-actions">
-                        <a asp-action="Index" asp-controller="Admin" class="btn-cancel">
-                            <i class="bi bi-arrow-left me-2"></i>Cancel
+                        <a asp-action="Index" asp-controller="Admin" class="btn btn-cancel">
+                            <i class="bi bi-arrow-left"></i> Cancel
                         </a>
-                        <button type="submit" class="btn-delete">
-                            <i class="bi bi-trash me-2"></i>Delete Course
+                        <button type="submit" class="btn btn-delete" id="deleteBtn">
+                            <i class="bi bi-trash"></i> Delete Course
                         </button>
                     </div>
                 </form>
@@ -261,8 +385,20 @@
 
 @section Scripts {
     <script>
-        function confirmDelete() {
-            return confirm('Are you sure you want to delete this course? This action cannot be undone.');
-        }
+        document.getElementById('deleteForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const deleteBtn = document.getElementById('deleteBtn');
+            const originalText = deleteBtn.innerHTML;
+
+            if (confirm('Are you absolutely sure you want to delete this course?\n\nThis action cannot be undone and will delete all associated lessons and student progress.')) {
+                // Show loading state
+                deleteBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status"></span> Deleting...';
+                deleteBtn.disabled = true;
+
+                // Submit the form
+                this.submit();
+            }
+        });
     </script>
 }
