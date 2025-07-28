@@ -34,10 +34,16 @@ namespace mvc.app.Controllers
                 return View(model);
 
             var user = _authService.AuthenticateUser(model.Email, model.Password);
-
             if (user == null)
             {
                 ModelState.AddModelError("", "Invalid email or password.");
+                return View(model);
+            }
+
+            // Check if user account is banned
+            if (!user.IsActive)
+            {
+                ModelState.AddModelError("", "Your account has been banned. Please contact support for assistance.");
                 return View(model);
             }
 
@@ -47,7 +53,6 @@ namespace mvc.app.Controllers
 
             // Store token in session
             HttpContext.Session.SetString("Token", token);
-
             Response.Cookies.Append("AuthToken", token, new CookieOptions
             {
                 HttpOnly = true,
@@ -99,7 +104,6 @@ namespace mvc.app.Controllers
             };
 
             user = _authService.RegisterUser(user);
-
             Console.WriteLine("User registered successfully: " + user.Id);
 
             // Redirect to Login page after successful registration

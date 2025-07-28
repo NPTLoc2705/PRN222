@@ -3,7 +3,7 @@
 <html>
 <head>
     <meta charset="utf-8" />
-    <title>Admin Dashboard - Booking Management</title>
+    <title>Admin Dashboard</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
     <style>
@@ -132,11 +132,11 @@
                 margin: 0 auto;
             }
 
-        .booking-section {
+        .content-section {
             display: none;
         }
 
-            .booking-section.active {
+            .content-section.active {
                 display: block;
             }
 
@@ -179,16 +179,16 @@
                 transform: translateY(-2px);
             }
 
-        .booking-table {
+        .booking-table, .user-table {
             width: 100%;
             border-collapse: collapse;
         }
 
-            .booking-table thead {
+            .booking-table thead, .user-table thead {
                 background: #f8f9fa;
             }
 
-            .booking-table th {
+            .booking-table th, .user-table th {
                 padding: 15px 20px;
                 text-align: left;
                 font-weight: 600;
@@ -197,18 +197,18 @@
                 border-bottom: 2px solid #e9ecef;
             }
 
-            .booking-table td {
+            .booking-table td, .user-table td {
                 padding: 15px 20px;
                 border-bottom: 1px solid #e9ecef;
                 color: #2c3e50;
                 vertical-align: middle;
             }
 
-            .booking-table tbody tr {
+            .booking-table tbody tr, .user-table tbody tr {
                 transition: all 0.3s ease;
             }
 
-                .booking-table tbody tr:hover {
+                .booking-table tbody tr:hover, .user-table tbody tr:hover {
                     background: rgba(39, 174, 96, 0.05);
                 }
 
@@ -235,6 +235,16 @@
             color: #0c5460;
         }
 
+        .status-active {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-banned {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
         .action-buttons {
             display: flex;
             gap: 8px;
@@ -255,13 +265,23 @@
             color: white;
         }
 
-        .btn-details {
+        .btn-details, .btn-view {
             background: #6c757d;
             color: white;
         }
 
         .btn-delete {
             background: #dc3545;
+            color: white;
+        }
+
+        .btn-ban {
+            background: #ffc107;
+            color: white;
+        }
+
+        .btn-unban {
+            background: #28a745;
             color: white;
         }
 
@@ -319,30 +339,39 @@
             color: #6c757d;
             font-size: 0.9rem;
         }
+
+        .alert {
+            margin: 20px 30px;
+            border-radius: 10px;
+        }
     </style>
 </head>
 <body>
+    @{
+        var currentRole = Context.Session.GetString("UserRole");
+        var currentUserId = Context.Session.GetString("UserId");
+    }
     <div class="sidebar">
         <div class="sidebar-header">
             <h4><i class="fas fa-crown"></i> Admin Panel</h4>
         </div>
 
         <nav class="sidebar-nav">
-            <a href="#" onclick="showSection('welcome')" class="nav-link active">
+            <a href="#" onclick="showSection('welcome')" class="nav-link active" data-section="welcome">
                 <i class="fas fa-tachometer-alt"></i>
                 <span>Dashboard</span>
             </a>
-            <a href="#" onclick="showSection('bookings')" class="nav-link">
+            <a href="#" onclick="showSection('bookings')" class="nav-link" data-section="bookings">
                 <i class="fas fa-calendar-check"></i>
                 <span>Booking Management</span>
             </a>
-            <a href="#" onclick="showSection('blogs')" class="nav-link">
+            <a href="#" onclick="showSection('blogs')" class="nav-link" data-section="blogs">
                 <i class="fas fa-blog"></i>
                 <span>Blog Management</span>
             </a>
-            <a href="#" onclick="showSection('User')" class="nav-link">
+            <a href="#" onclick="showSection('users')" class="nav-link" data-section="users">
                 <i class="fas fa-users"></i>
-                <span>User</span>
+                <span>User Management</span>
             </a>
             <a asp-controller="Admin" asp-action="Index">
                 <i class="fas fa-book"></i>
@@ -388,7 +417,7 @@
         </div>
 
         <!-- Bookings Section -->
-        <div id="bookings-section" class="content-section booking-section">
+        <div id="bookings-section" class="content-section">
             <div class="content-header">
                 <h2><i class="fas fa-calendar-check"></i> Booking Management</h2>
                 <p>Manage all your bookings efficiently</p>
@@ -444,29 +473,29 @@
                                         </td>
                                         <td class="status">
                                             <div class="cell-content">
-                                                <span class="status-badge status-active">
+                                                <span class="status-badge status-@item.Status">
                                                     @Html.DisplayFor(modelItem => item.Status)
                                                 </span>
                                             </div>
                                         </td>
                                         <td class="phone">
                                             <div class="cell-content">
-                                                <span class="status-badge status-active">
+                                                <span class="status-badge">
                                                     @Html.DisplayFor(modelItem => item.Phone)
                                                 </span>
                                             </div>
                                         </td>
                                         <td class="actions">
                                             <div class="action-buttons">
-                                                <a asp-action="Edit" asp-route-id="@item.Id" class="action-btn edit-btn">
+                                                <a asp-action="Edit" asp-route-id="@item.Id" class="action-btn btn-edit">
                                                     <span class="action-icon">✏️</span>
                                                     <span class="action-text">Edit</span>
                                                 </a>
-                                                <a asp-action="Details" asp-route-id="@item.Id" class="action-btn details-btn">
+                                                <a asp-action="Details" asp-route-id="@item.Id" class="action-btn btn-details">
                                                     <span class="action-icon">👁️</span>
                                                     <span class="action-text">Details</span>
                                                 </a>
-                                                <a asp-action="Delete" asp-route-id="@item.Id" class="action-btn delete-btn">
+                                                <a asp-action="Delete" asp-route-id="@item.Id" class="action-btn btn-delete">
                                                     <span class="action-icon">🗑️</span>
                                                     <span class="action-text">Delete</span>
                                                 </a>
@@ -481,8 +510,121 @@
             </div>
         </div>
 
-        <!-- Other Sections (Placeholder) -->
-        <div id="blogs-section" class="content-section" style="display: none;">
+        <!-- User Management Section -->
+        <div id="users-section" class="content-section">
+            <div class="content-header">
+                <h2><i class="fas fa-users"></i> User Management</h2>
+                <p>Manage all users in the system</p>
+            </div>
+            <div class="content-body">
+                @if (TempData["Success"] != null)
+                {
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        @TempData["Success"]
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                }
+                @if (TempData["Error"] != null)
+                {
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        @TempData["Error"]
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                }
+                <div class="table-container">
+                    <div class="table-header">
+                        <h4><i class="fas fa-list"></i> All Users</h4>
+                    </div>
+                    <div class="table-wrapper">
+                        <table class="user-table">
+                            <thead>
+                                <tr>
+                                    <th><i class="fas fa-user"></i> Full Name</th>
+                                    <th><i class="fas fa-envelope"></i> Email</th>
+                                    <th><i class="fas fa-phone"></i> Phone</th>
+                                    <th><i class="fas fa-user-tag"></i> Role</th>
+                                    <th><i class="fas fa-info-circle"></i> Status</th>
+                                    <th><i class="fas fa-cogs"></i> Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (ViewBag.Users != null)
+                                {
+                                    @foreach (var user in ViewBag.Users)
+                                    {
+                                        <tr>
+                                            <td>@user.FullName</td>
+                                            <td>@user.Email</td>
+                                            <td>@user.PhoneNumber</td>
+                                            <td>
+                                                <span class="status-badge">@user.Role</span>
+                                            </td>
+                                            <td>
+                                                @if (user.IsActive)
+                                                {
+                                                    <span class="status-badge status-active">Active</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="status-badge status-banned">Banned</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                <div class="action-buttons">
+                                                    <a asp-controller="User" asp-action="Profile" asp-route-id="@user.Id" class="action-btn btn-view">
+                                                        <span class="action-icon">👁️</span>
+                                                        <span class="action-text">View</span>
+                                                    </a>
+                                                    @if (currentRole == "Admin" && user.Id.ToString() != currentUserId)
+                                                    {
+                                                        if (user.IsActive)
+                                                        {
+                                                            <form asp-controller="User" asp-action="Ban" asp-route-id="@user.Id" method="post" class="d-inline" onsubmit="storeCurrentSection(); return confirm('Are you sure you want to ban this user?');">
+                                                                @Html.AntiForgeryToken()
+                                                                <button type="submit" class="action-btn btn-ban">
+                                                                    <span class="action-icon">🔒</span>
+                                                                    <span class="action-text">Ban</span>
+                                                                </button>
+                                                            </form>
+                                                        }
+                                                        else
+                                                        {
+                                                            <form asp-controller="User" asp-action="UnBan" asp-route-id="@user.Id" method="post" class="d-inline" onsubmit="storeCurrentSection();">
+                                                                @Html.AntiForgeryToken()
+                                                                <button type="submit" class="action-btn btn-unban">
+                                                                    <span class="action-icon">🔓</span>
+                                                                    <span class="action-text">Unban</span>
+                                                                </button>
+                                                            </form>
+                                                        }
+                                                        <form asp-controller="User" asp-action="Delete" asp-route-id="@user.Id" method="post" class="d-inline" onsubmit="storeCurrentSection(); return confirm('Are you sure you want to delete this user? This action cannot be undone.');">
+                                                            @Html.AntiForgeryToken()
+                                                            <button type="submit" class="action-btn btn-delete">
+                                                                <span class="action-icon">🗑️</span>
+                                                                <span class="action-text">Delete</span>
+                                                            </button>
+                                                        </form>
+                                                    }
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                                else
+                                {
+                                    <tr>
+                                        <td colspan="6" class="text-center">No users found</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Blog Management Section -->
+        <div id="blogs-section" class="content-section">
             <div class="content-header">
                 <h2><i class="fas fa-blog"></i> Blog Management</h2>
                 <p>Manage your blog content</p>
@@ -496,7 +638,8 @@
             </div>
         </div>
 
-        <div id="customers-section" class="content-section" style="display: none;">
+        <!-- Other Sections (Placeholder) -->
+        <div id="customers-section" class="content-section">
             <div class="content-header">
                 <h2><i class="fas fa-users"></i> Customer Management</h2>
                 <p>Manage your customers</p>
@@ -510,7 +653,7 @@
             </div>
         </div>
 
-        <div id="consultants-section" class="content-section" style="display: none;">
+        <div id="consultants-section" class="content-section">
             <div class="content-header">
                 <h2><i class="fas fa-user-tie"></i> Consultant Management</h2>
                 <p>Manage your consultants</p>
@@ -524,7 +667,7 @@
             </div>
         </div>
 
-        <div id="settings-section" class="content-section" style="display: none;">
+        <div id="settings-section" class="content-section">
             <div class="content-header">
                 <h2><i class="fas fa-cog"></i> Settings</h2>
                 <p>Configure your application</p>
@@ -540,7 +683,19 @@
     </div>
 
     <script>
+        // Store current section before form submission
+        function storeCurrentSection() {
+            const activeSection = document.querySelector('.content-section.active');
+            if (activeSection) {
+                const sectionId = activeSection.id.replace('-section', '');
+                sessionStorage.setItem('currentAdminSection', sectionId);
+            }
+        }
+
         function showSection(sectionName) {
+            // Store current section in session storage
+            sessionStorage.setItem('currentAdminSection', sectionName);
+
             // Hide all sections
             const sections = document.querySelectorAll('.content-section');
             sections.forEach(section => {
@@ -559,10 +714,10 @@
             const navLinks = document.querySelectorAll('.nav-link');
             navLinks.forEach(link => link.classList.remove('active'));
 
-            // Find and activate the clicked nav link
-            const clickedLink = event ? event.target.closest('.nav-link') : document.querySelector('.nav-link');
-            if (clickedLink) {
-                clickedLink.classList.add('active');
+            // Find and activate the nav link for the current section
+            const activeLink = document.querySelector(`[data-section="${sectionName}"]`);
+            if (activeLink) {
+                activeLink.classList.add('active');
             }
         }
 
@@ -571,27 +726,16 @@
             // window.location.href = '/Bookings/Create';
         }
 
-        function editBooking(id) {
-            alert(`Edit booking with ID: ${id}`);
-            // window.location.href = `/Bookings/Edit/${id}`;
-        }
-
-        function viewDetails(id) {
-            alert(`View details for booking ID: ${id}`);
-            // window.location.href = `/Bookings/Details/${id}`;
-        }
-
-        function deleteBooking(id) {
-            if (confirm('Are you sure you want to delete this booking?')) {
-                alert(`Delete booking with ID: ${id}`);
-                // window.location.href = `/Bookings/Delete/${id}`;
-            }
-        }
-
-        // Initialize with welcome section
+        // Modified initialization - restore last viewed section
         document.addEventListener('DOMContentLoaded', function() {
-            showSection('welcome');
+            const lastSection = sessionStorage.getItem('currentAdminSection');
+            if (lastSection) {
+                showSection(lastSection);
+            } else {
+                showSection('welcome');
+            }
         });
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

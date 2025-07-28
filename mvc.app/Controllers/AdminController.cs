@@ -13,27 +13,46 @@ namespace mvc.app.Controllers
         private readonly ICourseService _courseService;
         private readonly ILessonService _lessonService;
         private readonly IProgressService _progressService;
-        public AdminController(IBookingService bookingService, IAuthService userService, ICourseService courseService,
-     ILessonService lessonService,
-     IProgressService progressService)
+        private readonly IUserService _userService;
+
+        public AdminController(
+            IBookingService bookingService,
+            IUserService userService,
+            ICourseService courseService,
+            ILessonService lessonService,
+            IProgressService progressService)
         {
             _bookingService = bookingService;
+            _userService = userService;
             _courseService = courseService;
             _lessonService = lessonService;
             _progressService = progressService;
-
         }
+
         public async Task<IActionResult> Dashboard()
         {
-            var role = HttpContext.Session.GetString("Role");            // This action could be used to display admin dashboard information
-            var customerIdObj = HttpContext.Session.GetString("UserId");
-            if (customerIdObj == null || role == "Admin")
+            var role = HttpContext.Session.GetString("UserRole");
+            var userId = HttpContext.Session.GetString("UserId");
+            if (userId == null || role != "Admin")
             {
                 return RedirectToAction("Login", "Auth");
             }
-            var list = await _bookingService.GetAllBookingsWithNamesAsync();
-            return View("AdminPage",list);
+
+            try
+            {
+                var bookings = await _bookingService.GetAllBookingsWithNamesAsync();
+                var users = await _userService.GetAllUsers();
+                ViewBag.Users = users;
+                ViewBag.CurrentUserId = userId;
+                return View("AdminPage", bookings);
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = "Error loading dashboard data: " + ex.Message;
+                return View("AdminPage", new List<BookingViewModel>());
+            }
         }
+
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -79,6 +98,7 @@ namespace mvc.app.Controllers
             }
             return View(booking);
         }
+
         private bool BookingExists(int id)
         {
             var booking = _bookingService.GetBookingByIdAsync(id);
@@ -91,30 +111,29 @@ namespace mvc.app.Controllers
                 return true;
             }
         }
+
         [HttpGet]
         public async Task<IActionResult> Index()
         {
             if (!IsAdmin()) return RedirectToAction("AccessDenied", "Home");
 
-            var courses = await _courseService.GetAllCoursesWithLessonsAsync(); // New service method
+            var courses = await _courseService.GetAllCoursesWithLessonsAsync();
             var activeCount = courses.Count(c => c.IsActive);
             var inactiveCount = courses.Count(c => !c.IsActive);
             System.Diagnostics.Debug.WriteLine($"Active courses: {activeCount}, Inactive: {inactiveCount}");
             return View("~/Views/Admin/Index.cshtml", courses);
         }
 
-        // Manager Details View
         [HttpGet("details/{id}")]
         public async Task<IActionResult> Details(Guid id)
         {
             if (!IsAdmin()) return RedirectToAction("AccessDenied", "Home");
 
-            var course = await _courseService.GetCourseWithLessonsAsync(id); // New service method
+            var course = await _courseService.GetCourseWithLessonsAsync(id);
             if (course == null) return NotFound();
 
             return View("~/Views/Admin/Details.cshtml", course);
         }
-
 
         [HttpGet("lessons/{courseId}")]
         public async Task<IActionResult> LessonIndex(Guid courseId)
@@ -126,7 +145,6 @@ namespace mvc.app.Controllers
 
             var lessons = await _lessonService.GetLessonsByCourseIdAsync(courseId);
 
-            // Convert to DTOs
             var lessonDTOs = lessons.Select(l => new LessonDTO
             {
                 LessonId = l.LessonId,
@@ -135,7 +153,6 @@ namespace mvc.app.Controllers
                 ContentType = l.ContentType,
                 Duration = l.Duration,
                 OrderNumber = l.OrderNumber,
-                // Add other properties as needed
             }).ToList();
 
             ViewBag.CourseId = courseId;
@@ -143,7 +160,6 @@ namespace mvc.app.Controllers
 
             return View("~/Views/Admin/LessonIndex.cshtml", lessonDTOs);
         }
-
 
         [HttpGet("lessons/details/{courseId}/{lessonId}")]
         public async Task<IActionResult> LessonDetails(Guid courseId, Guid lessonId)
@@ -153,7 +169,6 @@ namespace mvc.app.Controllers
             var lesson = await _lessonService.GetLessonByIdAsync(lessonId);
             if (lesson == null) return NotFound();
 
-            // Convert to DTO
             var lessonDto = new LessonDTO
             {
                 LessonId = lesson.LessonId,
@@ -162,7 +177,6 @@ namespace mvc.app.Controllers
                 ContentType = lesson.ContentType,
                 Duration = lesson.Duration,
                 OrderNumber = lesson.OrderNumber,
-                // Add other properties as needed
             };
 
             var course = await _courseService.GetCourseByIdAsync(courseId);
@@ -173,10 +187,10 @@ namespace mvc.app.Controllers
 
             return View("~/Views/Admin/LessonDetails.cshtml", lessonDto);
         }
+
         private bool IsAdmin()
         {
             return HttpContext.Session.GetString("UserRole") == "Admin";
         }
-
     }
 }
