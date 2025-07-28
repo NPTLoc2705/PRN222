@@ -1,4 +1,5 @@
-﻿using System;
+﻿using mvc.dataaccess.Entities;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -14,5 +15,7 @@ namespace mvc.dataaccess.ViewModels.User
         public string PhoneNumber { get; set; }
         public string Address { get; set; }
         public bool IsActive { get; set; }
+        public SystemRole Role { get; set; }
+        public List<UserCourseProgressDTO> CourseProgresses { get; set; }
     }
 }
