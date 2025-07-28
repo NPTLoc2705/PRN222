@@ -366,9 +366,7 @@
                     </div>
                 }
 
-                <form id="deleteForm"
-                      method="post"
-                      action="/Courses/DeleteConfirmed/@Model.CourseId">
+                <form id="deleteForm" asp-controller="Courses" asp-action="DeleteConfirmed" asp-route-id="@Model.CourseId" method="post">
                     @Html.AntiForgeryToken()
 
                     <div class="delete-actions">
@@ -387,20 +385,20 @@
 
 @section Scripts {
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const deleteForm = document.getElementById('deleteForm');
+        document.getElementById('deleteForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
             const deleteBtn = document.getElementById('deleteBtn');
+            const originalText = deleteBtn.innerHTML;
 
-            deleteBtn.addEventListener('click', function (e) {
-                e.preventDefault();
+            if (confirm('Are you absolutely sure you want to delete this course?\n\nThis action cannot be undone and will delete all associated lessons and student progress.')) {
+                // Show loading state
+                deleteBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status"></span> Deleting...';
+                deleteBtn.disabled = true;
 
-                if (confirm('Are you absolutely sure you want to delete this course?\n\nThis action cannot be undone and will delete all associated lessons and student progress.')) {
-                    deleteBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status"></span> Deleting...';
-                    deleteBtn.disabled = true;
-
-                    deleteForm.submit();
-                }
-            });
+                // Submit the form
+                this.submit();
+            }
         });
     </script>
 }
