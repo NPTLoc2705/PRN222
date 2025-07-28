@@ -1,4 +1,4 @@
-﻿@model mvc.dataaccess.Entities.User
+﻿@model mvc.dataaccess.ViewModels.User.UserProfileDTO
 @{
     ViewData["Title"] = "User Profile";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -8,6 +8,21 @@
 }
 
 <style>
+    :root {
+        --primary-color: #4CAF50;
+        --primary-hover: #45a049;
+        --primary-light: #e8f5e9;
+        --primary-dark: #2e7d32;
+        --secondary-color: #6c757d;
+        --light-bg: #f0fdf4;
+        --card-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        --transition: all 0.3s ease;
+    }
+
+    body {
+        background-color: var(--light-bg);
+    }
+
     .profile-container {
         max-width: 800px;
         margin: 0 auto;
@@ -15,54 +30,51 @@
     }
 
     .profile-header {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-hover) 100%);
         color: white;
-        padding: 3rem;
-        border-radius: 16px;
+        padding: 2.5rem;
+        border-radius: 12px;
         margin-bottom: 2rem;
         text-align: center;
-    }
-
-    .profile-avatar {
-        width: 120px;
-        height: 120px;
-        background: white;
-        border-radius: 50%;
-        margin: 0 auto 1.5rem;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 3rem;
-        color: #667eea;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        box-shadow: var(--card-shadow);
     }
 
     .profile-name {
         font-size: 2rem;
         font-weight: 700;
         margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.75rem;
     }
+
+        .profile-name i {
+            font-size: 2.5rem;
+            opacity: 0.9;
+        }
 
     .profile-role {
         display: inline-block;
         background: rgba(255,255,255,0.2);
-        padding: 0.5rem 1rem;
+        padding: 0.5rem 1.5rem;
         border-radius: 20px;
         font-size: 0.9rem;
         margin-bottom: 1rem;
+        font-weight: 500;
     }
 
     .profile-status {
         display: inline-block;
-        padding: 0.25rem 0.75rem;
-        border-radius: 12px;
+        padding: 0.3rem 1rem;
+        border-radius: 20px;
         font-size: 0.85rem;
         font-weight: 500;
     }
 
     .status-active {
-        background: #d4edda;
-        color: #155724;
+        background: rgba(255,255,255,0.9);
+        color: var(--primary-dark);
     }
 
     .status-banned {
@@ -74,14 +86,25 @@
         background: white;
         border-radius: 12px;
         padding: 2rem;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        box-shadow: var(--card-shadow);
         margin-bottom: 2rem;
+        border: 1px solid rgba(76, 175, 80, 0.1);
     }
+
+        .profile-info h3 {
+            color: var(--primary-dark);
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
 
     .info-row {
         display: flex;
-        padding: 1rem 0;
-        border-bottom: 1px solid #e9ecef;
+        padding: 1.25rem 0;
+        border-bottom: 1px solid #f0f0f0;
+        align-items: center;
     }
 
         .info-row:last-child {
@@ -90,16 +113,29 @@
 
     .info-label {
         font-weight: 600;
-        color: #495057;
+        color: var(--secondary-color);
         width: 150px;
         display: flex;
         align-items: center;
         gap: 0.5rem;
+        font-size: 0.95rem;
     }
+
+        .info-label i {
+            color: var(--primary-color);
+            font-size: 1.1rem;
+        }
 
     .info-value {
         flex: 1;
         color: #212529;
+    }
+
+    .badge {
+        background: var(--primary-light) !important;
+        color: var(--primary-dark) !important;
+        padding: 0.4rem 0.8rem;
+        font-weight: 500;
     }
 
     .action-buttons {
@@ -107,6 +143,7 @@
         gap: 1rem;
         justify-content: center;
         margin-top: 2rem;
+        flex-wrap: wrap;
     }
 
     .btn {
@@ -119,44 +156,48 @@
         gap: 0.5rem;
         border: none;
         cursor: pointer;
-        transition: all 0.3s;
+        transition: var(--transition);
     }
 
     .btn-primary {
-        background: #667eea;
+        background: var(--primary-color);
         color: white;
     }
 
         .btn-primary:hover {
-            background: #5a67d8;
+            background: var(--primary-hover);
             transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
 
     .btn-warning {
-        background: #ffc107;
-        color: #212529;
+        background: #ff9800;
+        color: white;
     }
 
         .btn-warning:hover {
-            background: #e0a800;
+            background: #f57c00;
+            transform: translateY(-2px);
         }
 
     .btn-success {
-        background: #28a745;
+        background: #2ecc71;
         color: white;
     }
 
         .btn-success:hover {
-            background: #218838;
+            background: #27ae60;
+            transform: translateY(-2px);
         }
 
     .btn-danger {
-        background: #dc3545;
+        background: #e74c3c;
         color: white;
     }
 
         .btn-danger:hover {
-            background: #c82333;
+            background: #c0392b;
+            transform: translateY(-2px);
         }
 
     .btn-secondary {
@@ -166,7 +207,333 @@
 
         .btn-secondary:hover {
             background: #5a6268;
+            transform: translateY(-2px);
         }
+
+    /* Modal styling */
+    .modal-content {
+        border: 1px solid rgba(76, 175, 80, 0.1);
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+    .modal-header {
+        background: var(--light-bg);
+        border-bottom: 1px solid var(--primary-light);
+        padding: 1.5rem;
+    }
+
+    .modal-title {
+        color: var(--primary-dark);
+        font-weight: 600;
+    }
+
+    .modal-body {
+        padding: 1.5rem;
+    }
+
+    .form-label {
+        color: var(--primary-dark);
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+    }
+
+    .form-control {
+        border: 1px solid #e0e0e0;
+        border-radius: 6px;
+        padding: 0.75rem;
+        transition: var(--transition);
+    }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2);
+        }
+
+    .modal-footer {
+        background: var(--light-bg);
+        border-top: 1px solid var(--primary-light);
+        padding: 1rem 1.5rem;
+    }
+
+    .back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: var(--secondary-color);
+        text-decoration: none;
+        margin-bottom: 1.5rem;
+        transition: var(--transition);
+    }
+
+        .back-link:hover {
+            color: var(--primary-color);
+            transform: translateX(-3px);
+        }
+
+    /* Course Progress Styles */
+    .courses-section {
+        margin-top: 2rem;
+    }
+
+    .courses-header {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem 2rem;
+        box-shadow: var(--card-shadow);
+        border: 1px solid rgba(76, 175, 80, 0.1);
+        cursor: pointer;
+        transition: var(--transition);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+        .courses-header:hover {
+            background: var(--light-bg);
+        }
+
+        .courses-header h3 {
+            color: var(--primary-dark);
+            margin: 0;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+    .toggle-icon {
+        color: var(--primary-color);
+        font-size: 1.25rem;
+        transition: transform 0.3s ease;
+    }
+
+        .toggle-icon.rotated {
+            transform: rotate(180deg);
+        }
+
+    .courses-content {
+        margin-top: 1rem;
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease;
+    }
+
+        .courses-content.expanded {
+            max-height: 5000px;
+        }
+
+    .courses-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 1.5rem;
+        padding: 1rem 0;
+    }
+
+    .course-progress-card {
+        background: var(--light-bg);
+        border: 1px solid var(--primary-light);
+        border-radius: 8px;
+        padding: 1.25rem;
+        transition: var(--transition);
+    }
+
+        .course-progress-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(76, 175, 80, 0.1);
+        }
+
+    .course-header-progress {
+        display: flex;
+        justify-content: space-between;
+        align-items: start;
+        margin-bottom: 1rem;
+        gap: 1rem;
+    }
+
+    .course-title-progress {
+        color: var(--primary-dark);
+        font-weight: 600;
+        margin: 0;
+        font-size: 1rem;
+    }
+
+    .completion-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 500;
+        white-space: nowrap;
+    }
+
+        .completion-badge.completed {
+            background: rgba(46, 204, 113, 0.1);
+            color: #27ae60;
+        }
+
+        .completion-badge.in-progress {
+            background: rgba(255, 152, 0, 0.1);
+            color: #f57c00;
+        }
+
+        .completion-badge.not-started {
+            background: rgba(108, 117, 125, 0.1);
+            color: var(--secondary-color);
+        }
+
+    .progress-bar-container {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .progress {
+        flex: 1;
+        height: 8px;
+        background-color: #e0e0e0;
+        border-radius: 4px;
+        overflow: hidden;
+    }
+
+    .progress-bar {
+        height: 100%;
+        background-color: var(--primary-color);
+        transition: width 0.3s ease;
+    }
+
+    .progress-percentage {
+        font-weight: 600;
+        color: var(--primary-dark);
+        font-size: 0.875rem;
+        min-width: 40px;
+    }
+
+    .current-lesson {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: var(--secondary-color);
+        font-size: 0.875rem;
+        margin-bottom: 0.75rem;
+        padding: 0.5rem;
+        background: white;
+        border-radius: 4px;
+    }
+
+        .current-lesson i {
+            color: var(--primary-color);
+        }
+
+    .course-meta-info {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        margin-top: 0.75rem;
+        padding-top: 0.75rem;
+        border-top: 1px solid #e0e0e0;
+    }
+
+    .meta-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: var(--secondary-color);
+        font-size: 0.8rem;
+    }
+
+        .meta-item i {
+            color: var(--primary-color);
+            font-size: 0.9rem;
+        }
+
+    .empty-courses {
+        text-align: center;
+        padding: 3rem 1rem;
+        color: var(--secondary-color);
+        background: white;
+        border-radius: 12px;
+        box-shadow: var(--card-shadow);
+        border: 1px solid rgba(76, 175, 80, 0.1);
+    }
+
+        .empty-courses i {
+            font-size: 3rem;
+            color: var(--primary-light);
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+    .course-action {
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 1px solid #e0e0e0;
+    }
+
+        .course-action .btn-sm {
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+        }
+
+    /* Progress Summary */
+    .progress-summary {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 1rem;
+        margin-bottom: 2rem;
+        padding: 1.5rem;
+        background: white;
+        border-radius: 8px;
+        border: 1px solid var(--primary-light);
+    }
+
+    .summary-item {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .summary-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--primary-light);
+        color: var(--primary-color);
+        font-size: 1.5rem;
+    }
+
+        .summary-icon.completed-icon {
+            background: rgba(46, 204, 113, 0.1);
+            color: #27ae60;
+        }
+
+        .summary-icon.in-progress-icon {
+            background: rgba(255, 152, 0, 0.1);
+            color: #f57c00;
+        }
+
+    .summary-content {
+        flex: 1;
+    }
+
+    .summary-value {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: var(--primary-dark);
+        line-height: 1;
+    }
+
+    .summary-label {
+        font-size: 0.875rem;
+        color: var(--secondary-color);
+        margin-top: 0.25rem;
+    }
 
     @@media (max-width: 768px) {
         .profile-container {
@@ -177,9 +544,14 @@
             padding: 2rem;
         }
 
+        .profile-name {
+            font-size: 1.5rem;
+        }
+
         .info-row {
             flex-direction: column;
             gap: 0.5rem;
+            align-items: flex-start;
         }
 
         .info-label {
@@ -198,26 +570,51 @@
 </style>
 
 <div class="profile-container">
+    <!-- Back Link -->
+    @if (currentRole == "Admin")
+    {
+        <a href="@Url.Action("Index", "User")" class="back-link">
+            <i class="bi bi-arrow-left"></i>
+            Back to Users List
+        </a>
+    }
+    else
+    {
+        <a href="@Url.Action("Index", "Home")" class="back-link">
+            <i class="bi bi-arrow-left"></i>
+            Back to Homepage
+        </a>
+    }
+
     <div class="profile-header">
-        <div class="profile-avatar">
-            <i class="bi bi-person-fill"></i>
+        <h1 class="profile-name">
+            <i class="bi bi-person-circle"></i>
+            @Model.FullName
+        </h1>
+        <div class="profile-role">
+            @Model.Role
         </div>
-        <h1 class="profile-name">@Model.FullName</h1>
-        <div class="profile-role">@Model.Role</div>
         <div>
             @if (Model.IsActive)
             {
-                <span class="profile-status status-active">Active</span>
+                <span class="profile-status status-active">
+                    <i class="bi bi-check-circle"></i> Active
+                </span>
             }
             else
             {
-                <span class="profile-status status-banned">Banned</span>
+                <span class="profile-status status-banned">
+                    <i class="bi bi-x-circle"></i> Banned
+                </span>
             }
         </div>
     </div>
 
     <div class="profile-info">
-        <h3 class="mb-4">Profile Information</h3>
+        <h3>
+            <i class="bi bi-info-circle"></i>
+            Profile Information
+        </h3>
 
         <div class="info-row">
             <div class="info-label">
@@ -240,14 +637,12 @@
             <div class="info-value">@(string.IsNullOrEmpty(Model.Address) ? "Not provided" : Model.Address)</div>
         </div>
 
-        
-
         <div class="info-row">
             <div class="info-label">
                 <i class="bi bi-shield-check"></i> Role
             </div>
             <div class="info-value">
-                <span class="badge bg-info">@Model.Role</span>
+                <span class="badge">@Model.Role</span>
             </div>
         </div>
     </div>
@@ -292,12 +687,156 @@
             </form>
         }
 
-        <a asp-controller="User" asp-action="Index" class="btn btn-secondary">
-            <i class="bi bi-arrow-left"></i> Back to List
-        </a>
+        @if (currentRole == "Admin")
+        {
+            <a asp-controller="Admin" asp-action="Index" class="btn btn-secondary">
+                <i class="bi bi-speedometer2"></i> Back to Dashboard
+            </a>
+        }
+        else
+        {
+            <a asp-controller="Home" asp-action="Index" class="btn btn-secondary">
+                <i class="bi bi-house"></i> Back to Homepage
+            </a>
+        }
     </div>
-</div>
 
+    <!-- Course Progress Section - Moved below action buttons with collapsible functionality -->
+    @if (Model.CourseProgresses != null && Model.CourseProgresses.Any())
+    {
+        <div class="courses-section">
+            <div class="courses-header" onclick="toggleCoursesSection()">
+                <h3>
+                    <i class="bi bi-book"></i>
+                    Course Progress (@Model.CourseProgresses.Count courses)
+                </h3>
+                <i class="bi bi-chevron-down toggle-icon" id="coursesToggleIcon"></i>
+            </div>
+
+            <div class="courses-content" id="coursesContent">
+                <!-- Summary Stats -->
+                <div class="progress-summary">
+                    <div class="summary-item">
+                        <div class="summary-icon">
+                            <i class="bi bi-journal-check"></i>
+                        </div>
+                        <div class="summary-content">
+                            <div class="summary-value">@Model.CourseProgresses.Count</div>
+                            <div class="summary-label">Total Courses</div>
+                        </div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="summary-icon completed-icon">
+                            <i class="bi bi-trophy"></i>
+                        </div>
+                        <div class="summary-content">
+                            <div class="summary-value">@Model.CourseProgresses.Count(c => c.IsCompleted)</div>
+                            <div class="summary-label">Completed</div>
+                        </div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="summary-icon in-progress-icon">
+                            <i class="bi bi-clock-history"></i>
+                        </div>
+                        <div class="summary-content">
+                            <div class="summary-value">@Model.CourseProgresses.Count(c => !c.IsCompleted && c.ProgressPercentage > 0)</div>
+                            <div class="summary-label">In Progress</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="courses-grid">
+                    @foreach (var progress in Model.CourseProgresses)
+                    {
+                        <div class="course-progress-card">
+                            <div class="course-header-progress">
+                                <h6 class="course-title-progress">@progress.CourseTitle</h6>
+                                @if (progress.IsCompleted)
+                                {
+                                    <span class="completion-badge completed">
+                                        <i class="bi bi-check-circle-fill"></i> Completed
+                                    </span>
+                                }
+                                else if (progress.ProgressPercentage > 0)
+                                {
+                                    <span class="completion-badge in-progress">
+                                        <i class="bi bi-clock-history"></i> In Progress
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="completion-badge not-started">
+                                        <i class="bi bi-circle"></i> Not Started
+                                    </span>
+                                }
+                            </div>
+
+                            <div class="progress-bar-container">
+                                <div class="progress">
+                                    <div class="progress-bar"
+                                         role="progressbar"
+                                         style="width: @progress.ProgressPercentage%"
+                                         aria-valuenow="@progress.ProgressPercentage"
+                                         aria-valuemin="0"
+                                         aria-valuemax="100">
+                                    </div>
+                                </div>
+                                <span class="progress-percentage">@progress.ProgressPercentage.ToString("0")%</span>
+                            </div>
+
+                            @if (!string.IsNullOrEmpty(progress.LessonTitle))
+                            {
+                                <div class="current-lesson">
+                                    <i class="bi bi-play-circle"></i>
+                                    <span>Current: @progress.LessonTitle</span>
+                                </div>
+                            }
+
+                            <div class="course-meta-info">
+                                <div class="meta-item">
+                                    <i class="bi bi-calendar-check"></i>
+                                    <span>Last accessed: @progress.LastAccessed.ToString("MMM dd, yyyy")</span>
+                                </div>
+                                @if (progress.CompletedAt.HasValue)
+                                {
+                                    <div class="meta-item">
+                                        <i class="bi bi-trophy"></i>
+                                        <span>Completed: @progress.CompletedAt.Value.ToString("MMM dd, yyyy")</span>
+                                    </div>
+                                }
+                            </div>
+
+                            @if (isOwnProfile)
+                            {
+                                <div class="course-action">
+                                    <a href="@Url.Action("Details", "Courses", new { id = progress.CourseId })"
+                                       class="btn btn-primary btn-sm w-100">
+                                        <i class="bi bi-arrow-right-circle"></i> Continue Learning
+                                    </a>
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+    else if (isOwnProfile || currentRole == "Admin")
+    {
+        <div class="courses-section">
+            <div class="empty-courses">
+                <i class="bi bi-journal-x"></i>
+                <p>No courses enrolled yet</p>
+                @if (isOwnProfile)
+                {
+                    <a href="@Url.Action("Index", "Courses")" class="btn btn-primary btn-sm">
+                        <i class="bi bi-search"></i> Browse Courses
+                    </a>
+                }
+            </div>
+        </div>
+    }
+</div>
 
 <!-- Edit Profile Modal -->
 <div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileModalLabel" aria-hidden="true">
@@ -306,38 +845,78 @@
             <form asp-controller="User" asp-action="UpdateProfile" method="post">
                 @Html.AntiForgeryToken()
                 <div class="modal-header">
-                    <h5 class="modal-title" id="editProfileModalLabel">Edit Profile</h5>
+                    <h5 class="modal-title" id="editProfileModalLabel">
+                        <i class="bi bi-pencil-square me-2"></i>Edit Profile
+                    </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <input type="hidden" name="Id" value="@Model.Id" />
 
                     <div class="mb-3">
-                        <label for="FullName" class="form-label">Full Name</label>
+                        <label for="FullName" class="form-label">
+                            <i class="bi bi-person me-1"></i>Full Name
+                        </label>
                         <input type="text" class="form-control" name="FullName" value="@Model.FullName" required />
                     </div>
 
                     <div class="mb-3">
-                        <label for="PhoneNumber" class="form-label">Phone</label>
+                        <label for="PhoneNumber" class="form-label">
+                            <i class="bi bi-telephone me-1"></i>Phone
+                        </label>
                         <input type="text" class="form-control" name="PhoneNumber" value="@Model.PhoneNumber" />
                     </div>
 
                     <div class="mb-3">
-                        <label for="Address" class="form-label">Address</label>
+                        <label for="Address" class="form-label">
+                            <i class="bi bi-geo-alt me-1"></i>Address
+                        </label>
                         <input type="text" class="form-control" name="Address" value="@Model.Address" />
                     </div>
 
                     <div class="mb-3">
-                        <label for="Password" class="form-label">New Password</label>
-                        <input type="password" class="form-control" name="Password" />
-                        <small class="form-text text-muted">Leave blank if not changing password</small>
+                        <label for="Password" class="form-label">
+                            <i class="bi bi-key me-1"></i>New Password
+                        </label>
+                        <input type="password" class="form-control" name="Password"
+                               minlength="6"
+                               pattern=".{6,}"
+                               title="Password must be at least 6 characters long" />
+                        <small class="form-text text-muted">Leave blank if not changing password. Minimum 6 characters required.</small>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-success">Save Changes</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-check-circle me-1"></i>Save Changes
+                    </button>
                 </div>
             </form>
         </div>
     </div>
 </div>
+
+<script>
+    // Toggle courses section
+    function toggleCoursesSection() {
+        const content = document.getElementById('coursesContent');
+        const toggleIcon = document.getElementById('coursesToggleIcon');
+
+        if (content.classList.contains('expanded')) {
+            content.classList.remove('expanded');
+            toggleIcon.classList.remove('rotated');
+        } else {
+            content.classList.add('expanded');
+            toggleIcon.classList.add('rotated');
+        }
+    }
+
+    // Auto-expand if user has courses
+    document.addEventListener('DOMContentLoaded', function() {
+        @if (Model.CourseProgresses != null && Model.CourseProgresses.Any())
+        {
+                @:// You can choose to auto-expand or keep it collapsed by default
+                @:// toggleCoursesSection(); // Uncomment to auto-expand on page load
+        }
+    });
+</script>
