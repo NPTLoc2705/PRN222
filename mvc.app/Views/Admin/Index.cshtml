@@ -1,0 +1,245 @@
+﻿@model IEnumerable<mvc.dataaccess.Entities.Courses.Course>
+@{
+    ViewData["Title"] = "Course Management Dashboard";
+    var isAdmin = Context.Session.GetString("UserRole") == "Admin";
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+}
+
+<style>
+    .management-dashboard {
+        padding: 1.5rem 2rem;
+        background-color: #f5f7fa;
+    }
+
+    .management-header {
+        background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+        padding: 1.5rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        margin-bottom: 1.5rem;
+    }
+
+    .management-title {
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 0.25rem;
+    }
+
+    .stats-card {
+        background: white;
+        border-radius: 8px;
+        padding: 1rem;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        margin-bottom: 1.5rem;
+    }
+
+    .management-table {
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+        overflow: hidden;
+    }
+
+    .table thead th {
+        background-color: #f8f9fa;
+        border-bottom-width: 1px;
+        font-weight: 600;
+        color: #495057;
+        padding: 1rem 1.25rem;
+    }
+
+    .table td {
+        padding: 1rem 1.25rem;
+        vertical-align: middle;
+    }
+
+    .status-badge {
+        font-weight: 500;
+        padding: 0.5rem 0.75rem;
+        font-size: 0.85rem;
+        border-radius: 6px;
+    }
+
+    .course-thumbnail {
+        width: 80px;
+        height: 45px;
+        object-fit: cover;
+        border-radius: 4px;
+        border: 1px solid #e9ecef;
+    }
+
+    .action-buttons .btn {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.9rem;
+        margin-right: 0.5rem;
+    }
+
+        .action-buttons .btn:last-child {
+            margin-right: 0;
+        }
+
+    .empty-state {
+        background: white;
+        border-radius: 8px;
+        padding: 3rem;
+        text-align: center;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    .empty-state-icon {
+        font-size: 3rem;
+        color: #adb5bd;
+        margin-bottom: 1rem;
+    }
+
+    .course-title {
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 0.25rem;
+    }
+
+    .course-description {
+        color: #6c757d;
+        font-size: 0.9rem;
+        line-height: 1.4;
+    }
+</style>
+
+<div class="container-fluid management-dashboard">
+    @if (!isAdmin)
+    {
+        <div class="alert alert-danger">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            <strong>Access Denied:</strong> Administrator privileges required
+        </div>
+    }
+    else
+    {
+        <div class="management-header">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h2 class="management-title">
+                        <i class="fas fa-book-open me-2 text-primary"></i>Course Management
+                    </h2>
+                    <p class="text-muted mb-0">
+                        Manage course content, visibility, and publishing status
+                    </p>
+                </div>
+                <div>
+                    <a asp-controller="Courses" asp-action="Create" class="btn btn-primary px-4">
+                        <i class="fas fa-plus me-2"></i>Create Course
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="row stats-card">
+            <div class="col-md-3 text-center border-end">
+                <div class="h4 text-dark">@Model.Count()</div>
+                <div class="text-muted small">Total Courses</div>
+            </div>
+            <div class="col-md-3 text-center border-end">
+                <div class="h4 text-success">@Model.Count(c => c.IsActive)</div>
+                <div class="text-muted small">Published</div>
+            </div>
+            <div class="col-md-3 text-center border-end">
+                <div class="h4 text-secondary">@Model.Count(c => !c.IsActive)</div>
+                <div class="text-muted small">Draft</div>
+            </div>
+            <div class="col-md-3 text-center">
+                <div class="h4 text-info">@Model.Sum(c => c.Lessons?.Count ?? 0)</div>
+                <div class="text-muted small">Total Lessons</div>
+            </div>
+        </div>
+
+        <div class="management-table">
+            @if (!Model.Any())
+            {
+                <div class="empty-state">
+                    <div class="empty-state-icon">
+                        <i class="fas fa-book-open"></i>
+                    </div>
+                    <h5 class="mb-2">No courses available</h5>
+                    <p class="text-muted mb-4">Get started by creating your first course</p>
+                    <a asp-controller="Courses" asp-action="Create" class="btn btn-primary px-4">
+                        <i class="fas fa-plus me-2"></i>Create Course
+                    </a>
+                </div>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th style="width: 100px;">Thumbnail</th>
+                                <th>Course Information</th>
+                                <th style="width: 120px;">Status</th>
+                                <th style="width: 120px;">Difficulty</th>
+                                <th style="width: 100px;">Lessons</th>
+                                <th style="width: 100px;">Duration</th>
+                                <th style="width: 120px;">Created</th>
+                                <th style="width: 200px;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var course in Model.OrderByDescending(c => c.CreatedAt))
+                            {
+                                <tr class="@(!course.IsActive ? "table-secondary" : "")">
+                                    <td>
+                                        @if (course.ImageBytes != null)
+                                        {
+                                            <img src="@Url.Action("GetCourseImage", "Courses", new { id = course.CourseId })"
+                                                 alt="@course.Title" class="course-thumbnail" />
+                                        }
+                                        else
+                                        {
+                                            <div class="course-thumbnail bg-light d-flex align-items-center justify-content-center">
+                                                <i class="fas fa-image text-muted"></i>
+                                            </div>
+                                        }
+                                    </td>
+                                    <td>
+                                        <div class="course-title">@course.Title</div>
+                                        <div class="course-description">
+                                            @if (!string.IsNullOrEmpty(course.Description))
+                                            {
+                                                @(course.Description.Length > 100 ? course.Description.Substring(0, 100) + "..." : course.Description)
+                                            }
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="status-badge badge @(course.IsActive ? "bg-success" : "bg-secondary")">
+                                            @(course.IsActive ? "Published" : "Inactive")
+                                        </span>
+                                    </td>
+                                    <td>@course.DifficultyLevel</td>
+                                    <td>@(course.Lessons?.Count ?? 0)</td>
+                                    <td>@course.Duration min</td>
+                                    <td>@course.CreatedAt.ToString("MMM dd, yyyy")</td>
+                                    <td>
+                                        <div class="d-flex action-buttons">
+                                            <a asp-action="Details" asp-route-id="@course.CourseId"
+                                               class="btn btn-sm btn-outline-primary">
+                                                <i class="fas fa-eye me-1"></i> View
+                                            </a>
+                                            <a asp-controller="Courses" asp-action="Edit" asp-route-id="@course.CourseId"
+                                               class="btn btn-sm btn-outline-warning">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <a asp-controller="Courses" asp-action="Delete" asp-route-id="@course.CourseId"
+                                               class="btn btn-sm btn-outline-danger">
+                                                <i class="fas fa-trash"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    }
+</div>

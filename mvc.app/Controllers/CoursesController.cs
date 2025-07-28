@@ -11,7 +11,7 @@ using mvc.services.Implements;
 
 namespace mvc.app.Controllers
 {
-    public class CoursesController : Controller
+    public class CoursesController : BaseController
     {
         private readonly ICourseService _courseService;
         private readonly IProgressService _progressService;
@@ -40,7 +40,10 @@ namespace mvc.app.Controllers
             }
             return userId;
         }
-
+        private bool IsAdmin()
+        {
+            return HttpContext.Session.GetString("UserRole") == "Admin";
+        }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -177,6 +180,7 @@ namespace mvc.app.Controllers
         // GET: Courses/Create
         public async Task<IActionResult> Create()
         {
+            if (!IsAdmin()) return RedirectToAction("AccessDenied", "Home");
             var dto = new CoursesDTO
             {
                 AvailableCategories = await GetCategoryDTOs()
@@ -191,6 +195,7 @@ namespace mvc.app.Controllers
       [Bind("Title,Description,Duration,DifficultyLevel,IsActive,SelectedCategoryIds")] CoursesDTO courseDTO,
       IFormFile imageFile)
         {
+            if (!IsAdmin()) return RedirectToAction("AccessDenied", "Home");
             courseDTO.AvailableCategories = await GetCategoryDTOs();
             courseDTO.SelectedCategoryIds ??= new List<Guid>();
 
@@ -209,7 +214,7 @@ namespace mvc.app.Controllers
             try
             {
                 await _courseService.CreateCourseFromDTOAsync(courseDTO, imageFile);
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction("Index", "Admin");
             }
             catch (Exception ex)
             {
@@ -223,6 +228,7 @@ namespace mvc.app.Controllers
         [HttpGet]
         public async Task<IActionResult> Edit(Guid? id)
         {
+            if (!IsAdmin()) return RedirectToAction("AccessDenied", "Home");
             if (id == null) return NotFound();
 
             try
@@ -249,6 +255,7 @@ namespace mvc.app.Controllers
     [Bind("CourseId,Title,Description,Duration,DifficultyLevel,IsActive,SelectedCategoryIds")] CoursesDTO courseDTO,
     IFormFile imageFile = null)
         {
+            if (!IsAdmin()) return RedirectToAction("AccessDenied", "Home");
             if (id != courseDTO.CourseId) return NotFound();
 
             // Load available categories for the view
@@ -283,7 +290,7 @@ namespace mvc.app.Controllers
                     }
 
                     await _courseService.UpdateCourseFromDTOAsync(courseDTO, imageFile);
-                    return RedirectToAction(nameof(Index));
+                    return RedirectToAction("Index", "Admin");
                 }
                 catch (Exception ex)
                 {
@@ -313,6 +320,7 @@ namespace mvc.app.Controllers
         // GET: Courses/Delete/5
         public async Task<IActionResult> Delete(Guid? id)
         {
+            if (!IsAdmin()) return RedirectToAction("AccessDenied", "Home");
             if (id == null) return NotFound();
 
             try
@@ -320,11 +328,6 @@ namespace mvc.app.Controllers
                 var course = await _courseService.GetCourseByIdAsync(id.Value);
                 if (course == null) return NotFound();
 
-                // Check for dependent records
-                var hasLessons = course.Lessons?.Any() ?? false;
-                var hasProgress = await _progressService.HasCourseProgress(id.Value);
-
-                ViewBag.CanDelete = !hasLessons && !hasProgress;
                 return View(course);
             }
             catch (Exception ex)
@@ -339,6 +342,7 @@ namespace mvc.app.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(Guid id)
         {
+            if (!IsAdmin()) return RedirectToAction("AccessDenied", "Home");
             try
             {
                 if (!await _courseService.CourseExistsAsync(id))
@@ -361,7 +365,7 @@ namespace mvc.app.Controllers
                 }
 
                 TempData["SuccessMessage"] = "Course deleted successfully";
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction("Index", "Admin");
             }
             catch (Exception ex)
             {
@@ -403,5 +407,6 @@ namespace mvc.app.Controllers
                 Name = c.Name
             }).ToList();
         }
+       
     }
 }

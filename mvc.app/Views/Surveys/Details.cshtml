@@ -1,0 +1,465 @@
+﻿@model mvc.dataaccess.Entities.Surveys.Survey
+
+@{
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    ViewData["Title"] = "Survey Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var userId = Context.Session.GetString("UserId");
+    var isLoggedIn = !string.IsNullOrEmpty(userId);
+    var username = Context.Session.GetString("Username");
+    var IsCon = Context.Session.GetString("UserRole");
+}
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drug-Free World - Survey Details</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <style>
+        :root {
+            --primary: #00a79d;
+            --primary-dark: #008c83;
+            --secondary: #ffcf66;
+            --bg: #e0f7fa;
+            --glass-bg: rgba(255,255,255,0.81);
+            --glass-bg-dark: rgba(34,39,46,0.82);
+            --shadow: 0 8px 32px 0 rgba(0,0,0,0.13), 0 1.5px 8px 0 rgba(0,0,0,0.09);
+            --shadow-hover: 0 12px 46px 0 rgba(0, 167, 157,0.15), 0 3px 18px 0 rgba(0,0,0,0.10);
+            --border-radius: 24px;
+            --option-bg: #f8fafb;
+            --option-bg-glass: rgba(240,255,255,0.72);
+            --text: #232d33;
+            --text-muted: #6a7d85;
+            --option-score-bg: #e0f8f7;
+            --question-bar: linear-gradient(90deg, var(--primary) 70%, var(--primary-dark));
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #e0f7fa 0%, #f8f9fa 100%);
+            font-family: 'Poppins', Arial, sans-serif;
+            color: var(--text);
+            padding-top: 86px;
+            position: relative;
+            overflow-x: hidden;
+        }
+        /* Animated Bubbles */
+        .animated-bg {
+            pointer-events: none;
+            z-index: 0;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .bubble {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0.18;
+            filter: blur(1.5px);
+            animation: floatBubbles 16s infinite alternate;
+        }
+
+        .bubble1 {
+            width: 180px;
+            height: 180px;
+            left: 4vw;
+            top: 11vh;
+            background: var(--primary);
+            animation-delay: 0s;
+        }
+
+        .bubble2 {
+            width: 120px;
+            height: 120px;
+            right: 8vw;
+            top: 30vh;
+            background: var(--secondary);
+            animation-delay: 3s;
+        }
+
+        .bubble3 {
+            width: 90px;
+            height: 90px;
+            left: 61vw;
+            top: 68vh;
+            background: var(--primary-dark);
+            animation-delay: 2s;
+        }
+
+        .bubble4 {
+            width: 60px;
+            height: 60px;
+            left: 24vw;
+            top: 84vh;
+            background: var(--option-bg);
+            animation-delay: 7s;
+        }
+        @@keyframes floatBubbles {
+            0%
+
+        {
+            transform: translateY(0) scale(1);
+        }
+
+        100% {
+            transform: translateY(-55px) scale(1.09);
+        }
+
+        }
+
+        .content-container {
+            max-width: 870px;
+            margin: 40px auto 60px auto;
+            padding: 38px 22px 32px 22px;
+            background: var(--glass-bg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            position: relative;
+            z-index: 1;
+            backdrop-filter: blur(4.5px) saturate(1.1);
+            border: 1.5px solid rgba(0,167,157,0.07);
+        }
+
+        .survey-title {
+            font-size: clamp(2.1rem, 4vw, 2.9rem);
+            font-weight: 700;
+            color: transparent;
+            background: linear-gradient(90deg, var(--primary) 70%, var(--primary-dark) 100%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-align: center;
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+        }
+
+        .survey-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            background: rgba(0,167,157,0.051);
+            padding: 18px 16px 13px 16px;
+            border-radius: 14px;
+            margin-bottom: 32px;
+            border-left: 4px solid var(--primary);
+            box-shadow: 0 2px 10px 0 rgba(0,167,157,0.06);
+        }
+
+        .survey-meta-desc {
+            font-size: 1.06rem;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+
+        .meta-row {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            font-size: 1.04rem;
+            margin-bottom: 4px;
+        }
+
+        .meta-label {
+            font-weight: 600;
+            color: var(--primary-dark);
+            min-width: 115px;
+        }
+
+        .meta-value {
+            color: var(--text);
+        }
+
+        .meta-status.active {
+            color: #28a745;
+            font-weight: 600;
+        }
+
+        .meta-status.inactive {
+            color: #dc3545;
+            font-weight: 600;
+        }
+
+        hr {
+            border: none;
+            border-top: 1.5px solid #e0e0e0;
+            margin: 12px 0 18px 0;
+        }
+        /* Questions Section */
+        .questions-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.68rem;
+            font-weight: 600;
+            color: var(--primary-dark);
+            margin-bottom: 18px;
+            letter-spacing: 0.2px;
+        }
+
+        .questions-container {
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+        }
+
+        .question-card {
+            background: var(--option-bg-glass);
+            box-shadow: 0 2px 18px 0 rgba(0,167,157,0.08);
+            padding: 23px 18px 15px 19px;
+            border-radius: 18px;
+            position: relative;
+            border-left: 6px solid var(--primary);
+            transition: box-shadow 0.23s, transform 0.23s;
+        }
+
+            .question-card:hover {
+                box-shadow: 0 7px 36px 0 rgba(0,167,157,0.15);
+                transform: scale(1.012) translateY(-3px);
+            }
+
+        .question-bar {
+            position: absolute;
+            left: -10px;
+            top: 18px;
+            width: 8px;
+            height: 38px;
+            border-radius: 7px;
+            background: var(--question-bar);
+            box-shadow: 0 0 14px 0 rgba(0,167,157,0.13);
+            opacity: 0.7;
+        }
+
+        .question-number {
+            font-weight: 700;
+            color: var(--primary-dark);
+            font-size: 1.12rem;
+            margin-bottom: 4px;
+        }
+
+        .question-text {
+            font-size: 1.25rem;
+            color: var(--text);
+            margin-bottom: 12px;
+            font-weight: 500;
+        }
+
+        .options-list {
+            list-style: none;
+            padding-left: 0;
+            margin-top: 2px;
+        }
+
+        .option-item {
+            background: var(--glass-bg);
+            border-radius: 12px;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px 10px 13px;
+            border: 1.5px solid #e0f7fa;
+            box-shadow: 0 1px 6px 0 rgba(0,167,157,0.05);
+            font-size: 1.05rem;
+            transition: box-shadow 0.17s, border 0.16s;
+        }
+
+            .option-item:hover {
+                box-shadow: 0 3px 18px 0 rgba(0,167,157,0.10);
+                border: 1.5px solid var(--primary-dark);
+            }
+
+        .option-text {
+            flex: 1;
+            color: var(--text);
+            font-weight: 500;
+        }
+
+        .option-score {
+            background: var(--option-score-bg);
+            padding: 3px 11px;
+            border-radius: 13px;
+            font-size: 0.98em;
+            font-weight: 600;
+            color: var(--primary-dark);
+            margin-left: 18px;
+            border: 1px solid #b2ebe1;
+            box-shadow: 0 0.5px 2px 0 rgba(0,167,157,0.06);
+        }
+
+        .no-options {
+            color: #b0b8bc;
+            font-style: italic;
+            font-size: 0.97rem;
+            margin-left: 6px;
+        }
+        /* Actions Bar */
+        .actions-bar {
+            position: sticky;
+            bottom: 16px;
+            left: 0;
+            right: 0;
+            margin: 0 auto;
+            z-index: 20;
+            display: flex;
+            gap: 18px;
+            justify-content: center;
+            padding: 20px 0 0 0;
+        }
+
+        .btn {
+            padding: 11px 24px;
+            border-radius: 7px;
+            font-weight: 600;
+            font-size: 1.08rem;
+            letter-spacing: 0.03em;
+            transition: all 0.23s cubic-bezier(0.45,0,0.55,1);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none !important;
+            box-shadow: 0 1.5px 7px 0 rgba(0,167,157,0.09);
+            border: none;
+            outline: none;
+            border-bottom: 3px solid rgba(0,167,157,0.12);
+        }
+
+        .btn-primary {
+            background: linear-gradient(90deg, var(--primary) 85%, var(--primary-dark) 100%);
+            color: #fff !important;
+        }
+
+            .btn-primary:hover, .btn-primary:focus {
+                background: linear-gradient(90deg, var(--primary-dark) 70%, var(--primary) 100%);
+                transform: scale(1.045) translateY(-2px);
+                box-shadow: 0 6px 24px 0 rgba(0,167,157,0.16);
+            }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: #fff !important;
+        }
+
+            .btn-secondary:hover, .btn-secondary:focus {
+                background: #5a6268;
+                transform: scale(1.04) translateY(-2px);
+            }
+        /* Responsive */
+        @@media (max-width: 600px) {
+            .content-container
+
+        {
+            padding: 14px 6px 17px 6px;
+        }
+
+        .questions-header {
+            font-size: 1.18rem;
+        }
+
+        .btn {
+            padding: 10px 13px;
+            font-size: 0.97rem;
+        }
+
+        .survey-title {
+            font-size: 1.25rem;
+        }
+
+        }
+    </style>
+</head>
+<body>
+    <div class="animated-bg" aria-hidden="true">
+        <div class="bubble bubble1"></div>
+        <div class="bubble bubble2"></div>
+        <div class="bubble bubble3"></div>
+        <div class="bubble bubble4"></div>
+    </div>
+    <div class="content-container">
+        <div class="survey-title">
+            <i class="fa fa-poll-h"></i> @Model.Title
+        </div>
+        <div class="survey-meta">
+            @if (!string.IsNullOrEmpty(Model.Description))
+            {
+                <div class="survey-meta-desc"><i class="fa fa-info-circle"></i> @Model.Description</div>
+                <hr />
+            }
+            <div class="meta-row">
+                <span class="meta-label"><i class="fa fa-tag"></i> Survey Type:</span>
+                <span class="meta-value">@Model.Type</span>
+            </div>
+            <div class="meta-row">
+                <span class="meta-label"><i class="fa fa-bolt"></i> Status:</span>
+                <span class="meta-value meta-status @(Model.IsActive ? "active" : "inactive")">
+                    @(Model.IsActive ? "Active" : "Inactive")
+                </span>
+            </div>
+            <div class="meta-row">
+                <span class="meta-label"><i class="fa fa-calendar-alt"></i> Created:</span>
+                <span class="meta-value">@Model.CreatedAt.ToString("MMM dd, yyyy")</span>
+            </div>
+        </div>
+
+        <div class="questions-header">
+            <i class="fa fa-question-circle"></i> Questions
+        </div>
+        @if (Model.Questions != null && Model.Questions.Any())
+        {
+            <div class="questions-container">
+                @foreach (var question in Model.Questions.OrderBy(q => q.OrderIndex))
+                {
+                    <div class="question-card">
+                        <div class="question-bar"></div>
+                        <div class="question-number">Q@(question.OrderIndex + 1)</div>
+                        <div class="question-text">@question.QuestionText</div>
+                        @if (question.Options != null && question.Options.Any())
+                        {
+                            <ul class="options-list">
+                                @foreach (var option in question.Options.OrderBy(o => o.OrderIndex))
+                                {
+                                    <li class="option-item">
+                                        <span class="option-text">@option.OptionText</span>
+                                        <span class="option-score"><i class="fa fa-star"></i> @option.Score</span>
+                                    </li>
+                                }
+                            </ul>
+                        }
+                        else
+                        {
+                            <span class="no-options"><i class="fa fa-exclamation-circle"></i> No options defined for this question.</span>
+                        }
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <p class="no-options"><i class="fa fa-exclamation-circle"></i> This survey doesn't have any questions yet.</p>
+        }
+
+        <div class="actions-bar">
+            <a asp-action="Index" class="btn btn-secondary"><i class="fa fa-arrow-left"></i> Back to List</a>
+            @if (isLoggedIn)
+            {
+                <a asp-action="TakeSurvey" asp-route-id="@Model.SurveyId" class="btn btn-primary"><i class="fa fa-play"></i> Take This Survey</a>
+                @if(IsCon == "Admin")
+                {
+                    <a asp-action="Edit" asp-route-id="@Model.SurveyId" class="btn btn-primary"><i class="fa fa-edit"></i> Edit</a>
+			}
+            }
+            else
+            {
+                <span class="btn btn-secondary disabled"><i class="fa fa-lock"></i> Login to take this survey</span>
+			}
+            
+            
+            </div>
+    </div>
+</body>

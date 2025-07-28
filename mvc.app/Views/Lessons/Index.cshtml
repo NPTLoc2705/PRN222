@@ -6,8 +6,7 @@
     var userId = Context.Session.GetString("UserId");
     var isLoggedIn = !string.IsNullOrEmpty(userId);
     var isUserEnrolled = ViewBag.IsUserEnrolled ?? false;
-    var isAdmin = Context.Session.GetString("UserRole") == "Admin" ||
-                 Context.Session.GetString("UserRole") == "Instructor";
+    var isAdmin = Context.Session.GetString("UserRole") == "Admin";
 }
 
 <style>

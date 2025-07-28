@@ -1,0 +1,389 @@
+﻿@model mvc.dataaccess.ViewModels.SurveyDTO
+@{
+    ViewData["Title"] = "Create Survey";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var userId = Context.Session.GetString("UserId");
+    var isLoggedIn = !string.IsNullOrEmpty(userId);
+    var username = Context.Session.GetString("Username");
+    var IsCon = Context.Session.GetString("UserRole");
+}
+
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drug-Free World - Create Survey</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', Arial, sans-serif;
+        }
+
+        :root {
+            --primary-color: #00a79d;
+            --secondary-color: #008c83;
+            --background-color: #f8f9fa;
+            --text-color: #333;
+            --shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--background-color);
+            padding-top: 80px;
+        }
+
+        .content-container {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 32px 24px;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+        }
+
+        h1, h4, h5 {
+            color: var(--primary-color);
+            font-weight: 700;
+            margin-bottom: 18px;
+        }
+
+        hr {
+            margin: 18px 0;
+            border: none;
+            border-top: 1.5px solid #e0e0e0;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: border 0.2s;
+        }
+
+        .form-control:focus {
+                border-color: var(--primary-color);
+                outline: none;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: 500;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: #fff;
+            border: none;
+            box-shadow: var(--shadow);
+        }
+
+         .btn-primary:hover {
+                background: var(--secondary-color);
+                box-shadow: 0 4px 16px 0 rgba(0, 167, 157, 0.12);
+         }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: #fff;
+            border: none;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+            box-shadow: 0 4px 16px 0 rgba(108, 117, 125, 0.12);
+	    }
+
+        .btn-danger {
+            background: #dc3545;
+            color: #fff;
+            border: none;
+        }
+
+        .btn-sm {
+            padding: 5px 10px;
+            font-size: 0.875rem;
+        }
+
+        .text-danger {
+            color: #dc3545;
+            font-size: 0.95em;
+        }
+
+        .form-check-label {
+            font-weight: 500;
+        }
+
+        .form-check-input {
+            margin-right: 8px;
+        }
+
+        a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+            a:hover {
+                color: var(--secondary-color);
+                text-decoration: underline;
+            }
+
+        .question-container, .option-container {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            position: relative;
+        }
+
+        .option-container {
+            background: #f1f1f1;
+            margin-left: 20px;
+        }
+
+        .remove-btn {
+            position: absolute;
+            right: 10px;
+            top: 10px;
+        }
+
+        .options-section {
+            margin-top: 15px;
+            padding-left: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="content-container">
+        <h1>Create Survey</h1>
+        <hr />
+
+        <form id="surveyForm" asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <h4>Survey Information</h4>
+            <div class="form-group">
+                <label asp-for="Survey.Title" class="control-label">Title</label>
+                <input asp-for="Survey.Title" class="form-control" required />
+                <span asp-validation-for="Survey.Title" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Survey.Description" class="control-label">Description</label>
+                <textarea asp-for="Survey.Description" class="form-control" rows="3"></textarea>
+                <span asp-validation-for="Survey.Description" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Survey.Type" class="control-label">Survey Type</label>
+                <select asp-for="Survey.Type" class="form-control" asp-items="Html.GetEnumSelectList<mvc.dataaccess.Entities.Surveys.SurveyType>()"></select>
+                <span asp-validation-for="Survey.Type" class="text-danger"></span>
+            </div>
+            <div class="form-group form-check">
+                <label class="form-check-label">
+                    <input class="form-check-input" asp-for="Survey.IsActive" checked /> Active
+                </label>
+            </div>
+
+            <hr />
+            <h4>Questions</h4>
+            <p>Add questions to your survey below. For each question, you can add multiple choice options.</p>
+
+            <div id="questions-container">
+                <!-- Questions will be added here -->
+            </div>
+
+            <div class="form-group">
+                <button type="button" id="add-question" class="btn btn-secondary" onclick="addQuestion()">
+                    Add Question
+                </button>
+            </div>
+
+            <hr />
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary">Create Survey</button>
+                <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Templates (hidden) -->
+    <script id="question-template" type="text/html">
+        <div class="question-container">
+            <button type="button" class="btn btn-danger btn-sm remove-btn remove-question">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="form-group">
+                <label class="control-label">Question Text</label>
+                <input name="QuestionDtos[INDEX].Question.QuestionText" class="form-control question-text" required />
+            </div>
+            <div class="form-group">
+                <label class="control-label">Order</label>
+                <input name="QuestionDtos[INDEX].Question.OrderIndex" type="number" class="form-control question-order" value="0" min="0" />
+            </div>
+
+            <div class="options-section">
+                <h5>Options</h5>
+                <div class="options-container">
+                    <!-- Options will be added here -->
+                </div>
+                <button type="button" class="btn btn-secondary btn-sm add-option">
+                    <i class="fas fa-plus"></i> Add Option
+                </button>
+            </div>
+        </div>
+    </script>
+    
+    <div id="option-template" style="display: none;">
+        <div class="option-container">
+            <button type="button" class="btn btn-danger btn-sm remove-btn remove-option">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="form-group">
+                <label class="control-label">Option Text</label>
+                <input name="QuestionDtos[QINDEX].Options[OINDEX].OptionText" class="form-control option-text" required />
+            </div>
+            <div class="form-group">
+                <label class="control-label">Score</label>
+                <input name="QuestionDtos[QINDEX].Options[OINDEX].Score" type="number" class="form-control option-score" value="0" />
+            </div>
+            <div class="form-group">
+                <label class="control-label">Order</label>
+                <input name="QuestionDtos[QINDEX].Options[OINDEX].OrderIndex" type="number" class="form-control option-order" value="0" min="0" />
+            </div>
+        </div>
+    </div>
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"></script>
+    <script>
+        // Define the function in the global scope
+        let questionCount = 0;
+
+        function addQuestion() {
+            console.log("Add question clicked");
+            const questionsContainer = document.getElementById('questions-container');
+            const template = document.getElementById('question-template').innerHTML;
+
+            // Replace INDEX with current question count
+            const questionHtml = template.replace(/INDEX/g, questionCount);
+
+            // Create a container for the new question
+            const questionWrapper = document.createElement('div');
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = questionHtml;
+            const newQuestion = tempDiv.firstElementChild;
+            questionWrapper.appendChild(newQuestion);
+            questionWrapper.className = 'question-wrapper';
+            questionWrapper.dataset.index = questionCount;
+
+            questionsContainer.appendChild(questionWrapper);
+
+            // Setup remove question button
+            const removeBtn = questionWrapper.querySelector('.remove-question');
+            removeBtn.addEventListener('click', function() {
+                questionWrapper.remove();
+                renumberQuestions();
+            });
+
+            // Setup add option button
+            const addOptionBtn = questionWrapper.querySelector('.add-option');
+            addOptionBtn.addEventListener('click', function() {
+                const currentOptionCount = parseInt(questionWrapper.dataset.optionCount || 0);
+                addOption(questionWrapper, currentOptionCount);
+            });
+
+            // Add default first option
+            addOption(questionWrapper, 0);
+
+            questionCount++;
+            return questionWrapper;
+        }
+
+        function addOption(questionWrapper, optionIndex) {
+            const optionsContainer = questionWrapper.querySelector('.options-container');
+            const template = document.getElementById('option-template').innerHTML;
+            const questionIndex = questionWrapper.dataset.index;
+
+            // Replace indexes
+            let optionHtml = template.replace(/QINDEX/g, questionIndex);
+            optionHtml = optionHtml.replace(/OINDEX/g, optionIndex);
+
+            // Create option element
+            const optionWrapper = document.createElement('div');
+            optionWrapper.innerHTML = optionHtml;
+            optionWrapper.className = 'option-wrapper';
+            optionWrapper.dataset.index = optionIndex;
+
+            optionsContainer.appendChild(optionWrapper);
+
+            // Setup remove option button
+            const removeBtn = optionWrapper.querySelector('.remove-option');
+            removeBtn.addEventListener('click', function() {
+                optionWrapper.remove();
+                renumberOptions(questionWrapper);
+            });
+
+            // Auto-increment for next option
+            questionWrapper.dataset.optionCount = optionIndex + 1;
+
+            return optionWrapper;
+        }
+
+        function renumberQuestions() {
+            const questions = document.querySelectorAll('.question-wrapper');
+            questions.forEach((q, index) => {
+                q.dataset.index = index;
+
+                // Update question field names
+                const questionInputs = q.querySelectorAll('input[name^="QuestionDtos["]');
+                questionInputs.forEach(input => {
+                    input.name = input.name.replace(/QuestionDtos\[\d+\]/, `QuestionDtos[${index}]`);
+                });
+
+                // Update option field names
+                renumberOptions(q);
+            });
+        }
+
+        function renumberOptions(questionWrapper) {
+            const options = questionWrapper.querySelectorAll('.option-wrapper');
+            const questionIndex = questionWrapper.dataset.index;
+
+            options.forEach((o, index) => {
+                o.dataset.index = index;
+
+                // Update option field names
+                const optionInputs = o.querySelectorAll('input[name^="QuestionDtos["]');
+                optionInputs.forEach(input => {
+                    input.name = input.name.replace(
+                        /QuestionDtos\[\d+\]\.Options\[\d+\]/,
+                        `QuestionDtos[${questionIndex}].Options[${index}]`
+                    );
+                });
+            });
+        }
+
+        // Wait for DOM to be fully loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add first question by default
+            addQuestion();
+        });
+    </script>
+    
+</body>
+

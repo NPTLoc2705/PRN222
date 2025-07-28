@@ -12,8 +12,8 @@ using mvc.dataaccess.Entities;
 namespace mvc.dataaccess.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250715055155_rolestring")]
-    partial class rolestring
+    [Migration("20250715050433_InialPRN")]
+    partial class InialPRN
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

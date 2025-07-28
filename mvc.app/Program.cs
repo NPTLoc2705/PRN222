@@ -4,7 +4,6 @@ using Microsoft.Extensions.Configuration.Json;
 using Microsoft.IdentityModel.Tokens;
 using mvc.repositories.Implements;
 using mvc.repositories.Interfaces;
-using mvc.repositories.Implements;
 using mvc.dataaccess.Entities;
 using mvc.repositories.Interfaces.ICourse;
 using mvc.repositories.Implements.CourseRepo;
@@ -14,6 +13,7 @@ using mvc.services.Infrastructure;
 using mvc.services.Interfaces;
 using System.Data;
 using System.Text;
+using Microsoft.AspNetCore.Http.Features;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
@@ -30,6 +30,7 @@ builder.Services.AddScoped<IProgressRepo, ProgressRepo>();
 builder.Services.AddScoped<IBookingRepo, BookingRepo>();
 builder.Services.AddScoped<IBlogRepo, BlogRepo>();
 builder.Services.AddScoped<ICategoryRepo, CategoryRepo>();
+builder.Services.AddScoped<ISurveyRepository, SurveyRepository>();
 //Injection Service
 builder.Services.AddScoped<IBookingService, BookingService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
@@ -39,6 +40,7 @@ builder.Services.AddScoped<IProgressService, ProgressService>();
 builder.Services.AddScoped<IBlogService, BlogService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<ISurveyService, SurveyService>();
 builder.Services.AddSession(options =>
 {
     options.IdleTimeout = TimeSpan.FromMinutes(20); // Set session timeout
@@ -71,6 +73,16 @@ builder.Services.AddDbContext<AppDbContext>(
     options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnectionDB"))
 );
 
+//Increase the request size
+builder.Services.Configure<IISServerOptions>(options =>
+{
+    options.MaxRequestBodySize = 1073741824; // 1GB
+});
+
+builder.Services.Configure<FormOptions>(options =>
+{
+    options.MultipartBodyLengthLimit = 1073741824; // 1GB
+});
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -88,7 +100,7 @@ app.UseSwaggerUI();
 app.MapControllerRoute(
        name: "default",
        pattern: "{controller=Home}/{action=Index}/{id?}"
-   );
+   ).WithStaticAssets();
 
 app.UseHttpsRedirection();
 app.UseRouting();
@@ -100,9 +112,6 @@ app.UseAuthorization();
 
 app.MapStaticAssets();
 
-app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}")
-    .WithStaticAssets();
 
+  
 app.Run();
