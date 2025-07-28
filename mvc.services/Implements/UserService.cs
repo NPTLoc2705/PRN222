@@ -32,7 +32,7 @@ namespace mvc.services.Implements
             }
         }
 
-        public User GetUserProfile(Guid userId)
+        public UserProfileDTO GetUserProfile(Guid userId)
         {
             try
             {

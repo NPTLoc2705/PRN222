@@ -11,7 +11,7 @@ namespace mvc.services.Interfaces
     public interface IUserService
     {
         Task<List<User>> GetAllUsers();
-        User GetUserProfile(Guid userId);
+        UserProfileDTO GetUserProfile(Guid userId);
         bool DeleteUser(Guid userId);
         bool BanUser(Guid userId);
         bool UnBanUser(Guid userId);

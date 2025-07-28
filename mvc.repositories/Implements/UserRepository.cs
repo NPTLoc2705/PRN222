@@ -89,16 +89,37 @@ namespace mvc.repositories.Implements
                 throw new Exception("An error occurred while retrieving all users.", ex);
             }
         }
-        public User GetUserProfile(Guid userId)
+        public UserProfileDTO GetUserProfile(Guid userId)
         {
-            try
+            var user = _context.Users
+        .Include(u => u.CourseProgresses)
+            .ThenInclude(p => p.Course)
+        .Include(u => u.CourseProgresses)
+            .ThenInclude(p => p.Lesson)
+        .FirstOrDefault(u => u.Id == userId);
+
+            if (user == null) return null;
+
+            return new UserProfileDTO
             {
-                return _context.Users.FirstOrDefault(u => u.Id == userId);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("An error occurred while retrieving user profile.", ex);
-            }
+                Id = user.Id,
+                FullName = user.FullName,
+                Email = user.Email,
+                PhoneNumber = user.PhoneNumber,
+                Address = user.Address,
+                IsActive = user.IsActive,
+                CourseProgresses = user.CourseProgresses.Select(p => new UserCourseProgressDTO
+                {
+                    CourseId = p.CourseId,
+                    CourseTitle = p.Course?.Title,
+                    LessonId = p.LessonId,
+                    LessonTitle = p.Lesson?.Title,
+                    IsCompleted = p.IsCompleted,
+                    CompletedAt = p.CompletedAt,
+                    LastAccessed = p.LastAccessed,
+                    ProgressPercentage = p.ProgressPercentage
+                }).ToList()
+            };
         }
 
         public bool DeleteUser(Guid userId)

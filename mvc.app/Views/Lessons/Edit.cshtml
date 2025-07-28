@@ -2,68 +2,418 @@
 @{
     ViewData["Title"] = "Edit Lesson";
     var courseId = ViewBag.CourseId;
-    var module = ViewBag.Module;
+    var course = ViewBag.Module; // Using course since modules are removed
 }
 
-<h1>Edit Lesson</h1>
+<style>
+    :root {
+        --primary-color: #00a79d;
+        --primary-dark: #008c83;
+        --primary-light: #4db8ad;
+        --secondary-color: #6c757d;
+        --success-color: #28a745;
+        --warning-color: #ffc107;
+        --danger-color: #dc3545;
+        --light-bg: #f8f9fa;
+        --white: #ffffff;
+        --text-dark: #2c3e50;
+        --text-muted: #6c757d;
+        --shadow: 0 4px 12px rgba(0,0,0,0.1);
+        --shadow-hover: 0 6px 20px rgba(0,0,0,0.15);
+    }
 
-<h4>@Model.Title</h4>
-<hr />
-<div class="row">
-    <div class="col-md-6">
-        <form asp-controller="Lessons" asp-action="Edit" asp-route-courseId="@courseId" asp-route-lessonId="@Model.LessonId" enctype="multipart/form-data">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="LessonId" />
-            <input type="hidden" asp-for="CreatedAt" />
+    body {
+        background-color: var(--light-bg);
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
 
-            <div class="form-group">
-                <label asp-for="Title" class="control-label"></label>
-                <input asp-for="Title" class="form-control" />
-                <span asp-validation-for="Title" class="text-danger"></span>
-            </div>
+    .page-header {
+        background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
+        color: white;
+        padding: 3rem 0;
+        margin-bottom: 3rem;
+        border-radius: 0 0 50px 50px;
+        box-shadow: var(--shadow);
+    }
 
-            <div class="form-group">
-                <label asp-for="ContentType" class="control-label"></label>
-                <select asp-for="ContentType" class="form-control">
-                    <option value="Video">Video</option>
-                    <option value="Article">Article</option>
-                    <option value="Quiz">Quiz</option>
-                    <option value="Exercise">Exercise</option>
-                </select>
-                <span asp-validation-for="ContentType" class="text-danger"></span>
-            </div>
+        .page-header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
 
-            <div class="form-group">
-                <label asp-for="ContentFile" class="control-label">Update Content File</label>
-                <input type="file" asp-for="ContentFile" class="form-control" data-val="true"
-                       data-val-filesize="The file must be less than 1GB"
-                       data-val-filesize-max="1073741824" accept="video/mp4,video/x-m4v,video/*" />
-                <span asp-validation-for="ContentFile" class="text-danger"></span>
-                <small class="form-text text-muted">Current: @(string.IsNullOrEmpty(Model.ContentUrl) ? "None" : Model.ContentUrl)</small>
-            </div>
-            <div class="form-group">
-                <label asp-for="Duration" class="control-label">Duration (minutes)</label>
-                <input asp-for="Duration" class="form-control" />
-                <span asp-validation-for="Duration" class="text-danger"></span>
-            </div>
+    .breadcrumb {
+        background: transparent;
+        padding: 0;
+        margin: 0;
+    }
 
-            <div class="form-group">
-                <label asp-for="OrderNumber" class="control-label">Order Number</label>
-                <input asp-for="OrderNumber" class="form-control" />
-                <span asp-validation-for="OrderNumber" class="text-danger"></span>
-            </div>
+    .breadcrumb-item {
+        color: rgba(255, 255, 255, 0.8);
+    }
 
-            <div class="form-group form-check">
-                <label class="form-check-label">
-                    <input class="form-check-input" asp-for="IsFreePreview" /> @Html.DisplayNameFor(model => model.IsFreePreview)
-                </label>
-            </div>
+        .breadcrumb-item.active {
+            color: white;
+        }
 
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
-                <a asp-controller="Admin" asp-action="LessonIndex" asp-route-courseId="@courseId" class="btn btn-secondary">Cancel</a>
+        .breadcrumb-item + .breadcrumb-item::before {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+    .breadcrumb a {
+        color: rgba(255, 255, 255, 0.9);
+        text-decoration: none;
+    }
+
+        .breadcrumb a:hover {
+            color: white;
+        }
+
+    .form-container {
+        background: white;
+        border-radius: 16px;
+        padding: 2.5rem;
+        box-shadow: var(--shadow);
+        margin-bottom: 3rem;
+    }
+
+    .form-header {
+        border-bottom: 2px solid var(--primary-light);
+        padding-bottom: 1rem;
+        margin-bottom: 2rem;
+    }
+
+        .form-header h3 {
+            color: var(--text-dark);
+            font-weight: 600;
+            margin: 0;
+        }
+
+    .current-info {
+        background: var(--light-bg);
+        border-left: 4px solid var(--warning-color);
+        padding: 1rem;
+        border-radius: 0 8px 8px 0;
+        margin-bottom: 1.5rem;
+    }
+
+        .current-info h6 {
+            color: var(--text-dark);
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .current-info p {
+            margin: 0;
+            color: var(--text-muted);
+        }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-label {
+        color: var(--text-dark);
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+        display: block;
+    }
+
+    .form-control, .form-select {
+        border: 2px solid #e1e8ed;
+        border-radius: 8px;
+        padding: 0.75rem 1rem;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+    }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(0, 167, 157, 0.15);
+            outline: none;
+        }
+
+        .form-control[type="file"] {
+            padding: 0.5rem;
+        }
+
+    .form-check {
+        padding: 0.75rem;
+        background: var(--light-bg);
+        border-radius: 8px;
+        margin-bottom: 1.5rem;
+    }
+
+    .form-check-input {
+        width: 1.25rem;
+        height: 1.25rem;
+        margin-top: 0.2rem;
+        border: 2px solid var(--primary-color);
+    }
+
+        .form-check-input:checked {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+    .form-text {
+        color: var(--text-muted);
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+    }
+
+    .text-danger {
+        color: var(--danger-color) !important;
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+    }
+
+    .btn {
+        padding: 0.75rem 2rem;
+        border-radius: 8px;
+        font-weight: 500;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 1rem;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+        color: white;
+    }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-color) 100%);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-hover);
+            color: white;
+        }
+
+    .btn-secondary {
+        background: var(--secondary-color);
+        color: white;
+    }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+            color: white;
+        }
+
+    .btn-group {
+        display: flex;
+        gap: 1rem;
+        margin-top: 2rem;
+    }
+
+    .upload-area {
+        border: 2px dashed var(--primary-light);
+        border-radius: 12px;
+        padding: 2rem;
+        text-align: center;
+        background: rgba(0, 167, 157, 0.05);
+        transition: all 0.3s ease;
+    }
+
+        .upload-area:hover {
+            border-color: var(--primary-color);
+            background: rgba(0, 167, 157, 0.1);
+        }
+
+    .upload-icon {
+        font-size: 3rem;
+        color: var(--primary-color);
+        margin-bottom: 1rem;
+    }
+
+    .info-card {
+        background: var(--light-bg);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+        .info-card h5 {
+            color: var(--primary-dark);
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+    .info-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 0.75rem;
+        color: var(--text-muted);
+    }
+
+        .info-item i {
+            color: var(--primary-color);
+            margin-right: 0.75rem;
+            font-size: 1.2rem;
+        }
+
+    @@media (max-width: 768px) {
+        .page-header {
+            padding: 2rem 0;
+            border-radius: 0 0 30px 30px;
+        }
+
+            .page-header h1 {
+                font-size: 2rem;
+            }
+
+        .form-container {
+            padding: 1.5rem;
+        }
+
+        .btn-group {
+            flex-direction: column;
+        }
+
+        .btn {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+</style>
+
+<div class="page-header">
+    <div class="container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="@Url.Action("Index", "Courses")">Courses</a></li>
+                <li class="breadcrumb-item"><a href="@Url.Action("Details", "Courses", new { id = courseId })">@course?.Title</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Edit Lesson</li>
+            </ol>
+        </nav>
+        <h1><i class="bi bi-pencil-square me-2"></i>Edit Lesson</h1>
+        <p class="mb-0">Update lesson content and settings</p>
+    </div>
+</div>
+
+<div class="container">
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="form-container">
+                <div class="form-header">
+                    <h3><i class="bi bi-file-earmark-text me-2"></i>Lesson Information</h3>
+                </div>
+
+                <div class="current-info">
+                    <h6><i class="bi bi-info-circle me-2"></i>Current Lesson</h6>
+                    <p><strong>Title:</strong> @Model.Title</p>
+                    <p><strong>Type:</strong> @Model.ContentType</p>
+                    @if (!string.IsNullOrEmpty(Model.ContentUrl))
+                    {
+                        <p><strong>Content:</strong> <a href="@Model.ContentUrl" target="_blank" class="text-primary">View current file</a></p>
+                    }
+                </div>
+
+                <form asp-controller="Lessons" asp-action="Edit" asp-route-courseId="@courseId" asp-route-lessonId="@Model.LessonId" enctype="multipart/form-data">
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+                    <input type="hidden" asp-for="LessonId" />
+                    <input type="hidden" asp-for="CourseId" value="@courseId" />
+                    <input type="hidden" asp-for="CreatedAt" />
+
+                    <div class="form-group">
+                        <label asp-for="Title" class="form-label">Lesson Title *</label>
+                        <input asp-for="Title" class="form-control" placeholder="Enter a descriptive title for your lesson" />
+                        <span asp-validation-for="Title" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="ContentType" class="form-label">Content Type *</label>
+                        <select asp-for="ContentType" class="form-select">
+                            <option value="Video">📹 Video</option>
+                            <option value="Article">📄 Article</option>
+                            <option value="Quiz">📝 Quiz</option>
+                            <option value="Exercise">💪 Exercise</option>
+                        </select>
+                        <span asp-validation-for="ContentType" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="ContentFile" class="form-label">Update Content File (Optional)</label>
+                        <div class="upload-area">
+                            <i class="bi bi-cloud-upload upload-icon"></i>
+                            <input type="file" asp-for="ContentFile" class="form-control"
+                                   data-val="true"
+                                   data-val-filesize="The file must be less than 1GB"
+                                   data-val-filesize-max="1073741824"
+                                   accept="video/mp4,video/x-m4v,video/*,.pdf,.doc,.docx" />
+                            <p class="form-text mb-0 mt-2">
+                                Upload a new file to replace the current one<br>
+                                Maximum file size: 1GB
+                            </p>
+                        </div>
+                        <span asp-validation-for="ContentFile" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="Duration" class="form-label">Duration (minutes) *</label>
+                        <input asp-for="Duration" type="number" class="form-control" placeholder="Estimated time to complete" min="1" />
+                        <span asp-validation-for="Duration" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="OrderNumber" class="form-label">Order Number *</label>
+                        <input asp-for="OrderNumber" type="number" class="form-control" placeholder="Lesson sequence in the course" min="1" />
+                        <span asp-validation-for="OrderNumber" class="text-danger"></span>
+                        <small class="form-text">Determines the order of lessons in the course</small>
+                    </div>
+
+                    <div class="form-check">
+                        <input class="form-check-input" asp-for="IsFreePreview" />
+                        <label class="form-check-label" asp-for="IsFreePreview">
+                            <strong>Free Preview</strong><br>
+                            <small class="text-muted">Allow users to preview this lesson without enrollment</small>
+                        </label>
+                    </div>
+
+                    <div class="btn-group">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-circle"></i> Save Changes
+                        </button>
+                        <a asp-controller="Admin" asp-action="Details" asp-route-id="@courseId" class="btn btn-secondary">
+                            <i class="bi bi-x-circle"></i> Cancel
+                        </a>
+                    </div>
+                </form>
             </div>
-        </form>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="form-container">
+                <h5 class="text-primary mb-3"><i class="bi bi-info-circle me-2"></i>Lesson Details</h5>
+
+                <div class="info-card">
+                    <h6><i class="bi bi-calendar3 me-2"></i>Timeline</h6>
+                    <div class="info-item">
+                        <i class="bi bi-calendar-plus"></i>
+                        <span>Created: @Model.CreatedAt.ToString("MMM dd, yyyy")</span>
+                    </div>
+                    <div class="info-item">
+                        <i class="bi bi-calendar-check"></i>
+                        <span>Last Updated: @DateTime.Now.ToString("MMM dd, yyyy")</span>
+                    </div>
+                </div>
+
+                <div class="info-card">
+                    <h6><i class="bi bi-lightbulb me-2"></i>Quick Tips</h6>
+                    <ul class="ps-3 mb-0">
+                        <li>Keep the title clear and descriptive</li>
+                        <li>Only upload a new file if you want to replace the current one</li>
+                        <li>Order numbers should be sequential</li>
+                        <li>Free preview lessons help attract new students</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -72,9 +422,9 @@
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
     <script>
+        // File size validation
         $.validator.addMethod('filesize', function (value, element, param) {
             if (element.files.length < 1) {
-                // No files selected
                 return true;
             }
             return element.files[0].size <= param;
@@ -83,6 +433,15 @@
         $.validator.unobtrusive.adapters.add('filesize', ['max'], function (options) {
             options.rules['filesize'] = options.params.max;
             options.messages['filesize'] = options.message;
+        });
+
+        // File upload preview
+        document.getElementById('ContentFile').addEventListener('change', function(e) {
+            const fileName = e.target.files[0]?.name;
+            if (fileName) {
+                const uploadText = document.querySelector('.upload-area p');
+                uploadText.innerHTML = `<strong>Selected:</strong> ${fileName}<br><small class="text-warning">This will replace the current file</small>`;
+            }
         });
     </script>
 }

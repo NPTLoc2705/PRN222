@@ -1,6 +1,7 @@
 ﻿@model mvc.dataaccess.Entities.Courses.Course
 
 @{
+    Layout = "~/Views/Shared/_Layout.cshtml";
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     ViewData["Title"] = "Course Details";
     var userId = Context.Session.GetString("UserId");
@@ -13,210 +14,415 @@
 
 <style>
     :root {
-        --primary-color: #28a745; /* green */
+        --primary-color: #4CAF50;
+        --primary-hover: #45a049;
+        --primary-light: #e8f5e9;
+        --primary-dark: #2e7d32;
         --secondary-color: #6c757d;
-        --success-color: #20c997;
-        --info-color: #17a2b8;
-        --warning-color: #ffc107;
-        --danger-color: #dc3545;
-        --light-color: #f9fef9;
-        --dark-color: #343a40;
+        --light-bg: #f5fdf5;
+        --card-shadow: 0 10px 20px rgba(76, 175, 80, 0.1);
+        --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
     }
 
     body {
-        background-color: #f0fff0; /* bland green */
+        background-color: #f0fdf4;
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
 
+    /* Breadcrumb */
+    .breadcrumb-section {
+        background: white;
+        border-radius: 12px;
+        padding: 1rem 1.5rem;
+        margin-bottom: 1.5rem;
+        box-shadow: var(--card-shadow);
+    }
+
+    .breadcrumb-item a {
+        color: var(--secondary-color);
+        text-decoration: none;
+        transition: var(--transition);
+    }
+
+        .breadcrumb-item a:hover {
+            color: var(--primary-color);
+        }
+
+    /* Course Header */
     .course-header {
+        background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%);
+        border-radius: 12px;
+        padding: 2rem;
+        margin-bottom: 1.5rem;
+        box-shadow: var(--card-shadow);
+        border: 1px solid rgba(76, 175, 80, 0.1);
+    }
+
+    .course-title {
+        color: #1a5f1a;
+        font-weight: 700;
+        margin-bottom: 1rem;
+    }
+
+    .course-thumbnail {
+        width: 80px;
+        height: 80px;
+        border-radius: 12px;
+        object-fit: cover;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        border: 2px solid var(--primary-light);
+    }
+
+    .course-meta {
+        display: flex;
+        gap: 1.5rem;
+        flex-wrap: wrap;
+    }
+
+    .meta-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: var(--secondary-color);
+    }
+
+        .meta-item i {
+            color: var(--primary-color);
+        }
+
+    /* Course Image */
+    .course-image-container {
+        position: relative;
+        border-radius: 12px;
+        overflow: hidden;
         margin-bottom: 2rem;
-        padding-bottom: 1rem;
-        border-bottom: 1px solid #cce5cc;
+        box-shadow: var(--card-shadow);
     }
 
     .course-image {
-        border-radius: 8px;
-        box-shadow: 0 0 20px rgba(0, 128, 0, 0.1);
-        margin-bottom: 1.5rem;
-        transition: transform 0.3s ease;
+        width: 100%;
+        height: 400px;
+        object-fit: cover;
+        transition: transform 0.5s ease;
     }
 
-        .course-image:hover {
-            transform: scale(1.01);
-        }
-
-    .card {
-        border: 1px solid #c8e6c9;
-        border-radius: 0.5rem;
-        box-shadow: 0 0.125rem 0.75rem rgba(0, 128, 0, 0.08);
-        margin-bottom: 1.5rem;
-        transition: transform 0.2s ease;
-        background-color: #ffffff;
+    .course-image-container:hover .course-image {
+        transform: scale(1.02);
     }
 
-        .card:hover {
-            transform: translateY(-3px);
+    /* Cards */
+    .content-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: var(--card-shadow);
+        margin-bottom: 1.5rem;
+        overflow: hidden;
+        transition: var(--transition);
+    }
+
+        .content-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 24px rgba(0,0,0,0.1);
         }
 
     .card-header {
-        background-color: #e6f5e6;
-        border-bottom: 1px solid #b2dfdb;
+        background: white;
+        border-bottom: 1px solid #f0f0f0;
+        padding: 1.25rem 1.5rem;
         font-weight: 600;
     }
 
-    .progress {
-        height: 1.25rem;
-        background-color: #e8f5e9;
-        border-radius: 0.25rem;
+    .card-body {
+        padding: 1.5rem;
+    }
+
+    /* Categories */
+    .category-badge {
+        display: inline-flex;
+        align-items: center;
+        background: rgba(76, 175, 80, 0.1);
+        color: var(--primary-color);
+        padding: 0.5rem 1rem;
+        border-radius: 50px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        transition: var(--transition);
+    }
+
+        .category-badge:hover {
+            background: rgba(76, 175, 80, 0.2);
+            transform: translateY(-1px);
+        }
+
+    /* Progress */
+    .progress-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: var(--card-shadow);
+        padding: 1.5rem;
+        text-align: center;
+    }
+
+    .circular-progress-container {
+        position: relative;
+        display: inline-block;
+        margin-bottom: 1rem;
+    }
+
+    .circular-progress {
+        transform: rotate(-90deg);
+    }
+
+    .progress-text {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        text-align: center;
+    }
+
+        .progress-text h3 {
+            color: var(--primary-color);
+            margin: 0;
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+    .progress-bar-container {
+        background: #e9ecef;
+        border-radius: 10px;
+        height: 10px;
+        overflow: hidden;
+        margin: 1rem 0;
     }
 
     .progress-bar {
-        background-color: var(--primary-color);
-        font-size: 0.8rem;
-        font-weight: 600;
+        background: var(--primary-color);
+        height: 100%;
+        transition: width 0.6s ease;
     }
 
-    .list-group-item {
-        border: 1px solid #e0f2f1;
-        padding: 1.1rem;
-        margin-bottom: 0.5rem;
-        border-radius: 0.45rem !important;
-        transition: background 0.3s, transform 0.2s;
+    /* Enrollment Section */
+    .enrollment-card {
+        background: linear-gradient(135deg, #f6f9fc 0%, #ffffff 100%);
+        border: 1px solid rgba(76, 175, 80, 0.1);
+        text-align: center;
+        padding: 2rem;
     }
 
-        .list-group-item:hover {
-            background-color: #f1f8f5;
-            transform: translateX(4px);
+    .enrollment-icon {
+        width: 80px;
+        height: 80px;
+        background: rgba(76, 175, 80, 0.1);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+    }
+
+        .enrollment-icon i {
+            font-size: 2.5rem;
+            color: var(--primary-color);
         }
 
-    .list-group-item-success {
-        background-color: #d9f9d9;
-        border-left: 4px solid var(--success-color);
+    /* Lessons */
+    .lesson-item {
+        background: white;
+        border: 1px solid #f0f0f0;
+        border-radius: 8px;
+        padding: 1.25rem;
+        margin-bottom: 0.75rem;
+        transition: var(--transition);
+        cursor: pointer;
+        text-decoration: none;
+        color: inherit;
+        display: block;
     }
 
-    .badge {
-        padding: 0.4em 0.75em;
-        font-size: 0.8rem;
+        .lesson-item:hover {
+            background: rgba(76, 175, 80, 0.03);
+            border-color: var(--primary-color);
+            transform: translateX(4px);
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .lesson-item.completed {
+            background: rgba(76, 175, 80, 0.05);
+            border-left: 4px solid var(--primary-color);
+        }
+
+    .lesson-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 1rem;
+        background: #f8f9fa;
     }
 
+    .lesson-item.completed .lesson-icon {
+        background: rgba(76, 175, 80, 0.1);
+    }
+
+        .lesson-item.completed .lesson-icon i {
+            color: var(--primary-color);
+        }
+
+    /* Buttons */
     .btn-primary {
-        background-color: var(--primary-color);
-        border-color: var(--primary-color);
+        background: var(--primary-color);
+        border: none;
+        padding: 0.75rem 2rem;
+        border-radius: 8px;
+        font-weight: 500;
+        transition: var(--transition);
     }
 
         .btn-primary:hover {
-            background-color: #218838;
-            border-color: #1e7e34;
+            background: var(--primary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
 
-    .btn-lg {
-        padding: 0.75rem 1.5rem;
-        font-size: 1.05rem;
+    .btn-outline-secondary {
+        border: 1px solid #e0e0e0;
+        color: var(--secondary-color);
+        padding: 0.5rem 1.25rem;
+        border-radius: 8px;
+        transition: var(--transition);
     }
 
-    .category-badge {
-        background-color: #dcfce7;
-        color: #1f8f3c;
-        padding: 0.5rem 1rem;
-        border-radius: 999px;
+        .btn-outline-secondary:hover {
+            border-color: var(--secondary-color);
+            background: var(--secondary-color);
+            color: white;
+        }
+
+    /* Badges */
+    .badge {
+        padding: 0.4em 0.8em;
+        border-radius: 6px;
+        font-size: 0.75rem;
         font-weight: 500;
-        font-size: 0.9rem;
     }
 
-    .enroll-section {
-        background: linear-gradient(135deg, #e9fbe9 0%, #ffffff 100%);
-        border-radius: 0.5rem;
-        padding: 2rem;
+    .badge-active {
+        background: rgba(40, 167, 69, 0.1);
+        color: #28a745;
+    }
+
+    .badge-inactive {
+        background: rgba(108, 117, 125, 0.1);
+        color: #6c757d;
+    }
+
+    /* Empty State */
+    .empty-state {
+        padding: 3rem;
         text-align: center;
-        box-shadow: inset 0 0 8px rgba(0, 128, 0, 0.05);
     }
 
-    .lesson-icon {
-        margin-right: 0.6rem;
-        width: 24px;
-        text-align: center;
-        font-size: 1.2rem;
+    .empty-icon {
+        font-size: 3rem;
+        color: #e9ecef;
+        margin-bottom: 1rem;
     }
 
-    .text-muted {
-        color: #6c757d !important;
+    /* Description content */
+    .description-content {
+        line-height: 1.8;
+        color: #495057;
+        font-size: 1.1rem;
     }
 
-    .btn-block {
-        width: 100%;
-    }
-
-    .top-50 {
-        top: 50%;
-    }
-
-    .start-50 {
-        left: 50%;
-    }
-
-    .translate-middle {
-        transform: translate(-50%, -50%);
-    }
+        /* Remove any unwanted HTML tags styling */
+        .description-content p:empty {
+            display: none;
+        }
 </style>
 
-<div class="container py-4">
-    <div class="mb-4">
-        <a href="@Url.Action("Index", "Courses")" class="btn btn-outline-secondary">
-            <i class="fas fa-arrow-left mr-2"></i> Return to Courses List
-        </a>
-    </div>
+<div class="container-fluid px-lg-4 py-4">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="breadcrumb-section">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item">
+                <a href="@Url.Action("Index", "Home")"><i class="fas fa-home me-1"></i> Home</a>
+            </li>
+            <li class="breadcrumb-item">
+                <a href="@Url.Action("Index", "Courses")">Courses</a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">@Model.Title</li>
+        </ol>
+    </nav>
+
+    <!-- Course Header -->
     <div class="course-header">
-        <h1 class="display-4 font-weight-bold text-dark">@Model.Title</h1>
-        @if (Model.IsActive)
-        {
-            <span class="badge bg-success"><i class="fas fa-check-circle mr-1"></i> Active</span>
-        }
-        else
-        {
-            <span class="badge bg-secondary"><i class="fas fa-pause-circle mr-1"></i> Inactive</span>
-        }
+        <div class="d-flex justify-content-between align-items-start">
+            <div>
+                <h1 class="course-title h2">@Model.Title</h1>
+                <div class="course-meta">
+                    <div class="meta-item">
+                        <i class="fas fa-clock"></i>
+                        <span>@Model.Duration minutes</span>
+                    </div>
+                    <div class="meta-item">
+                        <i class="fas fa-signal"></i>
+                        <span>@Model.DifficultyLevel</span>
+                    </div>
+                    <div class="meta-item">
+                        <i class="fas fa-book"></i>
+                        <span>@(Model.Lessons?.Count ?? 0) lessons</span>
+                    </div>
+                </div>
+            </div>
+            <div>
+                @if (Model.IsActive)
+                {
+                    <span class="badge badge-active">
+                        <i class="fas fa-check-circle me-1"></i> Active
+                    </span>
+                }
+                else
+                {
+                    <span class="badge badge-inactive">
+                        <i class="fas fa-pause-circle me-1"></i> Inactive
+                    </span>
+                }
+            </div>
+        </div>
     </div>
 
+    <!-- Course Image -->
     @if (Model.ImageBytes != null && Model.ImageBytes.Length > 0)
     {
-        <img src="@Url.Action("GetCourseImage", "Courses", new { id = Model.CourseId })"
-             alt="@Model.Title" class="course-image img-fluid" style="max-height: 400px; width: 100%; object-fit: cover;" />
+        <div class="course-image-container">
+            <img src="@Url.Action("GetCourseImage", "Courses", new { id = Model.CourseId })"
+                 alt="@Model.Title" class="course-image" />
+        </div>
     }
 
     <div class="row">
         <div class="col-lg-8">
-            <div class="card">
+            <!-- Course Description -->
+            <div class="content-card">
                 <div class="card-header">
-                    <h5 class="mb-0"><i class="fas fa-info-circle mr-2"></i>Course Description</h5>
+                    <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>About This Course</h5>
                 </div>
                 <div class="card-body">
-                    <p class="card-text lead">@Model.Description</p>
-                    <div class="row mt-4">
-                        <div class="col-md-6">
-                            <div class="d-flex align-items-center mb-3">
-                                <i class="fas fa-clock fa-lg text-primary mr-3"></i>
-                                <div>
-                                    <h6 class="mb-0">Duration</h6>
-                                    <p class="text-muted mb-0">@Model.Duration minutes</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="d-flex align-items-center mb-3">
-                                <i class="fas fa-tachometer-alt fa-lg text-primary mr-3"></i>
-                                <div>
-                                    <h6 class="mb-0">Difficulty</h6>
-                                    <p class="text-muted mb-0">@Model.DifficultyLevel</p>
-                                </div>
-                            </div>
-                        </div>
+                    <div class="description-content">
+                        @Html.Raw(System.Web.HttpUtility.HtmlDecode(Model.Description?.Replace("<p></p>", "").Replace("<p> </p>", "")))
                     </div>
                 </div>
             </div>
 
-            <div class="card">
+            <!-- Categories -->
+            <div class="content-card">
                 <div class="card-header">
-                    <h5 class="mb-0"><i class="fas fa-tags mr-2"></i>Categories</h5>
+                    <h5 class="mb-0"><i class="fas fa-tags me-2"></i>Categories</h5>
                 </div>
                 <div class="card-body">
                     @if (Model.CategoryMappings?.Any() ?? false)
@@ -225,20 +431,82 @@
                             @foreach (var category in Model.CategoryMappings.Select(cm => cm.Category))
                             {
                                 <span class="category-badge">
-                                    <i class="fas fa-tag mr-1"></i>@category.Name
+                                    <i class="fas fa-tag me-1"></i>@category.Name
                                 </span>
                             }
                         </div>
                     }
                     else
                     {
-                        <div class="text-center py-3">
-                            <i class="fas fa-tags fa-2x text-muted mb-2"></i>
+                        <div class="empty-state">
+                            <div class="empty-icon">
+                                <i class="fas fa-tags"></i>
+                            </div>
                             <p class="text-muted mb-0">No categories assigned</p>
                         </div>
                     }
                 </div>
             </div>
+
+            <!-- Lessons (only shown if enrolled) -->
+            @if (isLoggedIn && isEnrolled)
+            {
+                <div class="content-card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0"><i class="fas fa-list-ol me-2"></i>Course Content</h5>
+                        <span class="text-muted small">
+                            @completedLessonIds.Count / @(Model.Lessons?.Count ?? 0) completed
+                        </span>
+                    </div>
+                    <div class="card-body">
+                        @if (Model.Lessons?.Any() ?? false)
+                        {
+                            <div class="lessons-list">
+                                @foreach (var lesson in Model.Lessons.OrderBy(l => l.OrderNumber))
+                                {
+                                    bool isCompleted = completedLessonIds.Contains(lesson.LessonId);
+
+                                    <a href="@Url.Action("Details", "Lessons", new { courseId = Model.CourseId, lessonId = lesson.LessonId })"
+                                       class="lesson-item @(isCompleted ? "completed" : "")">
+                                        <div class="d-flex align-items-center">
+                                            <div class="lesson-icon">
+                                                @if (isCompleted)
+                                                {
+                                                    <i class="fas fa-check-circle"></i>
+                                                }
+                                                else
+                                                {
+                                                    <i class="far fa-circle"></i>
+                                                }
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <h6 class="mb-1">@lesson.Title</h6>
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <small class="text-muted">
+                                                        <i class="fas fa-@(lesson.ContentType == "Video" ? "video" : "file-alt") me-1"></i>
+                                                        @lesson.ContentType
+                                                    </small>
+                                                    <small class="text-muted">@lesson.Duration min</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </a>
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="empty-state">
+                                <div class="empty-icon">
+                                    <i class="fas fa-book-open"></i>
+                                </div>
+                                <h5>No lessons available</h5>
+                                <p class="text-muted">This course doesn't have any lessons yet.</p>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
         </div>
 
         <div class="col-lg-4">
@@ -246,51 +514,48 @@
             {
                 if (!isEnrolled)
                 {
-                    <div class="card">
-                        <div class="card-body text-center enroll-section">
-                            <i class="fas fa-graduation-cap fa-3x mb-3 text-primary"></i>
-                            <h4 class="mb-3">Ready to start learning?</h4>
-                            <form asp-action="Enroll" method="post">
-                                <input type="hidden" name="courseId" value="@Model.CourseId" />
-                                <button type="submit" class="btn btn-primary btn-lg btn-block py-3">
-                                    <i class="fas fa-user-plus mr-2"></i> Enroll Now
-                                </button>
-                            </form>
+                    <!-- Enroll Card -->
+                    <div class="content-card enrollment-card">
+                        <div class="enrollment-icon">
+                            <i class="fas fa-graduation-cap"></i>
                         </div>
+                        <h4 class="mb-3">Ready to Learn?</h4>
+                        <p class="text-muted mb-4">Enroll now to access all course materials and track your progress.</p>
+                        <form asp-action="Enroll" method="post">
+                            <input type="hidden" name="courseId" value="@Model.CourseId" />
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn btn-primary btn-lg w-100">
+                                <i class="fas fa-user-plus me-2"></i> Enroll in Course
+                            </button>
+                        </form>
                     </div>
                 }
                 else
                 {
-                    <div class="card">
-                        <div class="card-header">
-                            <h5 class="mb-0"><i class="fas fa-chart-line mr-2"></i>Your Progress</h5>
-                        </div>
+                    <!-- Progress Card -->
+                    <div class="progress-card content-card">
                         <div class="card-body">
-                            <div class="text-center mb-3">
-                                <div class="position-relative d-inline-block">
-                                    <svg width="120" height="120" viewBox="0 0 120 120" class="circular-progress">
-                                        <circle cx="60" cy="60" r="54" fill="none" stroke="#e6e6e6" stroke-width="8"></circle>
-                                        <circle cx="60" cy="60" r="54" fill="none" stroke="#4e73df" stroke-width="8"
-                                                stroke-dasharray="@(339.292 * (double)progressPercentage / 100) 339.292"
-                                                stroke-linecap="round" transform="rotate(-90 60 60)"></circle>
-                                    </svg>
-                                    <div class="position-absolute top-50 start-50 translate-middle">
-                                        <h3 class="mb-0">@progressPercentage.ToString("0")%</h3>
-                                        <small class="text-muted">Complete</small>
-                                    </div>
+                            <h5 class="mb-4"><i class="fas fa-chart-line me-2"></i>Your Progress</h5>
+
+                            <div class="circular-progress-container">
+                                <svg width="140" height="140" class="circular-progress">
+                                    <circle cx="70" cy="70" r="60" fill="none" stroke="#e9ecef" stroke-width="12"></circle>
+                                    <circle cx="70" cy="70" r="60" fill="none" stroke="#4CAF50" stroke-width="12"
+                                            stroke-dasharray="@(377 * (double)progressPercentage / 100) 377"
+                                            stroke-linecap="round"></circle>
+                                </svg>
+                                <div class="progress-text">
+                                    <h3>@progressPercentage.ToString("0")%</h3>
+                                    <small class="text-muted">Complete</small>
                                 </div>
                             </div>
-                            <div class="progress mb-2" style="height: 12px;">
-                                <div class="progress-bar progress-bar-striped"
-                                     role="progressbar"
-                                     style="width: @progressPercentage%"
-                                     aria-valuenow="@progressPercentage"
-                                     aria-valuemin="0"
-                                     aria-valuemax="100">
-                                </div>
+
+                            <div class="progress-bar-container">
+                                <div class="progress-bar" style="width: @progressPercentage%"></div>
                             </div>
-                            <p class="text-center text-muted small mb-0">
-                                @Model.Lessons?.Count(l => completedLessonIds.Contains(l.LessonId)) of @Model.Lessons?.Count lessons completed
+
+                            <p class="text-muted small mb-0">
+                                <strong>@completedLessonIds.Count</strong> of <strong>@(Model.Lessons?.Count ?? 0)</strong> lessons completed
                             </p>
                         </div>
                     </div>
@@ -298,71 +563,43 @@
             }
             else
             {
-                <div class="card">
-                    <div class="card-body text-center enroll-section">
-                        <i class="fas fa-lock fa-3x mb-3 text-primary"></i>
-                        <h4 class="mb-3">Access Course Content</h4>
-                        <p class="text-muted mb-4">Login to enroll in this course and start learning</p>
-                        <a asp-controller="Auth" asp-action="Login" class="btn btn-primary btn-lg btn-block py-3">
-                            <i class="fas fa-sign-in-alt mr-2"></i> Login Now
-                        </a>
+                <!-- Login Required Card -->
+                <div class="content-card enrollment-card">
+                    <div class="enrollment-icon">
+                        <i class="fas fa-lock"></i>
                     </div>
+                    <h4 class="mb-3">Login Required</h4>
+                    <p class="text-muted mb-4">Please login to enroll in this course and track your learning progress.</p>
+                    <a asp-controller="Auth" asp-action="Login" class="btn btn-primary btn-lg w-100">
+                        <i class="fas fa-sign-in-alt me-2"></i> Login to Continue
+                    </a>
                 </div>
             }
+
+            <!-- Course Info Summary -->
+            <div class="content-card mt-3">
+                <div class="card-body">
+                    <h6 class="text-uppercase text-muted mb-3">Course Information</h6>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Duration</span>
+                        <strong>@Model.Duration min</strong>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Difficulty</span>
+                        <strong>@Model.DifficultyLevel</strong>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Total Lessons</span>
+                        <strong>@(Model.Lessons?.Count ?? 0)</strong>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span class="text-muted">Status</span>
+                        <strong class="@(Model.IsActive ? "text-success" : "text-muted")">
+                            @(Model.IsActive ? "Active" : "Inactive")
+                        </strong>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-
-    @if (isLoggedIn && isEnrolled)
-    {
-        <div class="card">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h5 class="mb-0"><i class="fas fa-book-open mr-2"></i>Course Lessons</h5>
-               
-            </div>
-
-            @if (Model.Lessons?.Any() ?? false)
-            {
-                <div class="list-group list-group-flush">
-                    @foreach (var lesson in Model.Lessons.OrderBy(l => l.OrderNumber))
-                    {
-                        bool isCompleted = completedLessonIds.Contains(lesson.LessonId);
-
-                        <a href="@Url.Action("Details", "Lessons", new { courseId = Model.CourseId, lessonId = lesson.LessonId })"
-                           class="list-group-item list-group-item-action @(isCompleted ? "list-group-item-success" : "")">
-                            <div class="d-flex align-items-center">
-                                <div class="lesson-icon">
-                                    @if (isCompleted)
-                                    {
-                                        <i class="fas fa-check-circle text-success"></i>
-                                    }
-                                    else
-                                    {
-                                        <i class="fas fa-circle-notch text-primary"></i>
-                                    }
-                                </div>
-                                <div class="flex-grow-1">
-                                    <div class="d-flex w-100 justify-content-between">
-                                        <h6 class="mb-1">@lesson.Title</h6>
-                                        <small class="text-muted">@lesson.Duration min</small>
-                                    </div>
-                                    <small class="text-muted">@lesson.ContentType</small>
-                                </div>
-                            </div>
-                        </a>
-                    }
-                </div>
-            }
-            else
-            {
-                <div class="card-body">
-                    <div class="text-center py-4">
-                        <i class="fas fa-book-open fa-3x text-muted mb-3"></i>
-                        <h5>No lessons available</h5>
-                        <p class="text-muted">This course doesn't have any lessons yet.</p>
-                       
-                    </div>
-                </div>
-            }
-        </div>
-    }
 </div>

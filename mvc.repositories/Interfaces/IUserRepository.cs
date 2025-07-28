@@ -16,7 +16,7 @@ namespace mvc.repositories.Interfaces
         public User GetUserById(string userId);
         public User CreateUser(User user);
         Task<List<User>> GetAllUsers();
-        User GetUserProfile(Guid userId);
+        UserProfileDTO GetUserProfile(Guid userId);
         bool DeleteUser(Guid userId);
         bool banUser(Guid userId);
         bool unBanUser(Guid userId);
