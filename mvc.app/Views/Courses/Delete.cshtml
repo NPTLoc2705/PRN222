@@ -242,7 +242,7 @@
                     </div>
                 }
 
-                <form asp-action="Delete" method="post" onsubmit="return confirmDelete()">
+                <form asp-action="Delete" asp-controller="Courses" method="post" onsubmit="return confirmDelete()">
                     <input type="hidden" asp-for="CourseId" />
 
                     <div class="delete-actions">
