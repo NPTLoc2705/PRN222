@@ -135,7 +135,8 @@
                     <li><a href="/Blogs">Blog</a></li>
                     <li><a asp-controller="Home" asp-action="Privacy">Contact</a></li>
                     <li><a asp-controller="Courses" asp-action="Index">Course</a></li>
-                    <li><a asp-controller="Bookings" asp-action="ConsultanView">Booking</a></li>
+                    <li><a asp-controller="Bookings" asp-action="UserBooking">Booking</a></li>
+                    <li><a asp-controller="Surveys" asp-action="Index">Surveys</a></li>
 
                     @if (ViewData["IsLoggedIn"] != null && (bool)ViewData["IsLoggedIn"])
                     {
