@@ -161,7 +161,7 @@ namespace mvc.app.Controllers
             {
                 TempData["Error"] = "Error banning user: " + ex.Message;
             }
-            return RedirectToAction("Index");
+            return RedirectToAction("DashBoard","Admin");
         }
 
         [HttpPost]
@@ -190,7 +190,7 @@ namespace mvc.app.Controllers
             {
                 TempData["Error"] = "Error unbanning user: " + ex.Message;
             }
-            return RedirectToAction("Index");
+            return RedirectToAction("Dashboard", "Admin");
         }
 
         [HttpPost]

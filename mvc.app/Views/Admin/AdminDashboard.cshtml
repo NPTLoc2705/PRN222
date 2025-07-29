@@ -1,0 +1,1004 @@
+﻿@model IEnumerable<mvc.dataaccess.ViewModels.BookingViewModel>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+            min-height: 100vh;
+            display: flex;
+        }
+
+        .sidebar {
+            width: 260px;
+            background: linear-gradient(180deg, #ffffff 0%, #f8f9fa 100%);
+            color: #2c3e50;
+            min-height: 100vh;
+            padding-top: 0;
+            box-shadow: 4px 0 15px rgba(0,0,0,0.1);
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+        }
+
+        .sidebar-header {
+            padding: 30px 20px;
+            border-bottom: 1px solid rgba(39,174,96,0.2);
+            text-align: center;
+        }
+
+            .sidebar-header h4 {
+                font-size: 1.4rem;
+                font-weight: 600;
+                margin-bottom: 0;
+                background: linear-gradient(45deg, #27ae60, #2ecc71);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+            }
+
+        .sidebar-nav {
+            padding: 20px 0;
+        }
+
+            .sidebar-nav a {
+                color: #2c3e50;
+                display: flex;
+                align-items: center;
+                padding: 15px 25px;
+                text-decoration: none;
+                transition: all 0.3s ease;
+                border-left: 3px solid transparent;
+                cursor: pointer;
+            }
+
+                .sidebar-nav a:hover,
+                .sidebar-nav a.active {
+                    background: rgba(39, 174, 96, 0.1);
+                    border-left: 3px solid #27ae60;
+                    color: #27ae60;
+                    transform: translateX(5px);
+                }
+
+                .sidebar-nav a i {
+                    margin-right: 12px;
+                    font-size: 1.1rem;
+                    width: 20px;
+                    text-align: center;
+                }
+
+        .main-content {
+            margin-left: 260px;
+            flex: 1;
+            background: rgba(255,255,255,0.95);
+            margin: 20px;
+            margin-left: 280px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+            min-height: calc(100vh - 40px);
+        }
+
+        .content-header {
+            background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+            .content-header h2 {
+                font-size: 2.5rem;
+                font-weight: 700;
+                margin-bottom: 10px;
+            }
+
+            .content-header p {
+                font-size: 1.2rem;
+                opacity: 0.9;
+            }
+
+        .content-body {
+            padding: 40px;
+        }
+
+        .welcome-section {
+            text-align: center;
+            padding: 60px 20px;
+            color: #2c3e50;
+        }
+
+            .welcome-section h3 {
+                font-size: 1.8rem;
+                margin-bottom: 20px;
+                color: #27ae60;
+            }
+
+            .welcome-section p {
+                font-size: 1.1rem;
+                line-height: 1.6;
+                max-width: 600px;
+                margin: 0 auto;
+            }
+
+        .content-section {
+            display: none;
+        }
+
+            .content-section.active {
+                display: block;
+            }
+
+        .table-container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            overflow: hidden;
+            margin-top: 20px;
+        }
+
+        .table-header {
+            background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+            color: white;
+            padding: 20px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+            .table-header h4 {
+                margin: 0;
+                font-size: 1.3rem;
+            }
+
+        .btn-create {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.3);
+            padding: 8px 20px;
+            border-radius: 20px;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+            .btn-create:hover {
+                background: rgba(255,255,255,0.3);
+                color: white;
+                transform: translateY(-2px);
+            }
+
+        .booking-table, .user-table, .blog-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+            .booking-table thead, .user-table thead, .blog-table thead {
+                background: #f8f9fa;
+            }
+
+            .booking-table th, .user-table th, .blog-table th {
+                padding: 15px 20px;
+                text-align: left;
+                font-weight: 600;
+                color: #2c3e50;
+                font-size: 0.9rem;
+                border-bottom: 2px solid #e9ecef;
+            }
+
+            .booking-table td, .user-table td, .blog-table td {
+                padding: 15px 20px;
+                border-bottom: 1px solid #e9ecef;
+                color: #2c3e50;
+                vertical-align: middle;
+            }
+
+            .booking-table tbody tr, .user-table tbody tr, .blog-table tbody tr {
+                transition: all 0.3s ease;
+            }
+
+                .booking-table tbody tr:hover, .user-table tbody tr:hover, .blog-table tbody tr:hover {
+                    background: rgba(39, 174, 96, 0.05);
+                }
+
+        .status-badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-ongoing {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-complete {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .status-active {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-banned {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-btn {
+            padding: 6px 12px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-edit {
+            background: #007bff;
+            color: white;
+        }
+
+        .btn-details, .btn-view {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-delete {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-ban {
+            background: #ffc107;
+            color: white;
+        }
+
+        .btn-unban {
+            background: #28a745;
+            color: white;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6c757d;
+        }
+
+            .empty-state i {
+                font-size: 4rem;
+                margin-bottom: 20px;
+                opacity: 0.5;
+            }
+
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+            .stat-card:hover {
+                transform: translateY(-5px);
+            }
+
+            .stat-card i {
+                font-size: 2.5rem;
+                margin-bottom: 15px;
+                color: #27ae60;
+            }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+
+        .alert {
+            margin: 20px 30px;
+            border-radius: 10px;
+        }
+
+        .category-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+            .category-table th {
+                padding: 15px;
+                text-align: left;
+                background: #f8f9fa;
+                border-bottom: 2px solid #e9ecef;
+            }
+
+            .category-table td {
+                padding: 15px;
+                border-bottom: 1px solid #e9ecef;
+                vertical-align: middle;
+            }
+
+            .category-table tr:hover {
+                background: rgba(39, 174, 96, 0.05);
+            }
+
+        /* Blog-specific styles */
+        .blog-table {
+            table-layout: fixed;
+            width: 100%;
+        }
+
+        .blog-content-preview {
+            max-width: 500px;
+            color: #555;
+            font-size: 0.9em;
+            line-height: 1.4;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            display: block;
+        }
+
+            .blog-content-preview:hover {
+                color: #333;
+                text-decoration: underline;
+            }
+
+            .blog-content-preview.no-text {
+                color: #999;
+                font-style: italic;
+            }
+
+            .blog-content-preview img {
+                display: none;
+            }
+
+        .content-badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+            margin-left: 0.5rem;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+            .content-badge.has-image {
+                background-color: #e3f2fd;
+                color: #1976d2;
+            }
+
+            .content-badge.text-only {
+                background-color: #f3e5f5;
+                color: #7b1fa2;
+            }
+
+        .blog-table td {
+            vertical-align: middle;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* Responsive for mobile */
+        @@media (max-width: 768px) {
+            .blog-content-preview {
+                max-width: 200px;
+            }
+
+            .action-buttons .btn {
+                display: block;
+                width: 100%;
+                margin: 2px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    @{
+        var currentRole = Context.Session.GetString("UserRole");
+        var currentUserId = Context.Session.GetString("UserId");
+    }
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h4><i class="fas fa-crown"></i> Admin Panel</h4>
+        </div>
+
+        <nav class="sidebar-nav">
+            <a href="#" onclick="showSection(event,'bookings')" class="nav-link" data-section="bookings">
+                <i class="fas fa-calendar-check"></i>
+                <span>Booking Management</span>
+            </a>
+            <a href="#" onclick="showSection(event,'blogs')" class="nav-link" data-section="blogs">
+                <i class="fas fa-blog"></i>
+                <span>Blog Management</span>
+            </a>
+            <a href="#" onclick="showSection(event,'users')" class="nav-link" data-section="users">
+                <i class="fas fa-users"></i>
+                <span>User Management</span>
+            </a>
+            <a asp-controller="Admin" asp-action="Index">
+                <i class="fas fa-book"></i>
+                <span>Course Management</span>
+            </a>
+            <a href="#" onclick="showSection(event, 'categories')" class="nav-link" data-section="categories">
+                <i class="fas fa-tags"></i>
+                <span>Categories</span>
+            </a>
+            <a asp-controller="Surveys" asp-action="Index">
+                <i class="fas fa-book"></i>
+                <span>Survey management</span>
+            </a>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <!-- Bookings Section -->
+        <div id="bookings-section" class="content-section">
+            <div class="content-header">
+                <h2><i class="fas fa-calendar-check"></i> Booking Management</h2>
+                <p>Manage all your bookings efficiently</p>
+            </div>
+            <div class="content-body">
+                <div class="table-container">
+                    <div class="table-header">
+                        <h4><i class="fas fa-list"></i> All Bookings</h4>
+                        <a href="#" class="btn-create" onclick="createBooking()">
+                            <i class="fas fa-plus"></i> Create New Booking
+                        </a>
+                    </div>
+                    <div class="table-wrapper">
+                        <table class="booking-table">
+                            <thead>
+                                <tr>
+                                    <th><i class="fas fa-calendar"></i> Booking Date</th>
+                                    <th><i class="fas fa-user"></i> Customer Name</th>
+                                    <th><i class="fas fa-user-tie"></i> Consultant Name</th>
+                                    <th><i class="fas fa-clock"></i> Start Date</th>
+                                    <th><i class="fas fa-info-circle"></i> Status</th>
+                                    <th><i class="fas fa-phone"></i> Phone</th>
+                                    <th><i class="fas fa-cogs"></i> Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="bookingsTableBody">
+                                @foreach (var item in Model)
+                                {
+                                    <tr class="table-row">
+                                        <td class="booking-date">
+                                            <div class="cell-content">
+                                                @Html.DisplayFor(modelItem => item.BookingDate)
+                                            </div>
+                                        </td>
+                                        <td class="customer-name">
+                                            <div class="cell-content">
+                                                <span class="data-badge customer-badge">
+                                                    @Html.DisplayFor(modelItem => item.CustomerName)
+                                                </span>
+                                            </div>
+                                        </td>
+                                        <td class="consultant-name">
+                                            <div class="cell-content">
+                                                <span class="data-badge consultant-badge">
+                                                    @Html.DisplayFor(modelItem => item.ConsultantName)
+                                                </span>
+                                            </div>
+                                        </td>
+                                        <td class="start-date">
+                                            <div class="cell-content">
+                                                @Html.DisplayFor(modelItem => item.StartDate)
+                                            </div>
+                                        </td>
+                                        <td class="status">
+                                            <div class="cell-content">
+                                                <span class="status-badge status-@item.Status">
+                                                    @Html.DisplayFor(modelItem => item.Status)
+                                                </span>
+                                            </div>
+                                        </td>
+                                        <td class="phone">
+                                            <div class="cell-content">
+                                                <span class="status-badge">
+                                                    @Html.DisplayFor(modelItem => item.Phone)
+                                                </span>
+                                            </div>
+                                        </td>
+                                        <td class="actions">
+                                            <div class="action-buttons">
+                                                <a asp-action="Edit" asp-route-id="@item.Id" class="action-btn btn-edit">
+                                                    <span class="action-icon">✏️</span>
+                                                    <span class="action-text">Edit</span>
+                                                </a>
+                                                <a asp-action="Details" asp-route-id="@item.Id" class="action-btn btn-details">
+                                                    <span class="action-icon">👁️</span>
+                                                    <span class="action-text">Details</span>
+                                                </a>
+                                                <a asp-action="Delete" asp-route-id="@item.Id" class="action-btn btn-delete">
+                                                    <span class="action-icon">🗑️</span>
+                                                    <span class="action-text">Delete</span>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Blog Management Section -->
+        <div id="blogs-section" class="content-section">
+            <div class="content-header">
+                <h2><i class="fas fa-blog"></i> Blog Management</h2>
+                <p>Manage your blog content</p>
+            </div>
+            <div class="content-body">
+                @if (TempData["Success"] != null)
+                {
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        @TempData["Success"]
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                }
+                @if (TempData["Error"] != null)
+                {
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        @TempData["Error"]
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                }
+                <div class="table-container">
+                    <div class="table-header">
+                        <h4><i class="fas fa-list"></i> All Blogs</h4>
+                        <div>
+                            <a asp-action="Create" asp-controller="Blogs" class="btn-create">
+                                <i class="fas fa-plus-circle"></i> Create New Blog
+                            </a>
+                            <a asp-action="AdminDashboard" asp-controller="Admin" class="btn-create">
+                                <i class="fas fa-arrow-left"></i> Back to List
+                            </a>
+                        </div>
+                    </div>
+                    <div class="table-wrapper">
+                        @if (ViewBag.Blogs != null )
+                        {
+                            <table class="blog-table table-striped table-hover">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 25%;">Title</th>
+                                        <th style="width: 50%;">Blog Content</th>
+                                        <th style="width: 25%;" class="text-center">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in ViewBag.Blogs)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <strong>@item.title</strong>
+                                            </td>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <div class="blog-content-preview" data-blogid="@item.Id" title="Click to view full content">
+                                                        @{
+                                                            var content = item.blog_content ?? "";
+                                                            content = System.Text.RegularExpressions.Regex.Replace(content, @"<img[^>]*>", "", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+                                                            content = System.Text.RegularExpressions.Regex.Replace(content, @"<[^>]+>", " ");
+                                                            content = System.Text.RegularExpressions.Regex.Replace(content, @"\s+", " ").Trim();
+                                                            if (string.IsNullOrWhiteSpace(content))
+                                                            {
+                                                                content = "(No text content)";
+                                                            }
+                                                            else if (content.Length > 100)
+                                                            {
+                                                                content = content.Substring(0, 100) + "...";
+                                                            }
+                                                        }
+                                                        @content
+                                                    </div>
+                                                    @if (item.blog_content != null && item.blog_content.Contains("<img"))
+                                                    {
+                                                        <span class="content-badge has-image">
+                                                            <i class="fa fa-image me-1"></i>Image
+                                                        </span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="content-badge text-only">
+                                                            <i class="fa fa-file-text me-1"></i>Text
+                                                        </span>
+                                                    }
+                                                </div>
+                                            </td>
+                                            <td class="text-center action-buttons">
+                                                <a asp-action="Edit" asp-controller="Blogs" asp-route-id="@item.Id"
+                                                   class="action-btn btn-edit"
+                                                   title="Edit this blog post">
+                                                    <i class="fa fa-edit"></i> Edit
+                                                </a>
+                                                <a asp-action="Delete" asp-controller="Blogs" asp-route-id="@item.Id"
+                                                   class="action-btn btn-delete"
+                                                   onclick="return confirm('Are you sure you want to delete this blog post?\n\nTitle: @item.title\n\nThis action cannot be undone!')"
+                                                   title="Delete this blog post">
+                                                    <i class="fa fa-trash"></i> Delete
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        }
+                        else
+                        {
+                            <div class="alert alert-info">
+                                <h5><i class="fa fa-info-circle me-2"></i>No blogs found</h5>
+                                <p class="mb-0">
+                                    Start by creating your first blog post.
+                                    <a asp-action="Create" asp-controller="Blogs" class="alert-link">Create the first blog post</a>
+                                </p>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- User Management Section -->
+        <div id="users-section" class="content-section">
+            <div class="content-header">
+                <h2><i class="fas fa-users"></i> User Management</h2>
+                <p>Manage all users in the system</p>
+            </div>
+            <div class="content-body">
+                @if (TempData["Success"] != null)
+                {
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        @TempData["Success"]
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                }
+                @if (TempData["Error"] != null)
+                {
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        @TempData["Error"]
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                }
+                <div class="table-container">
+                    <div class="table-header">
+                        <h4><i class="fas fa-list"></i> All Users</h4>
+                    </div>
+                    <div class="table-wrapper">
+                        <table class="user-table">
+                            <thead>
+                                <tr>
+                                    <th><i class="fas fa-user"></i> Full Name</th>
+                                    <th><i class="fas fa-envelope"></i> Email</th>
+                                    <th><i class="fas fa-phone"></i> Phone</th>
+                                    <th><i class="fas fa-user-tag"></i> Role</th>
+                                    <th><i class="fas fa-info-circle"></i> Status</th>
+                                    <th><i class="fas fa-cogs"></i> Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (ViewBag.Users != null)
+                                {
+                                    @foreach (var user in ViewBag.Users)
+                                    {
+                                        <tr>
+                                            <td>@user.FullName</td>
+                                            <td>@user.Email</td>
+                                            <td>@user.PhoneNumber</td>
+                                            <td>
+                                                <span class="status-badge">@user.Role</span>
+                                            </td>
+                                            <td>
+                                                @if (user.IsActive)
+                                                {
+                                                    <span class="status-badge status-active">Active</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="status-badge status-banned">Banned</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                <div class="action-buttons">
+                                                    <a asp-controller="User" asp-action="Profile" asp-route-id="@user.Id" class="action-btn btn-view">
+                                                        <span class="action-icon">👁️</span>
+                                                        <span class="action-text">View</span>
+                                                    </a>
+                                                    @if (currentRole == "Admin" && user.Id.ToString() != currentUserId)
+                                                    {
+                                                        if (user.IsActive)
+                                                        {
+                                                            <form asp-controller="User" asp-action="Ban" asp-route-id="@user.Id" method="post" class="d-inline" onsubmit="storeCurrentSection(); return confirm('Are you sure you want to ban this user?');">
+                                                                @Html.AntiForgeryToken()
+                                                                <button type="submit" class="action-btn btn-ban">
+                                                                    <span class="action-icon">🔒</span>
+                                                                    <span class="action-text">Ban</span>
+                                                                </button>
+                                                            </form>
+                                                        }
+                                                        else
+                                                        {
+                                                            <form asp-controller="User" asp-action="UnBan" asp-route-id="@user.Id" method="post" class="d-inline" onsubmit="storeCurrentSection();">
+                                                                @Html.AntiForgeryToken()
+                                                                <button type="submit" class="action-btn btn-unban">
+                                                                    <span class="action-icon">🔓</span>
+                                                                    <span class="action-text">Unban</span>
+                                                                </button>
+                                                            </form>
+                                                        }
+                                                        <form asp-controller="User" asp-action="Delete" asp-route-id="@user.Id" method="post" class="d-inline" onsubmit="storeCurrentSection(); return confirm('Are you sure you want to delete this user? This action cannot be undone.');">
+                                                            @Html.AntiForgeryToken()
+                                                            <button type="submit" class="action-btn btn-delete">
+                                                                <span class="action-icon">🗑️</span>
+                                                                <span class="action-text">Delete</span>
+                                                            </button>
+                                                        </form>
+                                                    }
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                                else
+                                {
+                                    <tr>
+                                        <td colspan="6" class="text-center">No users found</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Categories Section -->
+        <div id="categories-section" class="content-section">
+            <div class="content-header">
+                <h2><i class="fas fa-tags"></i> Category Management</h2>
+                <p>Manage all your course categories</p>
+            </div>
+            <div class="content-body">
+                <div class="table-container">
+                    <div class="table-header">
+                        <h4><i class="fas fa-list"></i> All Categories</h4>
+                        <a asp-controller="Categories" asp-action="Create" class="btn-create">
+                            <i class="fas fa-plus"></i> Create New Category
+                        </a>
+                    </div>
+                    <div class="table-wrapper">
+                        <table class="category-table">
+                            <thead>
+                                <tr>
+                                    <th><i class="fas fa-tag"></i> Category Name</th>
+                                    <th><i class="fas fa-cogs"></i> Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (ViewBag.Categories != null)
+                                {
+                                    @foreach (var category in ViewBag.Categories)
+                                    {
+                                        <tr>
+                                            <td>@category.Name</td>
+                                            <td>
+                                                <div class="action-buttons">
+                                                    <a asp-controller="Categories" asp-action="Edit" asp-route-id="@category.CategoryId" class="action-btn btn-edit">
+                                                        <i class="fas fa-edit"></i> Edit
+                                                    </a>
+                                                    <a asp-controller="Categories" asp-action="Details" asp-route-id="@category.CategoryId" class="action-btn btn-details">
+                                                        <i class="fas fa-info-circle"></i> Details
+                                                    </a>
+                                                    <a asp-controller="Categories" asp-action="Delete" asp-route-id="@category.CategoryId" class="action-btn btn-delete">
+                                                        <i class="fas fa-trash-alt"></i> Delete
+                                                    </a>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                                else
+                                {
+                                    <tr>
+                                        <td colspan="2" class="text-center">No categories found</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Other Sections (Placeholder) -->
+        <div id="customers-section" class="content-section">
+            <div class="content-header">
+                <h2><i class="fas fa-users"></i> Customer Management</h2>
+                <p>Manage your customers</p>
+            </div>
+            <div class="content-body">
+                <div class="empty-state">
+                    <i class="fas fa-users"></i>
+                    <h3>Customer Management</h3>
+                    <p>Customer management functionality will be implemented here.</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="consultants-section" class="content-section">
+            <div class="content-header">
+                <h2><i class="fas fa-user-tie"></i> Consultant Management</h2>
+                <p>Manage your consultants</p>
+            </div>
+            <div class="content-body">
+                <div class="empty-state">
+                    <i class="fas fa-user-tie"></i>
+                    <h3>Consultant Management</h3>
+                    <p>Consultant management functionality will be implemented here.</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="settings-section" class="content-section">
+            <div class="content-header">
+                <h2><i class="fas fa-cog"></i> Settings</h2>
+                <p>Configure your application</p>
+            </div>
+            <div class="content-body">
+                <div class="empty-state">
+                    <i class="fas fa-cog"></i>
+                    <h3>Settings</h3>
+                    <p>Application settings will be implemented here.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for Full Blog Content -->
+    <div class="modal fade" id="contentModal" tabindex="-1" aria-labelledby="contentModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="contentModalLabel">Blog Content</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="modalContent">
+                    <!-- Full content will be loaded here -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Store current section before form submission
+        function storeCurrentSection() {
+            const activeSection = document.querySelector('.content-section.active');
+            if (activeSection) {
+                const sectionId = activeSection.id.replace('-section', '');
+                sessionStorage.setItem('currentAdminSection', sectionId);
+            }
+        }
+
+        function showSection(event, sectionName) {
+            if (event && event.preventDefault) {
+                event.preventDefault();
+            }
+
+            // Hide all sections
+            const sections = document.querySelectorAll('.content-section');
+            sections.forEach(section => {
+                section.style.display = 'none';
+                section.classList.remove('active');
+            });
+
+            // Show selected section
+            const targetSection = document.getElementById(sectionName + '-section');
+            if (targetSection) {
+                targetSection.style.display = 'block';
+                targetSection.classList.add('active');
+            }
+
+            // Update active nav link
+            const navLinks = document.querySelectorAll('.nav-link');
+            navLinks.forEach(link => link.classList.remove('active'));
+
+            const activeLink = document.querySelector(`[data-section="${sectionName}"]`);
+            if (activeLink) {
+                activeLink.classList.add('active');
+            }
+
+            // Store current section
+            sessionStorage.setItem('currentAdminSection', sectionName);
+        }
+
+        function createBooking() {
+            alert('Redirect to Create Booking page');
+        }
+
+        // Initialize - restore last viewed section on page load
+        document.addEventListener('DOMContentLoaded', function () {
+            const lastSection = sessionStorage.getItem('currentAdminSection') || 'bookings';
+            showSection(null, lastSection);
+
+            // Blog content preview click handler
+            $('.blog-content-preview').css('cursor', 'pointer').on('click', function () {
+                var blogId = $(this).data('blogid');
+                var title = $(this).closest('tr').find('td:first strong').text();
+
+                $('#contentModal .modal-title').text('Blog: ' + title);
+                $('#modalContent').html('Loading content for Blog ID: ' + blogId);
+                $('#contentModal').modal('show');
+                // In a real implementation, fetch full content via AJAX
+                // $.get('@Url.Action("BlogDetails", "Admin")/' + blogId, function(data) {
+                //     $('#modalContent').html(data);
+                // });
+            });
+        });
+
+        // Store section when clicking nav links
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', function (event) {
+                const sectionName = this.getAttribute('data-section');
+                if (sectionName) {
+                    showSection(event, sectionName);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
