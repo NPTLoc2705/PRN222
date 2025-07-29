@@ -179,16 +179,16 @@
                 transform: translateY(-2px);
             }
 
-        .booking-table, .user-table {
+        .booking-table, .user-table, .blog-table {
             width: 100%;
             border-collapse: collapse;
         }
 
-            .booking-table thead, .user-table thead {
+            .booking-table thead, .user-table thead, .blog-table thead {
                 background: #f8f9fa;
             }
 
-            .booking-table th, .user-table th {
+            .booking-table th, .user-table th, .blog-table th {
                 padding: 15px 20px;
                 text-align: left;
                 font-weight: 600;
@@ -197,18 +197,18 @@
                 border-bottom: 2px solid #e9ecef;
             }
 
-            .booking-table td, .user-table td {
+            .booking-table td, .user-table td, .blog-table td {
                 padding: 15px 20px;
                 border-bottom: 1px solid #e9ecef;
                 color: #2c3e50;
                 vertical-align: middle;
             }
 
-            .booking-table tbody tr, .user-table tbody tr {
+            .booking-table tbody tr, .user-table tbody tr, .blog-table tbody tr {
                 transition: all 0.3s ease;
             }
 
-                .booking-table tbody tr:hover, .user-table tbody tr:hover {
+                .booking-table tbody tr:hover, .user-table tbody tr:hover, .blog-table tbody tr:hover {
                     background: rgba(39, 174, 96, 0.05);
                 }
 
@@ -344,6 +344,7 @@
             margin: 20px 30px;
             border-radius: 10px;
         }
+
         .category-table {
             width: 100%;
             border-collapse: collapse;
@@ -365,6 +366,77 @@
             .category-table tr:hover {
                 background: rgba(39, 174, 96, 0.05);
             }
+
+        /* Blog-specific styles */
+        .blog-table {
+            table-layout: fixed;
+            width: 100%;
+        }
+
+        .blog-content-preview {
+            max-width: 500px;
+            color: #555;
+            font-size: 0.9em;
+            line-height: 1.4;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            display: block;
+        }
+
+            .blog-content-preview:hover {
+                color: #333;
+                text-decoration: underline;
+            }
+
+            .blog-content-preview.no-text {
+                color: #999;
+                font-style: italic;
+            }
+
+            .blog-content-preview img {
+                display: none;
+            }
+
+        .content-badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+            margin-left: 0.5rem;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+            .content-badge.has-image {
+                background-color: #e3f2fd;
+                color: #1976d2;
+            }
+
+            .content-badge.text-only {
+                background-color: #f3e5f5;
+                color: #7b1fa2;
+            }
+
+        .blog-table td {
+            vertical-align: middle;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* Responsive for mobile */
+        @@media (max-width: 768px) {
+            .blog-content-preview {
+                max-width: 200px;
+            }
+
+            .action-buttons .btn {
+                display: block;
+                width: 100%;
+                margin: 2px 0;
+            }
+        }
     </style>
 </head>
 <body>
@@ -378,19 +450,15 @@
         </div>
 
         <nav class="sidebar-nav">
-            <a href="#" onclick="showSection('welcome')" class="nav-link active" data-section="welcome">
-                <i class="fas fa-tachometer-alt"></i>
-                <span>Dashboard</span>
-            </a>
-            <a href="#" onclick="showSection('bookings')" class="nav-link" data-section="bookings">
+            <a href="#" onclick="showSection(event,'bookings')" class="nav-link" data-section="bookings">
                 <i class="fas fa-calendar-check"></i>
                 <span>Booking Management</span>
             </a>
-            <a href="#" onclick="showSection('blogs')" class="nav-link" data-section="blogs">
+            <a href="#" onclick="showSection(event,'blogs')" class="nav-link" data-section="blogs">
                 <i class="fas fa-blog"></i>
                 <span>Blog Management</span>
             </a>
-            <a href="#" onclick="showSection('users')" class="nav-link" data-section="users">
+            <a href="#" onclick="showSection(event,'users')" class="nav-link" data-section="users">
                 <i class="fas fa-users"></i>
                 <span>User Management</span>
             </a>
@@ -398,49 +466,18 @@
                 <i class="fas fa-book"></i>
                 <span>Course Management</span>
             </a>
-            <a href="#" onclick="showSection(event, 'categories')" class="nav-link">
+            <a href="#" onclick="showSection(event, 'categories')" class="nav-link" data-section="categories">
                 <i class="fas fa-tags"></i>
                 <span>Categories</span>
+            </a>
+            <a asp-controller="Surveys" asp-action="Index">
+                <i class="fas fa-book"></i>
+                <span>Survey management</span>
             </a>
         </nav>
     </div>
 
     <div class="main-content">
-        <!-- Welcome Section -->
-        <div id="welcome-section" class="content-section active">
-            <div class="content-header">
-                <h2><i class="fas fa-tachometer-alt"></i> Welcome to the Admin Dashboard</h2>
-                <p>Manage your application with ease and style</p>
-            </div>
-            <div class="content-body">
-                <div class="stats-container">
-                    <div class="stat-card">
-                        <i class="fas fa-calendar-check"></i>
-                        <div class="stat-number">24</div>
-                        <div class="stat-label">Total Bookings</div>
-                    </div>
-                    <div class="stat-card">
-                        <i class="fas fa-clock"></i>
-                        <div class="stat-number">8</div>
-                        <div class="stat-label">Pending Bookings</div>
-                    </div>
-                    <div class="stat-card">
-                        <i class="fas fa-users"></i>
-                        <div class="stat-number">156</div>
-                        <div class="stat-label">Total Customers</div>
-                    </div>
-                    <div class="stat-card">
-                        <i class="fas fa-user-tie"></i>
-                        <div class="stat-number">12</div>
-                        <div class="stat-label">Active Consultants</div>
-                    </div>
-                </div>
-                <div class="welcome-section">
-                    <h3>System Overview</h3>
-                </div>
-            </div>
-        </div>
-
         <!-- Bookings Section -->
         <div id="bookings-section" class="content-section">
             <div class="content-header">
@@ -530,6 +567,123 @@
                                 }
                             </tbody>
                         </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Blog Management Section -->
+        <div id="blogs-section" class="content-section">
+            <div class="content-header">
+                <h2><i class="fas fa-blog"></i> Blog Management</h2>
+                <p>Manage your blog content</p>
+            </div>
+            <div class="content-body">
+                @if (TempData["Success"] != null)
+                {
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        @TempData["Success"]
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                }
+                @if (TempData["Error"] != null)
+                {
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        @TempData["Error"]
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                }
+                <div class="table-container">
+                    <div class="table-header">
+                        <h4><i class="fas fa-list"></i> All Blogs</h4>
+                        <div>
+                            <a asp-action="Create" asp-controller="Blogs" class="btn-create">
+                                <i class="fas fa-plus-circle"></i> Create New Blog
+                            </a>
+                            <a asp-action="AdminDashboard" asp-controller="Admin" class="btn-create">
+                                <i class="fas fa-arrow-left"></i> Back to List
+                            </a>
+                        </div>
+                    </div>
+                    <div class="table-wrapper">
+                        @if (ViewBag.Blogs != null )
+                        {
+                            <table class="blog-table table-striped table-hover">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 25%;">Title</th>
+                                        <th style="width: 50%;">Blog Content</th>
+                                        <th style="width: 25%;" class="text-center">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in ViewBag.Blogs)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <strong>@item.title</strong>
+                                            </td>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <div class="blog-content-preview" data-blogid="@item.Id" title="Click to view full content">
+                                                        @{
+                                                            var content = item.blog_content ?? "";
+                                                            content = System.Text.RegularExpressions.Regex.Replace(content, @"<img[^>]*>", "", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+                                                            content = System.Text.RegularExpressions.Regex.Replace(content, @"<[^>]+>", " ");
+                                                            content = System.Text.RegularExpressions.Regex.Replace(content, @"\s+", " ").Trim();
+                                                            if (string.IsNullOrWhiteSpace(content))
+                                                            {
+                                                                content = "(No text content)";
+                                                            }
+                                                            else if (content.Length > 100)
+                                                            {
+                                                                content = content.Substring(0, 100) + "...";
+                                                            }
+                                                        }
+                                                        @content
+                                                    </div>
+                                                    @if (item.blog_content != null && item.blog_content.Contains("<img"))
+                                                    {
+                                                        <span class="content-badge has-image">
+                                                            <i class="fa fa-image me-1"></i>Image
+                                                        </span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="content-badge text-only">
+                                                            <i class="fa fa-file-text me-1"></i>Text
+                                                        </span>
+                                                    }
+                                                </div>
+                                            </td>
+                                            <td class="text-center action-buttons">
+                                                <a asp-action="Edit" asp-controller="Blogs" asp-route-id="@item.Id"
+                                                   class="action-btn btn-edit"
+                                                   title="Edit this blog post">
+                                                    <i class="fa fa-edit"></i> Edit
+                                                </a>
+                                                <a asp-action="Delete" asp-controller="Blogs" asp-route-id="@item.Id"
+                                                   class="action-btn btn-delete"
+                                                   onclick="return confirm('Are you sure you want to delete this blog post?\n\nTitle: @item.title\n\nThis action cannot be undone!')"
+                                                   title="Delete this blog post">
+                                                    <i class="fa fa-trash"></i> Delete
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        }
+                        else
+                        {
+                            <div class="alert alert-info">
+                                <h5><i class="fa fa-info-circle me-2"></i>No blogs found</h5>
+                                <p class="mb-0">
+                                    Start by creating your first blog post.
+                                    <a asp-action="Create" asp-controller="Blogs" class="alert-link">Create the first blog post</a>
+                                </p>
+                            </div>
+                        }
                     </div>
                 </div>
             </div>
@@ -648,17 +802,60 @@
             </div>
         </div>
 
-        <!-- Blog Management Section -->
-        <div id="blogs-section" class="content-section">
+        <!-- Categories Section -->
+        <div id="categories-section" class="content-section">
             <div class="content-header">
-                <h2><i class="fas fa-blog"></i> Blog Management</h2>
-                <p>Manage your blog content</p>
+                <h2><i class="fas fa-tags"></i> Category Management</h2>
+                <p>Manage all your course categories</p>
             </div>
             <div class="content-body">
-                <div class="empty-state">
-                    <i class="fas fa-blog"></i>
-                    <h3>Blog Management</h3>
-                    <p>Blog management functionality will be implemented here.</p>
+                <div class="table-container">
+                    <div class="table-header">
+                        <h4><i class="fas fa-list"></i> All Categories</h4>
+                        <a asp-controller="Categories" asp-action="Create" class="btn-create">
+                            <i class="fas fa-plus"></i> Create New Category
+                        </a>
+                    </div>
+                    <div class="table-wrapper">
+                        <table class="category-table">
+                            <thead>
+                                <tr>
+                                    <th><i class="fas fa-tag"></i> Category Name</th>
+                                    <th><i class="fas fa-cogs"></i> Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (ViewBag.Categories != null)
+                                {
+                                    @foreach (var category in ViewBag.Categories)
+                                    {
+                                        <tr>
+                                            <td>@category.Name</td>
+                                            <td>
+                                                <div class="action-buttons">
+                                                    <a asp-controller="Categories" asp-action="Edit" asp-route-id="@category.CategoryId" class="action-btn btn-edit">
+                                                        <i class="fas fa-edit"></i> Edit
+                                                    </a>
+                                                    <a asp-controller="Categories" asp-action="Details" asp-route-id="@category.CategoryId" class="action-btn btn-details">
+                                                        <i class="fas fa-info-circle"></i> Details
+                                                    </a>
+                                                    <a asp-controller="Categories" asp-action="Delete" asp-route-id="@category.CategoryId" class="action-btn btn-delete">
+                                                        <i class="fas fa-trash-alt"></i> Delete
+                                                    </a>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                                else
+                                {
+                                    <tr>
+                                        <td colspan="2" class="text-center">No categories found</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
@@ -705,65 +902,28 @@
                 </div>
             </div>
         </div>
-        <!-- Categories Section -->
-        <div id="categories-section" class="content-section" style="display: none;">
-            <div class="content-header">
-                <h2><i class="fas fa-tags"></i> Category Management</h2>
-                <p>Manage all your course categories</p>
-            </div>
-            <div class="content-body">
-                <div class="table-container">
-                    <div class="table-header">
-                        <h4><i class="fas fa-list"></i> All Categories</h4>
-                        <a asp-controller="Categories" asp-action="Create" class="btn-create">
-                            <i class="fas fa-plus"></i> Create New Category
-                        </a>
-                    </div>
-                    <div class="table-wrapper">
-                        <table class="booking-table">
-                            <thead>
-                                <tr>
-                                    <th><i class="fas fa-tag"></i> Category Name</th>
-                                    <th><i class="fas fa-cogs"></i> Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @if (ViewBag.Categories != null)
-                                {
-                                    @foreach (var category in ViewBag.Categories)
-                                    {
-                                        <tr>
-                                            <td>@category.Name</td>
-                                            <td>
-                                                <div class="action-buttons">
-                                                    <a asp-controller="Categories" asp-action="Edit" asp-route-id="@category.CategoryId" class="action-btn btn-edit">
-                                                        <i class="fas fa-edit"></i> Edit
-                                                    </a>
-                                                    <a asp-controller="Categories" asp-action="Details" asp-route-id="@category.CategoryId" class="action-btn btn-details">
-                                                        <i class="fas fa-info-circle"></i> Details
-                                                    </a>
-                                                    <a asp-controller="Categories" asp-action="Delete" asp-route-id="@category.CategoryId" class="action-btn btn-delete">
-                                                        <i class="fas fa-trash-alt"></i> Delete
-                                                    </a>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    }
-                                }
-                                else
-                                {
-                                    <tr>
-                                        <td colspan="2" class="text-center">No categories found</td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
-                    </div>
+    </div>
+
+    <!-- Modal for Full Blog Content -->
+    <div class="modal fade" id="contentModal" tabindex="-1" aria-labelledby="contentModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="contentModalLabel">Blog Content</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="modalContent">
+                    <!-- Full content will be loaded here -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
     </div>
 
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         // Store current section before form submission
         function storeCurrentSection() {
@@ -774,11 +934,7 @@
             }
         }
 
-        function showSection(sectionName) {
-            // Store current section in session storage
-            sessionStorage.setItem('currentAdminSection', sectionName);
-                function showSection(event, sectionName) {
-            // Prevent default anchor behavior if event exists
+        function showSection(event, sectionName) {
             if (event && event.preventDefault) {
                 event.preventDefault();
             }
@@ -801,38 +957,48 @@
             const navLinks = document.querySelectorAll('.nav-link');
             navLinks.forEach(link => link.classList.remove('active'));
 
-            // Find and activate the nav link for the current section
             const activeLink = document.querySelector(`[data-section="${sectionName}"]`);
             if (activeLink) {
                 activeLink.classList.add('active');
             }
+
+            // Store current section
+            sessionStorage.setItem('currentAdminSection', sectionName);
         }
 
         function createBooking() {
             alert('Redirect to Create Booking page');
-            // window.location.href = '/Bookings/Create';
         }
 
-        // Modified initialization - restore last viewed section
-        document.addEventListener('DOMContentLoaded', function() {
-            const lastSection = sessionStorage.getItem('currentAdminSection');
-            if (lastSection) {
-                showSection(lastSection);
-            } else {
-                showSection('welcome');
-            }
-            // Find and activate the clicked nav link
-            const clickedLink = event ? event.currentTarget : document.querySelector('.nav-link.active');
-            if (clickedLink) {
-                clickedLink.classList.add('active');
-            }
-        }
+        // Initialize - restore last viewed section on page load
+        document.addEventListener('DOMContentLoaded', function () {
+            const lastSection = sessionStorage.getItem('currentAdminSection') || 'bookings';
+            showSection(null, lastSection);
 
-        // Initialize with welcome section
-        document.addEventListener('DOMContentLoaded', function() {
-            showSection(null, 'welcome');
+            // Blog content preview click handler
+            $('.blog-content-preview').css('cursor', 'pointer').on('click', function () {
+                var blogId = $(this).data('blogid');
+                var title = $(this).closest('tr').find('td:first strong').text();
+
+                $('#contentModal .modal-title').text('Blog: ' + title);
+                $('#modalContent').html('Loading content for Blog ID: ' + blogId);
+                $('#contentModal').modal('show');
+                // In a real implementation, fetch full content via AJAX
+                // $.get('@Url.Action("BlogDetails", "Admin")/' + blogId, function(data) {
+                //     $('#modalContent').html(data);
+                // });
+            });
+        });
+
+        // Store section when clicking nav links
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', function (event) {
+                const sectionName = this.getAttribute('data-section');
+                if (sectionName) {
+                    showSection(event, sectionName);
+                }
+            });
         });
     </script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

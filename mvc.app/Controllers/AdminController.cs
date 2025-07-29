@@ -1,8 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using mvc.dataaccess.Entities;
 using mvc.dataaccess.ViewModels;
-using mvc.services.Implements;
 using mvc.services.Interfaces;
 
 namespace mvc.app.Controllers
@@ -15,6 +18,7 @@ namespace mvc.app.Controllers
         private readonly ICategoryService _categoryService;
         private readonly IProgressService _progressService;
         private readonly IUserService _userService;
+        private readonly IBlogService _blogService;
 
         public AdminController(
             IBookingService bookingService,
@@ -22,7 +26,8 @@ namespace mvc.app.Controllers
             ICourseService courseService,
             ILessonService lessonService,
             IProgressService progressService,
-            ICategoryService categoryService)
+            ICategoryService categoryService,
+            IBlogService blogService)
         {
             _bookingService = bookingService;
             _userService = userService;
@@ -30,7 +35,7 @@ namespace mvc.app.Controllers
             _lessonService = lessonService;
             _progressService = progressService;
             _categoryService = categoryService;
-
+            _blogService = blogService;
         }
 
         public async Task<IActionResult> Dashboard()
@@ -47,20 +52,134 @@ namespace mvc.app.Controllers
                 var bookings = await _bookingService.GetAllBookingsWithNamesAsync();
                 var users = await _userService.GetAllUsers();
                 var categories = await _categoryService.GetAllCategoriesAsync();
+                var blogs = _blogService.GetAll(); // Using service layer for blogs
                 ViewBag.Users = users;
                 ViewBag.CurrentUserId = userId;
                 ViewBag.Categories = categories;
-                return View("AdminPage", bookings);
+                ViewBag.Blogs = blogs;
+                return View("AdminDashboard", bookings);
             }
             catch (Exception ex)
             {
                 TempData["Error"] = "Error loading dashboard data: " + ex.Message;
-                return View("AdminPage", new List<BookingViewModel>());
+                return View("AdminDashboard", new List<BookingViewModel>());
             }
+        }
+
+        // Blog Management Actions
+        public IActionResult BlogIndex()
+        {
+            if (!IsAdmin()) return RedirectToAction("AccessDenied", "Home");
+            var blogs = _blogService.GetAll();
+            return View("~/Views/Admin/BlogIndex.cshtml", blogs);
+        }
+
+        public IActionResult BlogCreate()
+        {
+            if (!IsAdmin()) return RedirectToAction("AccessDenied", "Home");
+            return View("~/Views/Admin/BlogCreate.cshtml");
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult BlogCreate([Bind("Id,blog_content,ImageData,title")] Blog blog)
+        {
+            if (!IsAdmin()) return RedirectToAction("AccessDenied", "Home");
+
+            if (ModelState.IsValid)
+            {
+                var userIdString = HttpContext.Session.GetString("UserId");
+                if (!string.IsNullOrEmpty(userIdString))
+                {
+                    blog.UserId = Guid.Parse(userIdString);
+                    _blogService.Add(blog);
+                    TempData["Success"] = "Blog created successfully.";
+                    return RedirectToAction(nameof(Dashboard));
+                }
+                return Unauthorized();
+            }
+            return View("~/Views/Admin/BlogCreate.cshtml", blog);
+        }
+
+        public IActionResult BlogEdit(Guid id)
+        {
+            if (!IsAdmin()) return RedirectToAction("AccessDenied", "Home");
+
+            var blog = _blogService.GetById(id);
+            if (blog == null)
+            {
+                return NotFound();
+            }
+            return View("~/Views/Admin/BlogEdit.cshtml", blog);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult BlogEdit(Guid id, [Bind("Id,blog_content,ImageData,title")] Blog blog)
+        {
+            if (!IsAdmin()) return RedirectToAction("AccessDenied", "Home");
+
+            if (id != blog.Id)
+            {
+                return NotFound();
+            }
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    _blogService.Update(blog);
+                    TempData["Success"] = "Blog updated successfully.";
+                }
+                catch (Exception)
+                {
+                    if (_blogService.GetById(blog.Id) == null)
+                    {
+                        return NotFound();
+                    }
+                    throw;
+                }
+                return RedirectToAction(nameof(Dashboard));
+            }
+            return View("~/Views/Admin/BlogEdit.cshtml", blog);
+        }
+
+        public IActionResult BlogDelete(Guid? id)
+        {
+            if (!IsAdmin()) return RedirectToAction("AccessDenied", "Home");
+
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var blog = _blogService.GetById(id.Value);
+            if (blog == null)
+            {
+                return NotFound();
+            }
+            return View("~/Views/Admin/BlogDelete.cshtml", blog);
+        }
+
+        [HttpPost, ActionName("BlogDelete")]
+        [ValidateAntiForgeryToken]
+        public IActionResult BlogDeleteConfirmed(Guid id)
+        {
+            if (!IsAdmin()) return RedirectToAction("AccessDenied", "Home");
+
+            var blog = _blogService.GetById(id);
+            if (blog != null)
+            {
+                _blogService.Delete(blog);
+                TempData["Success"] = "Blog deleted successfully.";
+            }
+            return RedirectToAction(nameof(Dashboard));
         }
 
         public async Task<IActionResult> Edit(int? id)
         {
+            if (!IsAdmin()) return RedirectToAction("AccessDenied", "Home");
+
             if (id == null)
             {
                 return NotFound();
@@ -71,13 +190,15 @@ namespace mvc.app.Controllers
             {
                 return NotFound();
             }
-            return View(booking);
+            return View("~/Views/Admin/EditBooking.cshtml", booking);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,BookingDate,CustomerId,ConsultantId,StartDate,Status,Phone")] Booking booking)
         {
+            if (!IsAdmin()) return RedirectToAction("AccessDenied", "Home");
+
             if (id != booking.Id)
             {
                 return NotFound();
@@ -88,34 +209,25 @@ namespace mvc.app.Controllers
                 try
                 {
                     await _bookingService.UpdateBookingAsync(booking);
+                    TempData["Success"] = "Booking updated successfully.";
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!BookingExists(booking.Id))
+                    if (!await BookingExists(id))
                     {
                         return NotFound();
                     }
-                    else
-                    {
-                        throw;
-                    }
+                    throw;
                 }
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Dashboard));
             }
-            return View(booking);
+            return View("~/Views/Admin/EditBooking.cshtml", booking);
         }
 
-        private bool BookingExists(int id)
+        private async Task<bool> BookingExists(int id)
         {
-            var booking = _bookingService.GetBookingByIdAsync(id);
-            if (booking == null)
-            {
-                return false;
-            }
-            else
-            {
-                return true;
-            }
+            var booking = await _bookingService.GetBookingByIdAsync(id);
+            return booking != null;
         }
 
         [HttpGet]
